@@ -1,3 +1,8 @@
+# Method
+1. I Followed the AWS tutorial [Build a Basic Web Application with a Dynamo DB](https://aws.amazon.com/getting-started/hands-on/build-web-app-s3-lambda-api-gateway-dynamodb/module-three/)
+2. 
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
