@@ -1,6 +1,11 @@
 # Method
 1. I Followed the AWS tutorial [Build a Basic Web Application with a Dynamo DB](https://aws.amazon.com/getting-started/hands-on/build-web-app-s3-lambda-api-gateway-dynamodb/module-three/)
 
+# Development Information
+Run the dev instance:
+```
+npm run dev
+```
 # Technologies Involved
 **React:** A JavaScript library for building user interfaces. It allows you to create reusable components and manage the application's state efficiently.
 
