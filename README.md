@@ -1,3 +1,19 @@
+# Method
+1. I Followed the AWS tutorial [Build a Basic Web Application with a Dynamo DB](https://aws.amazon.com/getting-started/hands-on/build-web-app-s3-lambda-api-gateway-dynamodb/module-three/)
+
+# Development Information
+Run the dev instance:
+```
+npm run dev
+```
+# Technologies Involved
+**React:** A JavaScript library for building user interfaces. It allows you to create reusable components and manage the application's state efficiently.
+
+**TypeScript:** A superset of JavaScript that adds static typing. This helps catch errors early on and improves code maintainability.
+
+**AWS Amplify UI React:** A library of pre-built UI components that simplifies building user interfaces for AWS Amplify applications. It provides components like Loader and Placeholder used in this code. While the original code used more of these components, this revised version only uses these two for the loading state.
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
