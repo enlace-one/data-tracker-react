@@ -12,7 +12,9 @@ import { Amplify } from "aws-amplify";
 import "@aws-amplify/ui-react/styles.css";
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
-import ListGroup from './components/ListGroup';
+// import ListGroup from "./components/ListGroup";
+// import Alert from "./components/Alert/Alert";
+import List from "./components/List/List";
 
 /**
  * @type {import('aws-amplify/data').Client<import('../amplify/data/resource').Schema>}
@@ -35,6 +37,13 @@ export default function App() {
     const { data: profiles } = await client.models.UserProfile.list();
     setUserProfiles(profiles);
   }
+
+  const items = [
+    { name: "Push Ups", id: "0001", count: "30" },
+    { name: "Pull Ups", id: "0002", count: "10" },
+    { name: "Squats", id: "0003", count: "49" },
+    { name: "Sit Ups", id: "0004", count: "54" },
+  ];
 
   return (
     <Flex
@@ -74,7 +83,11 @@ export default function App() {
           </Flex>
         ))}
       </Grid>
-      <ListGroup />
+      {/* <ListGroup items={items} heading="Test List" onSelectItem={console.log} />
+      <Alert>
+        <p>Test alert</p>
+      </Alert> */}
+      <List items={items} heading="Data" onSelectItem={console.log} />
       <Button onClick={signOut}>Sign Out</Button>
     </Flex>
   );

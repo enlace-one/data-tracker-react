@@ -41,9 +41,7 @@
   color: #888;
 }
 
-
 .app-container {
-
   margin: 0 auto;
   padding: 20px;
   text-align: center;
@@ -51,13 +49,11 @@
 
 .header-container {
   padding-bottom: 2.5rem;
-  margin:  auto;
+  margin: auto;
   text-align: center;
 
   align-items: center;
   max-width: 48rem;
-  
-  
 }
 
 .main-header {
@@ -77,7 +73,6 @@
 }
 
 .description {
-
   font-weight: 500;
   font-size: 1.125rem;
   max-width: 65ch;
