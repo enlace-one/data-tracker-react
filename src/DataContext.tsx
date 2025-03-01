@@ -7,9 +7,9 @@ import {
 } from "react";
 import {
   fetchUserProfiles,
-  fetchDataCategories,
-  fetchDataEntries,
   createDataCategory,
+  subscribeToDataCategories,
+  subscribeToDataEntries,
 } from "./api";
 
 // Define types for the data
@@ -54,24 +54,6 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
 
-  // Fetch categories on mount
-  useEffect(() => {
-    async function loadCategories() {
-      const categories = await fetchDataCategories();
-      setDataCategories(categories);
-    }
-    loadCategories();
-  }, []);
-
-  // Fetch entries on mount
-  useEffect(() => {
-    async function loadEntries() {
-      const entries = await fetchDataEntries();
-      setDataEntries(entries);
-    }
-    loadEntries();
-  }, []);
-
   // Fetch user profiles on mount
   useEffect(() => {
     async function loadProfiles() {
@@ -84,9 +66,19 @@ export function DataProvider({ children }: DataProviderProps) {
   // Function to create a new category and update state
   async function makeDataCategory() {
     await createDataCategory("New Category");
-    const updatedCategories = await fetchDataCategories();
-    setDataCategories(updatedCategories);
   }
+
+  // Reintroduce the subscription to real-time updates
+  useEffect(() => {
+    const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
+    const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
+
+    // Cleanup function to unsubscribe when the component is unmounted
+    return () => {
+      unsubscribeCategories();
+      unsubscribeEntries();
+    };
+  }, []);
 
   return (
     <DataContext.Provider

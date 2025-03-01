@@ -30,15 +30,17 @@ export default function App() {
         width="70%"
         margin="0 auto"
       >
+        {activeTab === "profile" && <Profile signOut={signOut} />}
+        {activeTab === "categories" && <Categories />}
+        {activeTab === "entries" && <Entries />}
+
+        <Divider />
+
         <Flex gap="1rem" margin="1rem">
           <Button onClick={() => setActiveTab("profile")}>Profile</Button>
           <Button onClick={() => setActiveTab("categories")}>Categories</Button>
           <Button onClick={() => setActiveTab("entries")}>Entries</Button>
         </Flex>
-
-        {activeTab === "profile" && <Profile signOut={signOut} />}
-        {activeTab === "categories" && <Categories />}
-        {activeTab === "entries" && <Entries />}
       </Flex>
     </DataProvider>
   );

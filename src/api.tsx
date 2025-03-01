@@ -50,34 +50,6 @@ export async function fetchUserProfiles(): Promise<UserProfile[]> {
 }
 
 /**
- * Fetch data categories from the database.
- * @returns {Promise<DataCategory[]>} List of data categories.
- */
-export async function fetchDataCategories(): Promise<DataCategory[]> {
-  try {
-    const { data: categories } = await client.models.DataCategory.list();
-    return categories || [];
-  } catch (error) {
-    console.error("Error fetching data categories:", error);
-    return [];
-  }
-}
-
-/**
- * Fetch data entries from the database.
- * @returns {Promise<DataEntry[]>} List of data entries.
- */
-export async function fetchDataEntries(): Promise<DataEntry[]> {
-  try {
-    const { data: entries } = await client.models.DataEntry.list();
-    return entries || [];
-  } catch (error) {
-    console.error("Error fetching data entries:", error);
-    return [];
-  }
-}
-
-/**
  * Create a new data category.
  * @param {string} name - Name of the category.
  * @returns {Promise<void>}
@@ -101,6 +73,20 @@ export function subscribeToDataCategories(
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: ({ items }) => {
       console.log("Updating DataCategories:", items);
+      callback(items || []);
+    },
+    error: (error) => {
+      console.error("Subscription error:", error);
+    },
+  });
+
+  return () => sub.unsubscribe(); // Cleanup function
+}
+
+export function subscribeToDataEntries(callback) {
+  const sub = client.models.DataEntry.observeQuery().subscribe({
+    next: ({ items }) => {
+      console.log("Updating DataEntries:", items);
       callback(items || []);
     },
     error: (error) => {
