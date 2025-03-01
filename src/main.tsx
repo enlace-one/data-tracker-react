@@ -3,8 +3,12 @@ import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
 import "./index.css";
 import { Authenticator } from "@aws-amplify/ui-react";
+import { Amplify } from "aws-amplify";
+import outputs from "../amplify_outputs.json";
 
-// Can use ReactNative instead of ReactDOM for mobile devices. 
+Amplify.configure(outputs);
+
+// Can use ReactNative instead of ReactDOM for mobile devices.
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Authenticator>

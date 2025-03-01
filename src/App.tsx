@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   Heading,
@@ -8,87 +8,38 @@ import {
   Divider,
 } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { Amplify } from "aws-amplify";
 import "@aws-amplify/ui-react/styles.css";
-import { generateClient } from "aws-amplify/data";
-import outputs from "../amplify_outputs.json";
-// import ListGroup from "./components/ListGroup";
-// import Alert from "./components/Alert/Alert";
-import List from "./components/List/List";
-
-/**
- * @type {import('aws-amplify/data').Client<import('../amplify/data/resource').Schema>}
- */
-
-Amplify.configure(outputs);
-const client = generateClient({
-  authMode: "userPool",
-});
+import { DataProvider } from "./DataContext"; // Import provider
+import Profile from "./views/Profile/Profile";
+import Categories from "./views/Categories/Categories";
+import Entries from "./views/Entries/Entries";
 
 export default function App() {
-  const [userprofiles, setUserProfiles] = useState([]);
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "categories" | "entries"
+  >("profile");
   const { signOut } = useAuthenticator((context) => [context.user]);
 
-  useEffect(() => {
-    fetchUserProfile();
-  }, []);
-
-  async function fetchUserProfile() {
-    const { data: profiles } = await client.models.UserProfile.list();
-    setUserProfiles(profiles);
-  }
-
-  const items = [
-    { name: "Push Ups", id: "0001", count: "30" },
-    { name: "Pull Ups", id: "0002", count: "10" },
-    { name: "Squats", id: "0003", count: "49" },
-    { name: "Sit Ups", id: "0004", count: "54" },
-  ];
-
   return (
-    <Flex
-      className="App"
-      justifyContent="center"
-      alignItems="center"
-      direction="column"
-      width="70%"
-      margin="0 auto"
-    >
-      <Heading level={1}>My Profile</Heading>
-
-      <Divider />
-
-      <Grid
-        margin="3rem 0"
-        autoFlow="column"
+    <DataProvider>
+      <Flex
+        className="App"
         justifyContent="center"
-        gap="2rem"
-        alignContent="center"
+        alignItems="center"
+        direction="column"
+        width="70%"
+        margin="0 auto"
       >
-        {userprofiles.map((userprofile) => (
-          <Flex
-            key={userprofile.id || userprofile.email}
-            direction="column"
-            justifyContent="center"
-            alignItems="center"
-            gap="2rem"
-            border="1px solid #ccc"
-            padding="2rem"
-            borderRadius="5%"
-            className="box"
-          >
-            <View>
-              <Heading level="3">{userprofile.email}</Heading>
-            </View>
-          </Flex>
-        ))}
-      </Grid>
-      {/* <ListGroup items={items} heading="Test List" onSelectItem={console.log} />
-      <Alert>
-        <p>Test alert</p>
-      </Alert> */}
-      <List items={items} heading="Data" onSelectItem={console.log} />
-      <Button onClick={signOut}>Sign Out</Button>
-    </Flex>
+        <Flex gap="1rem" margin="1rem">
+          <Button onClick={() => setActiveTab("profile")}>Profile</Button>
+          <Button onClick={() => setActiveTab("categories")}>Categories</Button>
+          <Button onClick={() => setActiveTab("entries")}>Entries</Button>
+        </Flex>
+
+        {activeTab === "profile" && <Profile signOut={signOut} />}
+        {activeTab === "categories" && <Categories />}
+        {activeTab === "entries" && <Entries />}
+      </Flex>
+    </DataProvider>
   );
 }

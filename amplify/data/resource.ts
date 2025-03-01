@@ -1,5 +1,3 @@
-
-
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
 adding a new "isDone" field as a boolean. The authorization rule below
@@ -16,11 +14,25 @@ const schema = a
         email: a.string(),
         profileOwner: a.string(),
       })
-      .authorization((allow) => [
-        allow.ownerDefinedIn("profileOwner"),
-      ]),
+      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+    DataCategory: a
+      .model({
+        name: a.string(),
+        dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
+      })
+      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+    DataEntry: a
+      .model({
+        note: a.string(),
+        category: a.belongsTo("DataCategory", "dataCategoryId"),
+        dataCategoryId: a.id(),
+        day: a.date(),
+        count: a.integer(),
+      })
+      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
+
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
