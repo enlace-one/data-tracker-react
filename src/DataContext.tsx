@@ -61,7 +61,7 @@ export function DataProvider({ children }: DataProviderProps) {
   useEffect(() => {
     async function loadAndSetDataTypes() {
       await initializeDataTypes();
-      const types = await client.models.DataType.list();
+      const types = await fetchDataTypes();
       setDataTypes(types);
     }
     loadAndSetDataTypes();
@@ -88,6 +88,7 @@ export function DataProvider({ children }: DataProviderProps) {
 
     // Cleanup function to unsubscribe when the component is unmounted
     return () => {
+      console.log("Cleaning up subscriptions");
       unsubscribeCategories();
       unsubscribeEntries();
     };

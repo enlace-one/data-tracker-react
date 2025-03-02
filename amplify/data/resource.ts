@@ -11,9 +11,10 @@ const schema = a
   .schema({
     UserProfile: a
       .model({
-        email: a.string(),
+        email: a.string().required(),
         profileOwner: a.string(),
       })
+      .secondaryIndexes((index) => [index("email")])
       .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
     DataType: a
       .model({
@@ -23,7 +24,7 @@ const schema = a
         dataEntries: a.hasMany("DataCategory", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+      .authorization((allow) => [allow.authenticated()]),
     DataCategory: a
       .model({
         name: a.string().required(),
@@ -32,10 +33,11 @@ const schema = a
         defaultValue: a.string(),
         options: a.string().array(), // For future use with options of values
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
-        type: a.belongsTo("DataType", "dataTypeId"),
+        dataTypeId: a.id(), // ✅ Explicitly define the reference field
+        dataType: a.belongsTo("DataType", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+      .authorization((allow) => [allow.owner()]),
     DataEntry: a
       .model({
         note: a.string(),
@@ -45,11 +47,14 @@ const schema = a
         value: a.string().required(),
       })
       .secondaryIndexes((index) => [index("date")])
-      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+      .authorization((allow) => [allow.owner()]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
 export type Schema = ClientSchema<typeof schema>;
+
+// export const schema = schema;
+export { schema };
 
 export const data = defineData({
   schema,

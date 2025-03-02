@@ -14,6 +14,7 @@ const client = generateClient({
 export async function fetchUserProfiles(): Promise<UserProfile[]> {
   try {
     const { data: profiles } = await client.models.UserProfile.list();
+    console.log("Profiles: ", profiles);
     return profiles || [];
   } catch (error) {
     console.error("Error fetching user profiles:", error);
@@ -39,7 +40,7 @@ export async function createUniqueDataType(
     await client.models.DataType.create({ name, note, isComplex });
     console.log(`✅ Created DataType: ${name}`);
   } else {
-    console.log(`⚠️ DataType "${name}" already exists, skipping.`);
+    console.log(`DataType "${name}" already exists, skipping.`);
   }
 }
 
