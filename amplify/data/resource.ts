@@ -15,20 +15,36 @@ const schema = a
         profileOwner: a.string(),
       })
       .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+    DataType: a
+      .model({
+        name: a.string().required(),
+        note: a.string(),
+        isComplex: a.boolean().required(),
+        dataEntries: a.hasMany("DataCategory", "dataTypeId"),
+      })
+      .secondaryIndexes((index) => [index("name")])
+      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
     DataCategory: a
       .model({
-        name: a.string(),
+        name: a.string().required(),
+        note: a.string(),
+        addDefault: a.boolean().required(),
+        defaultValue: a.string(),
+        options: a.string().array(), // For future use with options of values
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
+        type: a.belongsTo("DataType", "dataTypeId"),
       })
+      .secondaryIndexes((index) => [index("name")])
       .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
     DataEntry: a
       .model({
         note: a.string(),
         category: a.belongsTo("DataCategory", "dataCategoryId"),
         dataCategoryId: a.id(),
-        day: a.date(),
-        count: a.integer(),
+        date: a.date().required(),
+        value: a.string().required(),
       })
+      .secondaryIndexes((index) => [index("date")])
       .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);

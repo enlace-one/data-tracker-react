@@ -10,34 +10,18 @@ import {
   createDataCategory,
   subscribeToDataCategories,
   subscribeToDataEntries,
+  fetchDataTypes,
+  createUniqueDataType,
 } from "./api";
 
-// Define types for the data
-interface UserProfile {
-  id: string;
-  email: string;
-  name?: string;
-  // Add other fields based on your UserProfile model
-}
-
-interface DataCategory {
-  id: string;
-  name: string;
-  // Add other fields based on your DataCategory model
-}
-
-interface DataEntry {
-  id: string;
-  name: string;
-  categoryId: string;
-  // Add other fields based on your DataEntry model
-}
+import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
 
 // Define the context value type
 interface DataContextType {
   userProfiles: UserProfile[];
   dataCategories: DataCategory[];
   dataEntries: DataEntry[];
+  dataTypes: DataType[];
   makeDataCategory: () => Promise<void>;
 }
 
@@ -49,10 +33,39 @@ interface DataProviderProps {
   children: ReactNode;
 }
 
+const DEFAULT_DATA_TYPES = [
+  {
+    name: "Number",
+    note: "Stores numeric values such as '1', '-1' and '2.4",
+    isComplex: false,
+  },
+  { name: "Boolean", note: "Stores true/false values", isComplex: false },
+  { name: "Text", note: "Stores string values", isComplex: false },
+];
+
+async function initializeDataTypes() {
+  await Promise.all(
+    DEFAULT_DATA_TYPES.map((dataType) =>
+      createUniqueDataType(dataType.name, dataType.note, dataType.isComplex)
+    )
+  );
+}
+
 export function DataProvider({ children }: DataProviderProps) {
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
+  const [dataTypes, setDataTypes] = useState([]);
+
+  // Fetch DataTypes
+  useEffect(() => {
+    async function loadAndSetDataTypes() {
+      await initializeDataTypes();
+      const types = await client.models.DataType.list();
+      setDataTypes(types);
+    }
+    loadAndSetDataTypes();
+  }, []);
 
   // Fetch user profiles on mount
   useEffect(() => {
@@ -82,7 +95,13 @@ export function DataProvider({ children }: DataProviderProps) {
 
   return (
     <DataContext.Provider
-      value={{ userProfiles, dataCategories, dataEntries, makeDataCategory }}
+      value={{
+        userProfiles,
+        dataCategories,
+        dataEntries,
+        dataTypes,
+        makeDataCategory,
+      }}
     >
       {children}
     </DataContext.Provider>

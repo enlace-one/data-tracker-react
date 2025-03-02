@@ -1,39 +1,11 @@
 import { generateClient } from "aws-amplify/data";
 import outputs from "../amplify_outputs.json";
+import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
 
 // Initialize the Amplify client
 const client = generateClient({
   authMode: "userPool",
 });
-
-/**
- * Type for UserProfile object (based on the schema from your backend)
- */
-interface UserProfile {
-  id: string;
-  email: string;
-  name?: string;
-  // Define other fields as necessary based on the UserProfile model
-}
-
-/**
- * Type for DataCategory object (based on your backend schema)
- */
-interface DataCategory {
-  id: string;
-  name: string;
-  // Define other fields as necessary based on the DataCategory model
-}
-
-/**
- * Type for DataEntry object (based on your backend schema)
- */
-interface DataEntry {
-  id: string;
-  name: string;
-  categoryId: string;
-  // Define other fields as necessary based on the DataEntry model
-}
 
 /**
  * Fetch user profiles from the database.
@@ -46,6 +18,28 @@ export async function fetchUserProfiles(): Promise<UserProfile[]> {
   } catch (error) {
     console.error("Error fetching user profiles:", error);
     return [];
+  }
+}
+
+// Function to fetch all existing DataTypes
+export async function fetchDataTypes() {
+  return await client.models.DataType.list();
+}
+
+export async function createUniqueDataType(
+  name: string,
+  note: string,
+  isComplex: boolean
+) {
+  const existingTypes = await client.models.DataType.list({
+    filter: { name: { eq: name } },
+  });
+
+  if (existingTypes.length === 0) {
+    await client.models.DataType.create({ name, note, isComplex });
+    console.log(`✅ Created DataType: ${name}`);
+  } else {
+    console.log(`⚠️ DataType "${name}" already exists, skipping.`);
   }
 }
 
