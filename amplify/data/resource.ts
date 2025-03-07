@@ -15,7 +15,11 @@ const schema = a
         profileOwner: a.string(),
       })
       .secondaryIndexes((index) => [index("email")])
-      .authorization((allow) => [allow.ownerDefinedIn("profileOwner")]),
+      .authorization((allow) => [
+        allow.owner(),
+        allow.ownerDefinedIn("profileOwner"),
+        allow.groups(["Admins"]).to(["read"]),
+      ]),
     DataType: a
       .model({
         name: a.string().required(),
@@ -24,7 +28,7 @@ const schema = a
         dataEntries: a.hasMany("DataCategory", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.authenticated()]),
+      .authorization((allow) => [allow.authenticated(), allow.publicApiKey()]),
     DataCategory: a
       .model({
         name: a.string().required(),
@@ -37,7 +41,11 @@ const schema = a
         dataType: a.belongsTo("DataType", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.owner()]),
+      .authorization((allow) => [
+        allow.owner(),
+        allow.groups(["Admins"]).to(["read"]),
+        allow.publicApiKey(), // TODO: Remove. FOR TESTING
+      ]),
     DataEntry: a
       .model({
         note: a.string(),
@@ -47,7 +55,11 @@ const schema = a
         value: a.string().required(),
       })
       .secondaryIndexes((index) => [index("date")])
-      .authorization((allow) => [allow.owner()]),
+      .authorization((allow) => [
+        allow.owner(),
+        allow.groups(["Admins"]).to(["read"]),
+        allow.publicApiKey(), // TODO: Remove. FOR TESTING
+      ]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
@@ -59,11 +71,17 @@ export { schema };
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "apiKey",
+    defaultAuthorizationMode: "userPool", // Changed from public api key. https://docs.amplify.aws/react/build-a-backend/data/customize-authz/
     apiKeyAuthorizationMode: {
       expiresInDays: 30,
     },
   },
+  // authorizationModes: {
+  //   defaultAuthorizationMode: "userPools",
+  //   apiKeyAuthorizationMode: {
+  //     expiresInDays: 30,
+  //   },
+  // },
 });
 
 /*== STEP 2 ===============================================================

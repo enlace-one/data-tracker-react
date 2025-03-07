@@ -7,9 +7,9 @@ import {
 } from "react";
 import {
   fetchUserProfiles,
-  createDataCategory,
   subscribeToDataCategories,
   subscribeToDataEntries,
+  subscribeToDataTypes,
   fetchDataTypes,
   createUniqueDataType,
 } from "./api";
@@ -22,7 +22,7 @@ interface DataContextType {
   dataCategories: DataCategory[];
   dataEntries: DataEntry[];
   dataTypes: DataType[];
-  makeDataCategory: () => Promise<void>;
+  SETTINGS: { debug: boolean };
 }
 
 // Create the context
@@ -43,6 +43,8 @@ const DEFAULT_DATA_TYPES = [
   { name: "Text", note: "Stores string values", isComplex: false },
 ];
 
+const SETTINGS = { debug: true };
+
 async function initializeDataTypes() {
   await Promise.all(
     DEFAULT_DATA_TYPES.map((dataType) =>
@@ -55,7 +57,7 @@ export function DataProvider({ children }: DataProviderProps) {
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
-  const [dataTypes, setDataTypes] = useState([]);
+  const [dataTypes, setDataTypes] = useState<DataType[]>([]);
 
   // Fetch DataTypes
   useEffect(() => {
@@ -76,21 +78,18 @@ export function DataProvider({ children }: DataProviderProps) {
     loadProfiles();
   }, []);
 
-  // Function to create a new category and update state
-  async function makeDataCategory() {
-    await createDataCategory("New Category");
-  }
-
   // Reintroduce the subscription to real-time updates
   useEffect(() => {
     const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
     const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
+    const unsubscribeTypes = subscribeToDataTypes(setDataTypes);
 
     // Cleanup function to unsubscribe when the component is unmounted
     return () => {
       console.log("Cleaning up subscriptions");
       unsubscribeCategories();
       unsubscribeEntries();
+      unsubscribeTypes();
     };
   }, []);
 
@@ -101,7 +100,7 @@ export function DataProvider({ children }: DataProviderProps) {
         dataCategories,
         dataEntries,
         dataTypes,
-        makeDataCategory,
+        SETTINGS,
       }}
     >
       {children}
@@ -117,3 +116,5 @@ export function useData(): DataContextType {
   }
   return context;
 }
+
+export { SETTINGS };

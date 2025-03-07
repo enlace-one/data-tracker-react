@@ -40,6 +40,11 @@ export default function Profile({ signOut }: ProfileProps) {
           >
             <View>
               <Heading level={4}>{user.email}</Heading>
+              {Object.entries(user).map(
+                ([key, value]) =>
+                  key !== "id" &&
+                  key !== "name" && <span key={key}> {`${key}: ${value}`}</span>
+              )}
             </View>
             <Button onClick={signOut}>Sign Out</Button>
           </Flex>

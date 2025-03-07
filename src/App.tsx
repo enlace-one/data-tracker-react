@@ -9,15 +9,17 @@ import {
 } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { DataProvider } from "./DataContext"; // Import provider
+import { DataProvider, SETTINGS } from "./DataContext"; // Import provider
 import Profile from "./views/Profile/Profile";
 import Categories from "./views/Categories/Categories";
 import Entries from "./views/Entries/Entries";
+import Types from "./views/Types/Types";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<
-    "profile" | "categories" | "entries"
+    "profile" | "categories" | "entries" | "types"
   >("profile");
+
   const { signOut } = useAuthenticator((context) => [context.user]);
 
   return (
@@ -33,6 +35,7 @@ export default function App() {
         {activeTab === "profile" && <Profile signOut={signOut} />}
         {activeTab === "categories" && <Categories />}
         {activeTab === "entries" && <Entries />}
+        {activeTab === "types" && <Types />}
 
         <Divider />
 
@@ -40,6 +43,10 @@ export default function App() {
           <Button onClick={() => setActiveTab("profile")}>Profile</Button>
           <Button onClick={() => setActiveTab("categories")}>Categories</Button>
           <Button onClick={() => setActiveTab("entries")}>Entries</Button>
+          {SETTINGS.debug && (
+            <Button onClick={() => setActiveTab("types")}>Types</Button>
+          )}
+          <Button onClick={signOut}>Sign Out</Button>
         </Flex>
       </Flex>
     </DataProvider>
