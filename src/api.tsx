@@ -30,37 +30,34 @@ export async function fetchUserProfiles(): Promise<
 }
 
 // Function to fetch all existing DataTypes
-export async function fetchDataTypes() {
+export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
   try {
-    const response = await client.models.DataType.list(); // Adjust based on actual response
-    // console.log("Response from DataType.list:", response);
-    const dataTypes = response?.data || []; // Safely access dataTypes, default to empty array if undefined
-    console.log("Data Types:", dataTypes);
-    return dataTypes;
+    const { data: dataTypes, errors } = await client.models.DataType.list();
+    console.log("Data Types:", dataTypes, " Errors: ", errors);
+    return dataTypes || [];
   } catch (error) {
     console.error("Error fetching data types:", error);
     return [];
   }
 }
+
 export async function createUniqueDataType(
   name: string,
   note: string,
   isComplex: boolean
 ) {
   try {
-    const response = await client.models.DataType.list({
+    const { data: dataTypes, errors } = await client.models.DataType.list({
       filter: { name: { eq: name } },
     });
 
-    const dataTypes = response?.data || [];
-
     if (dataTypes.length === 0) {
-      const newDataType = await createDataType({
+      await createDataType({
         name: name,
         note: note,
         isComplex: isComplex,
       });
-      console.log(`✅ Created DataType: ${name}. ${newDataType.data.id}`);
+      console.log(`✅ Created DataType: ${name}.`);
     } else {
       console.log(`DataType "${name}" already exists, skipping.`);
     }
@@ -69,17 +66,16 @@ export async function createUniqueDataType(
   }
 }
 
-export async function createDataType(
-  formData: FormData
-): Promise<{ data: DataType }> {
+export async function createDataType(formData: FormData): Promise<void> {
   try {
     console.log("Adding type:", formData.name ?? "Unnamed Type"); // Avoid undefined
 
-    return await client.models.DataType.create({
+    const { errors } = await client.models.DataType.create({
       name: formData.name ?? "", // Ensure a default empty string
       note: formData.note ?? "", // Default to empty string
       isComplex: formData.isComplex ?? false, // Default to false for boolean
     });
+    console.log("Errors:", errors);
   } catch (error) {
     console.error("Error creating type:", error);
     throw error; // Ensure the function consistently returns a Promise<DataType>
@@ -92,10 +88,10 @@ export async function createDataType(
  * @returns {Function} Unsubscribe function.
  */
 export function subscribeToDataTypes(
-  callback: (items: DataType[]) => void
+  callback: (items: Schema["DataType"]["type"][]) => void
 ): () => void {
   const sub = client.models.DataType.observeQuery().subscribe({
-    next: (result: { items?: DataType[] }) => {
+    next: (result: { items?: Schema["DataType"]["type"][] }) => {
       console.log("Updating DataTypes:", result.items);
       callback(result.items ?? []); // Ensure an empty array if undefined
     },
@@ -109,19 +105,17 @@ export function subscribeToDataTypes(
 
 export async function deleteAllDataTypes() {
   try {
-    // Fetch all DataTypes first
-    const response = await client.models.DataType.list();
-    const dataTypes = response?.data || [];
+    const { data: dataTypes, errors } = await client.models.DataType.list();
 
-    // Check if there are any DataTypes to delete
     if (dataTypes.length === 0) {
       console.log("No DataTypes to delete.");
       return;
     }
 
-    // Delete each DataType
     await Promise.all(
-      dataTypes.map((dataType: DataType) => deleteDataType(dataType.id))
+      dataTypes.map((dataType: Schema["DataType"]["type"]) =>
+        deleteDataType(dataType.id)
+      )
     );
 
     console.log("✅ All DataTypes have been deleted.");
@@ -132,7 +126,7 @@ export async function deleteAllDataTypes() {
 
 export async function deleteDataType(id: string) {
   try {
-    client.models.DataType.delete({ id: id });
+    await client.models.DataType.delete({ id: id });
 
     console.log(`Data type deleted with id ${id}.`);
   } catch (error) {
@@ -142,7 +136,7 @@ export async function deleteDataType(id: string) {
 
 export async function deleteDataCategory(id: string) {
   try {
-    client.models.DataCategory.delete({ id: id });
+    await client.models.DataCategory.delete({ id: id });
 
     console.log(`Data Category deleted with id ${id}.`);
   } catch (error) {
@@ -152,7 +146,7 @@ export async function deleteDataCategory(id: string) {
 
 export async function deleteDataEntry(id: string) {
   try {
-    client.models.DataEntry.delete({ id: id });
+    await client.models.DataEntry.delete({ id: id });
 
     console.log(`Data entry deleted with id ${id}.`);
   } catch (error) {
@@ -169,33 +163,35 @@ export async function createDataCategory(formData: FormData): Promise<void> {
   try {
     console.log("Adding category:", formData.name); // Fixed incorrect variable reference
 
-    await client.models.DataCategory.create({
+    const { errors } = await client.models.DataCategory.create({
       name: formData.name || "", // Ensure a default empty string if missing
       defaultValue: formData.defaultValue || "", // Default empty string
       note: formData.note || "", // Default empty string
       addDefault: formData.addDefault ?? false, // Default to false for boolean
       dataTypeId: formData.dataTypeId,
     });
+    console.log("Errors:", errors);
   } catch (error) {
     console.error("Error creating data category:", error);
   }
 }
 
 /**
- * Create a new data category.
- * @param {string} name - Name of the category.
+ * Create a new data entry.
+ * @param {string} name - Name of the entry.
  * @returns {Promise<void>}
  */
 export async function createDataEntry(formData: FormData): Promise<void> {
   try {
     console.log("Adding Entry:", formData.date); // Fixed incorrect variable reference
 
-    await client.models.DataEntry.create({
-      date: formData.date, // Ensure a default empty string if missing
+    const { errors } = await client.models.DataEntry.create({
+      date: formData.date!, // Ensure a default empty string if missing
       note: formData.note || "", // Default empty string
-      value: formData.value,
+      value: formData.value!,
       dataCategoryId: formData.dataCategoryId,
     });
+    console.log("Errors:", errors);
   } catch (error) {
     console.error("Error creating data Entry:", error);
   }
@@ -207,10 +203,10 @@ export async function createDataEntry(formData: FormData): Promise<void> {
  * @returns {Function} Unsubscribe function.
  */
 export function subscribeToDataCategories(
-  callback: (items: DataCategory[]) => void
+  callback: (items: Schema["DataCategory"]["type"][]) => void
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
-    next: (result: { items?: DataCategory[] }) => {
+    next: (result: { items?: Schema["DataCategory"]["type"][] }) => {
       console.log("Updating DataCategories:", result.items);
       callback(result.items || []);
     },
@@ -223,11 +219,10 @@ export function subscribeToDataCategories(
 }
 
 export function subscribeToDataEntries(
-  callback: (items: DataEntry[]) => void
+  callback: (items: Schema["DataEntry"]["type"][]) => void
 ): () => void {
-  // console.log("Pre-subscription query call:", Auth.currentCredentials());
   const sub = client.models.DataEntry.observeQuery().subscribe({
-    next: (result: { items?: DataEntry[] }) => {
+    next: (result: { items?: Schema["DataEntry"]["type"][] }) => {
       console.log("Updating DataEntries:", result.items);
       callback(result.items || []);
     },

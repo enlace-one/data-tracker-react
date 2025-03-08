@@ -43,6 +43,6 @@ export interface FormDataType {
   addDefault?: boolean;
   dataTypeId?: string;
   dataCategoryId?: string;
-  date?: Date;
+  date?: string;
   value?: string;
 }

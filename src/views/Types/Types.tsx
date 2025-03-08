@@ -17,7 +17,7 @@ export default function Types() {
 
   const handleFormData = (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
-    createDataType(formData); // Handle form data submission
+    console.log(createDataType(formData)); // Handle form data submission
   };
 
   return (
