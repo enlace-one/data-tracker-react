@@ -5,13 +5,7 @@ import TextButton from "../../components/TextButton/TextButton";
 import { createDataType, deleteAllDataTypes, deleteDataTypes } from "../../api"; // Make sure fetchDataTypes is imported
 
 export default function Types() {
-  const { dataTypes, setDataTypes } = useData();
-
-  // Map fetched DataTypes to options for the select field
-  const dataTypeOptions = dataTypes.map((dt) => ({
-    label: dt.name,
-    value: dt.id,
-  }));
+  const { dataTypes } = useData();
 
   // Define fields for the form, including the generic select field
   const formFields = [

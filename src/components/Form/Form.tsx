@@ -30,10 +30,13 @@ const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { id, type, checked, value } = e.target;
+    const { id, type, value } = e.target;
+    const isCheckbox =
+      e.target instanceof HTMLInputElement && type === "checkbox";
+
     setFormData((prev) => ({
       ...prev,
-      [id]: type === "checkbox" ? checked : value,
+      [id]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -77,8 +80,8 @@ const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
                       name={field.id}
                       onChange={handleChange}
                       {...(field.type === "checkbox"
-                        ? { checked: !!formData[field.id] }
-                        : { value: formData[field.id] || "" })}
+                        ? { checked: Boolean(formData[field.id]) } // Ensure boolean for checkboxes
+                        : { value: String(formData[field.id] ?? "") })} // Ensure value is a string
                       required={field.type !== "checkbox"}
                     />
                   )}

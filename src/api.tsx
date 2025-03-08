@@ -1,7 +1,12 @@
 import { generateClient } from "aws-amplify/data";
-import outputs from "../amplify_outputs.json";
 
-import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
+import {
+  UserProfile,
+  DataCategory,
+  DataEntry,
+  DataType,
+  FormDataType as FormData,
+} from "./types"; // ✅ Import interfaces
 
 // Initialize the Amplify client
 const client = generateClient({
@@ -63,17 +68,20 @@ export async function createUniqueDataType(
   }
 }
 
-export async function createDataType(formData): Promise<void> {
+export async function createDataType(
+  formData: FormData
+): Promise<{ data: DataType }> {
   try {
-    console.log("Adding type:", formData.name); // Fixed incorrect variable reference
+    console.log("Adding type:", formData.name ?? "Unnamed Type"); // Avoid undefined
 
-    await client.models.DataType.create({
-      name: formData.name || "", // Ensure a default empty string if missing
-      note: formData.note || "", // Default empty string
+    return await client.models.DataType.create({
+      name: formData.name ?? "", // Ensure a default empty string
+      note: formData.note ?? "", // Default to empty string
       isComplex: formData.isComplex ?? false, // Default to false for boolean
     });
   } catch (error) {
     console.error("Error creating type:", error);
+    throw error; // Ensure the function consistently returns a Promise<DataType>
   }
 }
 
@@ -86,11 +94,11 @@ export function subscribeToDataTypes(
   callback: (items: DataType[]) => void
 ): () => void {
   const sub = client.models.DataType.observeQuery().subscribe({
-    next: ({ items }) => {
-      console.log("Updating DataTypes:", items);
-      callback(items || []);
+    next: (result: { items?: DataType[] }) => {
+      console.log("Updating DataTypes:", result.items);
+      callback(result.items ?? []); // Ensure an empty array if undefined
     },
-    error: (error) => {
+    error: (error: unknown) => {
       console.error("Subscription error:", error);
     },
   });
@@ -112,7 +120,7 @@ export async function deleteAllDataTypes() {
 
     // Delete each DataType
     await Promise.all(
-      dataTypes.map((dataType) => deleteDataTypes({ id: dataType.id }))
+      dataTypes.map((dataType: DataType) => deleteDataTypes(dataType.id))
     );
 
     console.log("✅ All DataTypes have been deleted.");
@@ -136,7 +144,7 @@ export async function deleteDataTypes(id: string) {
  * @param {string} name - Name of the category.
  * @returns {Promise<void>}
  */
-export async function createDataCategory(formData): Promise<void> {
+export async function createDataCategory(formData: FormData): Promise<void> {
   try {
     console.log("Adding category:", formData.name); // Fixed incorrect variable reference
 
@@ -160,11 +168,11 @@ export function subscribeToDataCategories(
   callback: (items: DataCategory[]) => void
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
-    next: ({ items }) => {
-      console.log("Updating DataCategories:", items);
-      callback(items || []);
+    next: (result: { items?: DataCategory[] }) => {
+      console.log("Updating DataCategories:", result.items);
+      callback(result.items || []);
     },
-    error: (error) => {
+    error: (error: unknown) => {
       console.error("Subscription error:", error);
     },
   });
@@ -172,14 +180,16 @@ export function subscribeToDataCategories(
   return () => sub.unsubscribe(); // Cleanup function
 }
 
-export function subscribeToDataEntries(callback) {
+export function subscribeToDataEntries(
+  callback: (items: DataEntry[]) => void
+): () => void {
   // console.log("Pre-subscription query call:", Auth.currentCredentials());
   const sub = client.models.DataEntry.observeQuery().subscribe({
-    next: ({ items }) => {
-      console.log("Updating DataEntries:", items);
-      callback(items || []);
+    next: (result: { items?: DataEntry[] }) => {
+      console.log("Updating DataEntries:", result.items);
+      callback(result.items || []);
     },
-    error: (error) => {
+    error: (error: unknown) => {
       console.error("Subscription error:", error);
     },
   });

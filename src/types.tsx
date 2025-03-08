@@ -31,3 +31,11 @@ export interface DataEntry {
   date: string; // Assuming ISO string format for dates
   value: string;
 }
+
+export interface FormDataType {
+  name?: string;
+  note?: string;
+  isComplex?: boolean;
+  defaultValue?: string;
+  addDefault?: boolean;
+}

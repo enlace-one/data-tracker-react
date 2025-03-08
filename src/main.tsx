@@ -9,7 +9,10 @@ import outputs from "../amplify_outputs.json";
 Amplify.configure(outputs);
 
 // Can use ReactNative instead of ReactDOM for mobile devices.
-ReactDOM.createRoot(document.getElementById("root")).render(
+// I add the null assertion (!) since I'm sure it's never null.
+const root = document.getElementById("root") as HTMLElement;
+
+ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <Authenticator>
       <App />

@@ -1,4 +1,4 @@
-import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
 import { createDataCategory } from "../../api"; // Make sure fetchDataTypes is imported

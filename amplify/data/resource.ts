@@ -65,6 +65,9 @@ const schema = a
 
 export type Schema = ClientSchema<typeof schema>;
 
+// Apply Schema to the model
+// export const schema: Schema = schema;
+
 // export const schema = schema;
 export { schema };
 

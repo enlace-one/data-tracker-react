@@ -9,7 +9,7 @@ export default function Entries() {
       <Heading level={1}>Data Entries</Heading>
       <Divider />
       {dataEntries.map((entry) => (
-        <p key={entry.id}>{entry.name}</p>
+        <p key={entry.id}>{entry.date}</p>
       ))}
     </>
   );
