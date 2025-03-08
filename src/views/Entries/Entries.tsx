@@ -39,26 +39,32 @@ export default function Entries() {
         buttonText="Add New"
         handleFormData={handleFormData}
       />
-      {dataEntries.map((item) => (
-        <tr key={item.id}>
-          <td>
-            {item.date}{" "}
-            <small>
-              ({/* {item.dataType.name} */}
-              {dataCategories
-                .filter((dt) => dt.id === item.dataCategoryId)
-                .map((dt) => dt.name)
-                .join(", ")}
-              )
-            </small>
-            <br />
-            <small>{item.note} </small>
-          </td>
-          <td>
-            <TextButton onClick={() => deleteDataEntry(item.id)}>❌</TextButton>
-          </td>
-        </tr>
-      ))}
+      <table>
+        <tbody>
+          {dataEntries.map((item) => (
+            <tr key={item.id}>
+              <td>
+                {item.date}{" "}
+                <small>
+                  ({/* {item.dataType.name} */}
+                  {dataCategories
+                    .filter((dt) => dt.id === item.dataCategoryId)
+                    .map((dt) => dt.name)
+                    .join(", ")}
+                  )
+                </small>
+                <br />
+                <small>{item.note} </small>
+              </td>
+              <td>
+                <TextButton onClick={() => deleteDataEntry(item.id)}>
+                  ❌
+                </TextButton>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }
