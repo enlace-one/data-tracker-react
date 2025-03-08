@@ -25,7 +25,7 @@ const schema = a
         name: a.string().required(),
         note: a.string(),
         isComplex: a.boolean().required(),
-        dataEntries: a.hasMany("DataCategory", "dataTypeId"),
+        dataCategories: a.hasMany("DataCategory", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
       .authorization((allow) => [allow.authenticated(), allow.publicApiKey()]),

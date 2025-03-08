@@ -2,6 +2,8 @@ export interface UserProfile {
   id: string;
   email: string;
   profileOwner: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface DataType {
@@ -20,7 +22,8 @@ export interface DataCategory {
   defaultValue?: string;
   options?: string[]; // Future use with value options
   dataEntries: DataEntry[];
-  type: DataType;
+  dataType: DataType;
+  dataTypeId: string;
 }
 
 export interface DataEntry {
@@ -38,4 +41,8 @@ export interface FormDataType {
   isComplex?: boolean;
   defaultValue?: string;
   addDefault?: boolean;
+  dataTypeId?: string;
+  dataCategoryId?: string;
+  date?: Date;
+  value?: string;
 }

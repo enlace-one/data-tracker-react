@@ -10,6 +10,7 @@ export interface Option {
 export interface Field {
   id: string;
   name: string;
+  required?: boolean;
   type?: string; // e.g. "text", "checkbox", "select", etc.
   options?: Option[]; // Only needed for select fields
 }
@@ -19,12 +20,24 @@ interface Props {
   fields: Field[];
   buttonText: string;
   handleFormData: (data: Record<string, string | boolean>) => void;
+  buttonStyle?: string;
 }
 
-const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
+const Form = ({
+  heading,
+  fields,
+  handleFormData,
+  buttonText,
+  buttonStyle = "",
+}: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
-    {}
+    fields.reduce((acc, field) => {
+      if (field.type === "date") {
+        acc[field.id] = new Date().toISOString().split("T")[0]; // Default to today
+      }
+      return acc;
+    }, {} as Record<string, string | boolean>)
   );
 
   const handleChange = (
@@ -49,7 +62,9 @@ const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)}>{buttonText}</Button>
+      <Button className={buttonStyle} onClick={() => setIsOpen(true)}>
+        {buttonText}
+      </Button>
       {isOpen && (
         <div className={styles.overlay}>
           <div className={styles.modal}>
@@ -64,7 +79,7 @@ const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
                       name={field.id}
                       value={(formData[field.id] as string) || ""}
                       onChange={handleChange}
-                      required
+                      required={field.required ?? false}
                     >
                       <option value="">Select an option</option>
                       {field.options.map((option) => (
@@ -80,9 +95,17 @@ const Form = ({ heading, fields, handleFormData, buttonText }: Props) => {
                       name={field.id}
                       onChange={handleChange}
                       {...(field.type === "checkbox"
-                        ? { checked: Boolean(formData[field.id]) } // Ensure boolean for checkboxes
-                        : { value: String(formData[field.id] ?? "") })} // Ensure value is a string
-                      required={field.type !== "checkbox"}
+                        ? { checked: !!formData[field.id] } // Ensuring boolean type
+                        : {
+                            value:
+                              field.type === "date"
+                                ? (formData[field.id] as string) ||
+                                  new Date().toISOString().split("T")[0] // Default to today’s date
+                                : String(formData[field.id] ?? ""),
+                          })}
+                      required={
+                        field.type !== "checkbox" && (field.required ?? false)
+                      }
                     />
                   )}
                 </div>

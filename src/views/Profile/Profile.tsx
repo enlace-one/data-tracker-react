@@ -7,6 +7,7 @@ import {
   Button,
 } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
+import DateSpan from "../../components/DateSpan/DateSpan";
 
 interface ProfileProps {
   signOut: () => void;
@@ -40,11 +41,19 @@ export default function Profile({ signOut }: ProfileProps) {
           >
             <View>
               <Heading level={4}>{user.email}</Heading>
-              {Object.entries(user).map(
+              <small>
+                Created: <DateSpan date={user.createdAt} />
+              </small>
+              <br />
+              <small>
+                Updated: <DateSpan date={user.updatedAt} />
+              </small>
+
+              {/* {Object.entries(user).map(
                 ([key, value]) =>
                   key !== "id" &&
                   key !== "name" && <span key={key}> {`${key}: ${value}`}</span>
-              )}
+              )} */}
             </View>
             <Button onClick={signOut}>Sign Out</Button>
           </Flex>

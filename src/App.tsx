@@ -44,9 +44,11 @@ export default function App() {
           <Button onClick={() => setActiveTab("categories")}>Categories</Button>
           <Button onClick={() => setActiveTab("entries")}>Entries</Button>
           {SETTINGS.debug && (
-            <Button onClick={() => setActiveTab("types")}>Types</Button>
+            <>
+              <Button onClick={() => setActiveTab("types")}>Types</Button>
+              <Button onClick={signOut}>Sign Out</Button>
+            </>
           )}
-          <Button onClick={signOut}>Sign Out</Button>
         </Flex>
       </Flex>
     </DataProvider>

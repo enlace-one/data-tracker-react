@@ -1,4 +1,5 @@
 import { generateClient } from "aws-amplify/data";
+import type { Schema } from "../amplify/data/resource";
 
 import {
   UserProfile,
@@ -9,18 +10,18 @@ import {
 } from "./types"; // ✅ Import interfaces
 
 // Initialize the Amplify client
-const client = generateClient({
-  authMode: "userPool",
-});
+const client = generateClient<Schema>();
 
 /**
  * Fetch user profiles from the database.
  * @returns {Promise<UserProfile[]>} List of user profiles.
  */
-export async function fetchUserProfiles(): Promise<UserProfile[]> {
+export async function fetchUserProfiles(): Promise<
+  Schema["UserProfile"]["type"][]
+> {
   try {
-    const { data: profiles } = await client.models.UserProfile.list();
-    console.log("Profiles: ", profiles);
+    const { data: profiles, errors } = await client.models.UserProfile.list();
+    console.log("Profiles: ", profiles, " Errors: ", errors);
     return profiles || [];
   } catch (error) {
     console.error("Error fetching user profiles:", error);
@@ -120,7 +121,7 @@ export async function deleteAllDataTypes() {
 
     // Delete each DataType
     await Promise.all(
-      dataTypes.map((dataType: DataType) => deleteDataTypes(dataType.id))
+      dataTypes.map((dataType: DataType) => deleteDataType(dataType.id))
     );
 
     console.log("✅ All DataTypes have been deleted.");
@@ -129,13 +130,33 @@ export async function deleteAllDataTypes() {
   }
 }
 
-export async function deleteDataTypes(id: string) {
+export async function deleteDataType(id: string) {
   try {
     client.models.DataType.delete({ id: id });
 
     console.log(`Data type deleted with id ${id}.`);
   } catch (error) {
     console.error("Error deleting DataTypes:", error);
+  }
+}
+
+export async function deleteDataCategory(id: string) {
+  try {
+    client.models.DataCategory.delete({ id: id });
+
+    console.log(`Data Category deleted with id ${id}.`);
+  } catch (error) {
+    console.error("Error deleting DataCategory:", error);
+  }
+}
+
+export async function deleteDataEntry(id: string) {
+  try {
+    client.models.DataEntry.delete({ id: id });
+
+    console.log(`Data entry deleted with id ${id}.`);
+  } catch (error) {
+    console.error("Error deleting DataEntry:", error);
   }
 }
 
@@ -153,9 +174,30 @@ export async function createDataCategory(formData: FormData): Promise<void> {
       defaultValue: formData.defaultValue || "", // Default empty string
       note: formData.note || "", // Default empty string
       addDefault: formData.addDefault ?? false, // Default to false for boolean
+      dataTypeId: formData.dataTypeId,
     });
   } catch (error) {
     console.error("Error creating data category:", error);
+  }
+}
+
+/**
+ * Create a new data category.
+ * @param {string} name - Name of the category.
+ * @returns {Promise<void>}
+ */
+export async function createDataEntry(formData: FormData): Promise<void> {
+  try {
+    console.log("Adding Entry:", formData.date); // Fixed incorrect variable reference
+
+    await client.models.DataEntry.create({
+      date: formData.date, // Ensure a default empty string if missing
+      note: formData.note || "", // Default empty string
+      value: formData.value,
+      dataCategoryId: formData.dataCategoryId,
+    });
+  } catch (error) {
+    console.error("Error creating data Entry:", error);
   }
 }
 

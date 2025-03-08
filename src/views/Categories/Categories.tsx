@@ -1,7 +1,8 @@
 import { Heading, Divider } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
-import { createDataCategory } from "../../api"; // Make sure fetchDataTypes is imported
+import { createDataCategory, deleteDataCategory } from "../../api"; // Make sure fetchDataTypes is imported
+import TextButton from "../../components/TextButton/TextButton";
 
 export default function Categories() {
   const { dataCategories, dataTypes } = useData();
@@ -14,15 +15,16 @@ export default function Categories() {
 
   // Define fields for the form, including the generic select field
   const formFields = [
-    { name: "Name", id: "name" },
+    { name: "Name", id: "name", required: true },
     { name: "Note", id: "note" },
     { name: "Add Default", id: "addDefault", type: "checkbox" },
     { name: "Default Value", id: "defaultValue" },
     {
       name: "Data Type",
-      id: "dataType",
+      id: "dataTypeId",
       type: "select",
       options: dataTypeOptions,
+      required: true,
     },
   ];
 
@@ -42,13 +44,35 @@ export default function Categories() {
         handleFormData={handleFormData}
       />
 
-      {dataCategories.map((cat) => (
-        <p key={cat.id}>
-          {cat.name}
-          <br />
-          <small>{cat.note}</small>
-        </p>
-      ))}
+      <table>
+        <tbody>
+          {dataCategories.map((item) => (
+            <tr key={item.id}>
+              <td>
+                {item.name}{" "}
+                <small>
+                  ({/* {item.dataType.name} */}
+                  {dataTypes
+                    .filter((dt) => dt.id === item.dataTypeId)
+                    .map((dt) => dt.name)
+                    .join(", ")}
+                  )
+                </small>
+                <br />
+                <small>
+                  {item.note}{" "}
+                  {item.addDefault && `(Default: ${item.defaultValue})`}
+                </small>
+              </td>
+              <td>
+                <TextButton onClick={() => deleteDataCategory(item.id)}>
+                  ❌
+                </TextButton>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }

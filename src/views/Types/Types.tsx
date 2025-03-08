@@ -2,14 +2,15 @@ import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
 import TextButton from "../../components/TextButton/TextButton";
-import { createDataType, deleteAllDataTypes, deleteDataTypes } from "../../api"; // Make sure fetchDataTypes is imported
+import { createDataType, deleteAllDataTypes, deleteDataType } from "../../api"; // Make sure fetchDataTypes is imported
+import styles from "./Types.module.css";
 
 export default function Types() {
   const { dataTypes } = useData();
 
   // Define fields for the form, including the generic select field
   const formFields = [
-    { name: "Name", id: "name" },
+    { name: "Name", id: "name", required: true },
     { name: "Note", id: "note" },
     { name: "Is Complex", id: "isComplex", type: "checkbox" },
   ];
@@ -29,18 +30,34 @@ export default function Types() {
           fields={formFields}
           buttonText="Add New"
           handleFormData={handleFormData}
+          buttonStyle={styles.horizontalMargin}
         />
-        <Button onClick={deleteAllDataTypes}>Delete All</Button>
+        <Button
+          className={styles.horizontalMargin}
+          onClick={deleteAllDataTypes}
+        >
+          Delete All
+        </Button>
       </div>
 
-      {dataTypes.map((cat) => (
-        <p key={cat.id}>
-          {cat.name}
-          <br />
-          <small>{cat.note}</small>
-          <TextButton onClick={() => deleteDataTypes(cat.id)}>❌</TextButton>
-        </p>
-      ))}
+      <table>
+        <tbody>
+          {dataTypes.map((item) => (
+            <tr key={item.id}>
+              <td>
+                {item.name} <small>{item.isComplex && "(Complex)"}</small>
+                <br />
+                <small>{item.note}</small>
+              </td>
+              <td>
+                <TextButton onClick={() => deleteDataType(item.id)}>
+                  ❌
+                </TextButton>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </>
   );
 }
