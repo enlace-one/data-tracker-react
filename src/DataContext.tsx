@@ -12,7 +12,10 @@ import {
   subscribeToDataTypes,
   fetchDataTypes,
   createUniqueDataType,
+  client,
 } from "./api";
+
+import type { Schema } from "../amplify/data/resource";
 
 import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
 
@@ -59,15 +62,25 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
 
-  // Fetch DataTypes
   useEffect(() => {
-    async function loadAndSetDataTypes() {
-      await initializeDataTypes();
-      const types = await fetchDataTypes();
-      setDataTypes(types);
-    }
-    loadAndSetDataTypes();
+    const sub = client.models.DataType.observeQuery().subscribe({
+      next: ({ items }) => {
+        setDataTypes([...items]);
+      },
+    });
+
+    return () => sub.unsubscribe();
   }, []);
+
+  // // Fetch DataTypes
+  // useEffect(() => {
+  //   async function loadAndSetDataTypes() {
+  //     await initializeDataTypes();
+  //     const types = await fetchDataTypes();
+  //     setDataTypes(types);
+  //   }
+  //   loadAndSetDataTypes();
+  // }, []);
 
   // Fetch user profiles on mount
   useEffect(() => {
@@ -82,14 +95,14 @@ export function DataProvider({ children }: DataProviderProps) {
   useEffect(() => {
     const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
     const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
-    const unsubscribeTypes = subscribeToDataTypes(setDataTypes);
+    // const unsubscribeTypes = subscribeToDataTypes(setDataTypes);
 
     // Cleanup function to unsubscribe when the component is unmounted
     return () => {
       console.log("Cleaning up subscriptions");
       unsubscribeCategories();
       unsubscribeEntries();
-      unsubscribeTypes();
+      // unsubscribeTypes();
     };
   }, []);
 

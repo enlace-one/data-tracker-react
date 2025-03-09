@@ -133,14 +133,41 @@ export async function deleteDataType(id: string) {
     console.error("Error deleting DataTypes:", error);
   }
 }
-
 export async function deleteDataCategory(id: string) {
-  try {
-    await client.models.DataCategory.delete({ id: id });
+  const isConfirmed = window.confirm(
+    "Are you sure you want to delete this Data Category? It will delete all associated entries."
+  );
+  if (!isConfirmed) {
+    console.log("Deletion cancelled by user.");
+    return;
+  }
 
-    console.log(`Data Category deleted with id ${id}.`);
+  try {
+    // Get the IDs of the associated DataEntries
+    const { data: categoryWithEntries } = await client.models.DataCategory.get(
+      { id: id },
+      { selectionSet: ["id", "dataEntries.*"] }
+    );
+
+    // Check if categoryWithEntries is null
+    if (!categoryWithEntries) {
+      console.error(`Data Category with id ${id} not found.`);
+      return;
+    }
+
+    // Delete all associated DataEntries in parallel
+    await Promise.all(
+      categoryWithEntries.dataEntries.map((entry) =>
+        client.models.DataEntry.delete({ id: entry.id })
+      )
+    );
+
+    // Delete the DataCategory
+    await client.models.DataCategory.delete({ id: categoryWithEntries.id });
+
+    console.log(`Data Category and associated entries deleted with id ${id}.`);
   } catch (error) {
-    console.error("Error deleting DataCategory:", error);
+    console.error("Error deleting DataCategory and associated entries:", error);
   }
 }
 
@@ -168,7 +195,25 @@ export async function createDataCategory(formData: FormData): Promise<void> {
       defaultValue: formData.defaultValue || "", // Default empty string
       note: formData.note || "", // Default empty string
       addDefault: formData.addDefault ?? false, // Default to false for boolean
-      dataTypeId: formData.dataTypeId,
+      dataTypeId: formData.dataTypeId!,
+    });
+    console.log("Errors:", errors);
+  } catch (error) {
+    console.error("Error creating data category:", error);
+  }
+}
+
+export async function updateDataCategory(formData: FormData): Promise<void> {
+  try {
+    console.log("Updating category:", formData.name); // Fixed incorrect variable reference
+
+    const { errors } = await client.models.DataCategory.update({
+      id: formData.id!,
+      name: formData.name || "", // Ensure a default empty string if missing
+      defaultValue: formData.defaultValue || "", // Default empty string
+      note: formData.note || "", // Default empty string
+      addDefault: formData.addDefault ?? false, // Default to false for boolean
+      dataTypeId: formData.dataTypeId!,
     });
     console.log("Errors:", errors);
   } catch (error) {
@@ -189,7 +234,7 @@ export async function createDataEntry(formData: FormData): Promise<void> {
       date: formData.date!, // Ensure a default empty string if missing
       note: formData.note || "", // Default empty string
       value: formData.value!,
-      dataCategoryId: formData.dataCategoryId,
+      dataCategoryId: formData.dataCategoryId!,
     });
     console.log("Errors:", errors);
   } catch (error) {

@@ -37,7 +37,7 @@ const schema = a
         defaultValue: a.string(),
         options: a.string().array(), // For future use with options of values
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
-        dataTypeId: a.id(), // ✅ Explicitly define the reference field
+        dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
         dataType: a.belongsTo("DataType", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
@@ -50,7 +50,7 @@ const schema = a
       .model({
         note: a.string(),
         category: a.belongsTo("DataCategory", "dataCategoryId"),
-        dataCategoryId: a.id(),
+        dataCategoryId: a.id().required(),
         date: a.date().required(),
         value: a.string().required(),
       })

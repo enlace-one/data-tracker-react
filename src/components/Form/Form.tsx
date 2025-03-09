@@ -13,6 +13,7 @@ export interface Field {
   required?: boolean;
   type?: string; // e.g. "text", "checkbox", "select", etc.
   options?: Option[]; // Only needed for select fields
+  default?: string | boolean; // Default value for the field
 }
 
 interface Props {
@@ -34,7 +35,10 @@ const Form = ({
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
     fields.reduce((acc, field) => {
       if (field.type === "date") {
-        acc[field.id] = new Date().toISOString().split("T")[0]; // Default to today
+        acc[field.id] = field.default || new Date().toISOString().split("T")[0]; // Default to today
+      } else {
+        acc[field.id] =
+          field.default || (field.type === "checkbox" ? false : "");
       }
       return acc;
     }, {} as Record<string, string | boolean>)
