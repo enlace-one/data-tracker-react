@@ -11,3 +11,7 @@
 .paddingLeft {
   padding-left: 20px;
 }
+
+.minWidth {
+  min-width: 200px;
+}

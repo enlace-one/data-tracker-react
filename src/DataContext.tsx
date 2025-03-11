@@ -26,6 +26,10 @@ interface DataContextType {
   dataEntries: DataEntry[];
   dataTypes: DataType[];
   SETTINGS: { debug: boolean };
+  selectedCategory: DataCategory | null;
+  setSelectedCategory: React.Dispatch<
+    React.SetStateAction<DataCategory | null>
+  >;
 }
 
 // Create the context
@@ -61,6 +65,9 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
+    null
+  );
 
   useEffect(() => {
     const sub = client.models.DataType.observeQuery().subscribe({
@@ -114,6 +121,8 @@ export function DataProvider({ children }: DataProviderProps) {
         dataEntries,
         dataTypes,
         SETTINGS,
+        selectedCategory,
+        setSelectedCategory,
       }}
     >
       {children}

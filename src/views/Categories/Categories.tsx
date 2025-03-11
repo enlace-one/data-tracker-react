@@ -9,10 +9,16 @@ import { DataCategory } from "../../types";
 import styles from "./Categories.module.css";
 
 export default function Categories() {
-  const { dataCategories, dataTypes, dataEntries } = useData();
-  const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
-    null
-  );
+  const {
+    dataCategories,
+    dataTypes,
+    dataEntries,
+    selectedCategory,
+    setSelectedCategory,
+  } = useData();
+  // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
+  //   null
+  // );
 
   const dataTypeOptions = dataTypes.map((dt) => ({
     label: dt.name,
@@ -60,7 +66,7 @@ export default function Categories() {
         <tbody>
           {dataCategories.map((item) => (
             <tr className={styles.tableRow} key={item.id}>
-              <td>
+              <td className={styles.minWidth}>
                 <span
                   onClick={() => setSelectedCategory(item)}
                   style={{
@@ -71,17 +77,19 @@ export default function Categories() {
                   {item.name}
                 </span>
                 <br />
-                <small>{item.note} </small>
-              </td>
-              <td>
                 <small>
-                  {/* Type:{" "} */}
                   {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
-                    "Unknown"}
-                  {/* <br />
-                    {item.addDefault && `Default: ${item.defaultValue}`} */}
+                    "Unknown"}{" "}
+                  - {item.note}{" "}
                 </small>
               </td>
+              {/* <td>
+                <small>
+                  
+                  {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
+                    "Unknown"}
+                </small>
+              </td> */}
               <td className={styles.paddingLeft}>
                 {
                   dataEntries.filter((de) => de.dataCategoryId === item.id)

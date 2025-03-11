@@ -5,6 +5,7 @@ import "./index.css";
 import { Authenticator } from "@aws-amplify/ui-react";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
+import { DataProvider } from "./DataContext"; // Import provider
 
 Amplify.configure(outputs);
 
@@ -15,7 +16,9 @@ const root = document.getElementById("root") as HTMLElement;
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <Authenticator>
-      <App />
+      <DataProvider>
+        <App />
+      </DataProvider>
     </Authenticator>
   </React.StrictMode>
 );

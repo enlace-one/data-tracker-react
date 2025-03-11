@@ -242,6 +242,23 @@ export async function createDataEntry(formData: FormData): Promise<void> {
   }
 }
 
+export async function updateDataEntry(formData: FormData): Promise<void> {
+  try {
+    console.log("Updating Entry:", formData.date); // Fixed incorrect variable reference
+
+    const { errors } = await client.models.DataEntry.update({
+      id: formData.id!,
+      date: formData.date!, // Ensure a default empty string if missing
+      note: formData.note || "", // Default empty string
+      value: formData.value!,
+      dataCategoryId: formData.dataCategoryId!,
+    });
+    console.log("Errors:", errors);
+  } catch (error) {
+    console.error("Error creating data entry:", error);
+  }
+}
+
 /**
  * Subscribe to real-time updates for data categories.
  * @param {Function} callback - Function to update state with new data.

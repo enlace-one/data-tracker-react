@@ -6,9 +6,11 @@ import {
   deleteDataEntry,
   updateDataCategory,
   deleteDataCategory,
+  updateDataEntry,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
-import { DataCategory } from "../../types";
+import { DataCategory, DataEntry } from "../../types";
+import FlexForm from "../../components/FlexForm/FlexForm";
 
 import styles from "./CategoryDetail.module.css";
 
@@ -26,7 +28,14 @@ export default function CategoryDetail({ category, onBack }: Props) {
     { name: "Date", id: "date", type: "date" },
     { name: "Note", id: "note" },
   ];
-
+  const getUpdateEntryFormField = (entry: DataEntry) => {
+    return [
+      { name: "Value", id: "value", default: entry.value ?? "" },
+      { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
+      { name: "Note", id: "note", default: entry.note ?? "" },
+      { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
+    ];
+  };
   const updateCategoryFormFields = [
     { name: "Name", id: "name", required: true, default: category.name ?? "" },
     { name: "Note", id: "note", default: category.note ?? "" },
@@ -43,7 +52,7 @@ export default function CategoryDetail({ category, onBack }: Props) {
     },
   ];
 
-  const handleCategoryFormData = (formData: Record<string, any>) => {
+  const handleUpdateCategoryFormData = (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     // Add fields that cannot be edited.
     formData.dataTypeId = category.dataTypeId;
@@ -51,20 +60,27 @@ export default function CategoryDetail({ category, onBack }: Props) {
     updateDataCategory(formData); // Handle form data submission
   };
 
-  const handleEntryFormData = (formData: Record<string, any>) => {
+  const handleNewEntryFormData = (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     formData.dataCategoryId = category.id;
     createDataEntry(formData); // Handle form data submission
   };
 
+  const handleUpdateEntryFormData = (formData: Record<string, any>) => {
+    console.log("Received form data:", formData);
+    formData.dataCategoryId = category.id;
+    // formData.id =
+    updateDataEntry(formData); // Handle form data submission
+  };
+
   return (
     <>
-      <Button onClick={onBack}>⬅ Back</Button>
+      {/* <Button onClick={onBack}>⬅ Back</Button> */}
       <Heading level={1}>{category.name}</Heading>
       <table>
         <tbody>
           <tr>
-            <td>
+            <td className={styles.minWidth}>
               Type:{" "}
               {dataTypes
                 .filter((dt) => dt.id === category.dataTypeId)
@@ -78,47 +94,57 @@ export default function CategoryDetail({ category, onBack }: Props) {
               Default Value: {category.defaultValue}
             </td>
             <td>
-              <Form
-                heading="Update Category"
-                fields={updateCategoryFormFields}
-                buttonText="Update"
-                handleFormData={handleCategoryFormData}
-                buttonStyle={styles.lightMargin}
-              />
-              <br />
               <Button
                 className={styles.lightMargin}
                 onClick={() => deleteDataCategory(category.id)}
               >
                 Delete
               </Button>
+              <Form
+                heading="Update Category"
+                fields={updateCategoryFormFields}
+                buttonText="Update"
+                handleFormData={handleUpdateCategoryFormData}
+                buttonStyle={styles.lightMargin}
+              />
+
+              <Form
+                heading="New Entry"
+                fields={addEntryFormFields}
+                buttonText="Add Entry"
+                handleFormData={handleNewEntryFormData}
+                buttonStyle={styles.lightMargin}
+              />
             </td>
           </tr>
         </tbody>
       </table>
 
       <Divider />
-      <Form
-        heading="New Entry"
-        fields={addEntryFormFields}
-        buttonText="Add Entry"
-        handleFormData={handleEntryFormData}
-      />
+
       <table>
         <tbody>
           {dataEntries
             .filter((de) => de.dataCategoryId === category.id)
             .map((item) => (
               <tr key={item.id}>
-                <td>
-                  <b>{item.value}</b> | {item.date}
-                  <br />
-                  <small>{item.note} </small>
+                <td className={styles.minWidth}>
+                  <FlexForm
+                    heading="Update Entry"
+                    fields={getUpdateEntryFormField(item)}
+                    handleFormData={handleUpdateEntryFormData}
+                  >
+                    <b>{item.value}</b>
+                    <br />
+                    <small>
+                      {item.date} {item.note ? "- " + item.note : ""}
+                    </small>
+                  </FlexForm>
                 </td>
                 {/* <td>{item.value}</td> */}
                 <td>
                   <TextButton onClick={() => deleteDataEntry(item.id)}>
-                    ❌
+                    <span className={styles.small}>❌</span>
                   </TextButton>
                 </td>
               </tr>

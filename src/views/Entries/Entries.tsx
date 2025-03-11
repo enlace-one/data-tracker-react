@@ -3,6 +3,7 @@ import { useData } from "../../DataContext";
 import { createDataEntry, deleteDataEntry } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
+import styles from "./Entries.module.css";
 
 export default function Entries() {
   const { dataEntries, dataCategories } = useData();
@@ -43,22 +44,21 @@ export default function Entries() {
         <tbody>
           {dataEntries.map((item) => (
             <tr key={item.id}>
-              <td>
-                {item.date}{" "}
+              <td className={styles.minWidth}>
+                {item.value} <br />
                 <small>
-                  ({/* {item.dataType.name} */}
                   {dataCategories
                     .filter((dt) => dt.id === item.dataCategoryId)
                     .map((dt) => dt.name)
-                    .join(", ")}
-                  )
+                    .join(", ")}{" "}
+                  - {item.date}
                 </small>
                 <br />
                 <small>{item.note} </small>
               </td>
               <td>
                 <TextButton onClick={() => deleteDataEntry(item.id)}>
-                  ❌
+                  <span className={styles.small}>❌</span>
                 </TextButton>
               </td>
             </tr>
