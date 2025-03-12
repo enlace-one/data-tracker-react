@@ -11,8 +11,10 @@ import {
 import TextButton from "../../components/TextButton/TextButton";
 import { DataCategory, DataEntry } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
+import DateSpan from "../../components/DateSpan/DateSpan";
 
 import styles from "./CategoryDetail.module.css";
+import { useState } from "react";
 
 interface Props {
   category: DataCategory;
@@ -21,6 +23,20 @@ interface Props {
 
 export default function CategoryDetail({ category, onBack }: Props) {
   const { dataCategories, dataTypes, dataEntries } = useData();
+
+  const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
+
+  const handleRightClick = (e: React.MouseEvent<Element>, id: string) => {
+    e.preventDefault(); // Prevent the default context menu from appearing
+    console.log("Right click detected", id);
+    if (id == selectedEntry) {
+      setSelectedEntry(null);
+    } else {
+      setSelectedEntry(id);
+    }
+
+    // Add your right-click logic here
+  };
 
   const addEntryFormFields = [
     // Category added in handleFormData
@@ -128,7 +144,10 @@ export default function CategoryDetail({ category, onBack }: Props) {
             .filter((de) => de.dataCategoryId === category.id)
             .map((item) => (
               <tr key={item.id}>
-                <td className={styles.minWidth}>
+                <td
+                  className={styles.minWidth}
+                  onContextMenu={(e) => handleRightClick(e, item.id)}
+                >
                   <FlexForm
                     heading="Update Entry"
                     fields={getUpdateEntryFormField(item)}
@@ -139,6 +158,20 @@ export default function CategoryDetail({ category, onBack }: Props) {
                     <small>
                       {item.date} {item.note ? "- " + item.note : ""}
                     </small>
+                    {item.id == selectedEntry && (
+                      <>
+                        <br />
+                        <small>
+                          Created at: <DateSpan date={item.createdAt} />
+                        </small>
+                        <br />
+                        <small>
+                          Updated at: <DateSpan date={item.updatedAt} />
+                        </small>
+                        <br />
+                        <small>ID: {item.id}</small>
+                      </>
+                    )}
                   </FlexForm>
                 </td>
                 {/* <td>{item.value}</td> */}
