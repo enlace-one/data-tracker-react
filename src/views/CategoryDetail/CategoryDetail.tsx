@@ -5,7 +5,7 @@ import {
   createDataEntry,
   deleteDataEntry,
   updateDataCategory,
-  fetchDataEntryByCategory,
+  fetchDataEntriesByCategory,
   deleteDataCategory,
   updateDataEntry,
 } from "../../api"; // Make sure fetchDataTypes is imported
@@ -30,7 +30,7 @@ export default function CategoryDetail({ category, onBack }: Props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const entries = await fetchDataEntryByCategory(category.id);
+        const entries = await fetchDataEntriesByCategory(category.id);
         setDataEntries(entries);
       } catch (error) {
         console.error("Error fetching data entries:", error);

@@ -172,17 +172,38 @@ export async function deleteDataCategory(id: string) {
 }
 
 // Function to fetch all existing DataTypes
-export async function fetchDataEntryByCategory(
+export async function fetchDataEntriesByCategory(
   categoryId: string
 ): Promise<Schema["DataEntry"]["type"][]> {
   try {
     const { data: dataEntries, errors } =
-      await client.models.DataEntry.listByDate(
+      await client.models.DataEntry.listCategoryEntries(
         {
           dataCategoryId: categoryId,
         },
         {
           sortDirection: "DESC",
+        }
+      );
+    // await client.models.DataEntry.list({ orderBy: { name: "asc" } });
+    console.log("Data Entry:", dataEntries, " Errors: ", errors);
+    return dataEntries || [];
+  } catch (error) {
+    console.error("Error fetching data entries:", error);
+    return [];
+  }
+}
+
+export async function fetchDataEntries(
+  limit: number
+): Promise<Schema["DataEntry"]["type"][]> {
+  try {
+    const { data: dataEntries, errors } =
+      await client.models.DataEntry.listByDate(
+        { dummy: 0 },
+        {
+          sortDirection: "DESC",
+          limit: limit,
         }
       );
     // await client.models.DataEntry.list({ orderBy: { name: "asc" } });

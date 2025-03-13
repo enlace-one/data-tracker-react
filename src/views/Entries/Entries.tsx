@@ -1,18 +1,37 @@
 import { Heading, Divider } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import { createDataEntry, deleteDataEntry, updateDataEntry } from "../../api";
+import {
+  createDataEntry,
+  deleteDataEntry,
+  updateDataEntry,
+  fetchDataEntries,
+} from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
 import styles from "./Entries.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DataEntry } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 
 export default function Entries() {
-  const { dataEntries, dataCategories } = useData();
+  const { dataCategories } = useData();
+  const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
 
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const entries = await fetchDataEntries(20);
+        setDataEntries(entries);
+      } catch (error) {
+        console.error("Error fetching data entries:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleRightClick = (e: React.MouseEvent<Element>, id: string) => {
     e.preventDefault(); // Prevent the default context menu from appearing

@@ -53,10 +53,15 @@ const schema = a
         dataCategoryId: a.id().required(),
         date: a.date().required(),
         value: a.string().required(),
+        dummy: a.integer().default(0),
       })
       .secondaryIndexes((index) => [
         index("dataCategoryId")
-          .name("entryByDate")
+          .name("categoryEntriesByDate")
+          .queryField("listCategoryEntries")
+          .sortKeys(["date"]),
+        index("dummy")
+          .name("entriesByDate")
           .queryField("listByDate")
           .sortKeys(["date"]),
       ])
