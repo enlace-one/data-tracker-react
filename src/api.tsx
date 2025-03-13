@@ -177,9 +177,15 @@ export async function fetchDataEntryByCategory(
 ): Promise<Schema["DataEntry"]["type"][]> {
   try {
     const { data: dataEntries, errors } =
-      await client.models.DataEntry.listDataEntryByDataCategoryId({
-        dataCategoryId: categoryId,
-      });
+      await client.models.DataEntry.listByDate(
+        {
+          dataCategoryId: categoryId,
+        },
+        {
+          sortDirection: "DESC",
+        }
+      );
+    // await client.models.DataEntry.list({ orderBy: { name: "asc" } });
     console.log("Data Entry:", dataEntries, " Errors: ", errors);
     return dataEntries || [];
   } catch (error) {
