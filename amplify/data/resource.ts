@@ -54,7 +54,8 @@ const schema = a
         date: a.date().required(),
         value: a.string().required(),
       })
-      .secondaryIndexes((index) => [index("date")])
+      .secondaryIndexes((index) => [index("dataCategoryId"), index("date")])
+      // client.models.DataEntry.listDataentryByDataCategoryId({dataCategoryId: "ID"})
       .authorization((allow) => [
         allow.owner(),
         allow.groups(["Admins"]).to(["read"]),

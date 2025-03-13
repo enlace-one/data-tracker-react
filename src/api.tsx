@@ -171,6 +171,23 @@ export async function deleteDataCategory(id: string) {
   }
 }
 
+// Function to fetch all existing DataTypes
+export async function fetchDataEntryByCategory(
+  categoryId: string
+): Promise<Schema["DataEntry"]["type"][]> {
+  try {
+    const { data: dataEntries, errors } =
+      await client.models.DataEntry.listDataEntryByDataCategoryId({
+        dataCategoryId: categoryId,
+      });
+    console.log("Data Entry:", dataEntries, " Errors: ", errors);
+    return dataEntries || [];
+  } catch (error) {
+    console.error("Error fetching data entries:", error);
+    return [];
+  }
+}
+
 export async function deleteDataEntry(id: string) {
   try {
     await client.models.DataEntry.delete({ id: id });

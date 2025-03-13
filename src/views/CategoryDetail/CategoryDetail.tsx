@@ -5,6 +5,7 @@ import {
   createDataEntry,
   deleteDataEntry,
   updateDataCategory,
+  fetchDataEntryByCategory,
   deleteDataCategory,
   updateDataEntry,
 } from "../../api"; // Make sure fetchDataTypes is imported
@@ -14,7 +15,7 @@ import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 
 import styles from "./CategoryDetail.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Props {
   category: DataCategory;
@@ -22,9 +23,22 @@ interface Props {
 }
 
 export default function CategoryDetail({ category, onBack }: Props) {
-  const { dataCategories, dataTypes, dataEntries } = useData();
-
+  const { dataCategories, dataTypes } = useData();
+  const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const entries = await fetchDataEntryByCategory(category.id);
+        setDataEntries(entries);
+      } catch (error) {
+        console.error("Error fetching data entries:", error);
+      }
+    };
+
+    fetchData();
+  }, [category.id]);
 
   const handleRightClick = (e: React.MouseEvent<Element>, id: string) => {
     e.preventDefault(); // Prevent the default context menu from appearing
