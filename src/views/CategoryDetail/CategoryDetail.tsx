@@ -55,18 +55,32 @@ export default function CategoryDetail({ category, onBack }: Props) {
     } else if (typeof action === "number") {
       targetPageIndex = action;
     }
+    console.log("Action:", action);
+    console.log("targetPageIndex:", targetPageIndex);
+    console.log("currentPageIndex:", currentPageIndex);
+    console.log("pageTokens:", pageTokens);
+    console.log("hasMorePages:", hasMorePages);
+    console.log("dataEntries:", dataEntries);
 
-    const token = pageTokens[targetPageIndex];
-    const nextToken = fetchEntries(token);
-    setCurrentPageIndex(targetPageIndex);
+    // Only fetch if data for this page isn't already loaded
+    if (targetPageIndex + 1 >= pageTokens.length) {
+      const token = pageTokens[pageTokens.length - 1];
+      const nextToken = await fetchEntries(token);
 
-    // Manage nextToken and hasMorePages
-    if (nextToken && !pageTokens.includes(nextToken)) {
-      setPageTokens([...pageTokens, nextToken]);
+      if (nextToken && !pageTokens.includes(nextToken)) {
+        console.log("Setting Page Tokens:", [pageTokens, nextToken]);
+        setPageTokens((prev) => [...prev, nextToken]);
+        setHasMorePages(true);
+      } else {
+        setHasMorePages(false);
+      }
+    } else {
+      const token = pageTokens[targetPageIndex];
+      await fetchEntries(token); // Load existing page data
       setHasMorePages(true);
-    } else if (!nextToken) {
-      setHasMorePages(false);
     }
+
+    setCurrentPageIndex(targetPageIndex);
   };
 
   useEffect(() => {
