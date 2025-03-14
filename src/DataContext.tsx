@@ -72,6 +72,7 @@ export function DataProvider({ children }: DataProviderProps) {
   useEffect(() => {
     const sub = client.models.DataType.observeQuery().subscribe({
       next: ({ items }) => {
+        console.log("Setting data type to ", items);
         setDataTypes([...items]);
       },
     });

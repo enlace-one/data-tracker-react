@@ -1,4 +1,4 @@
-import { Heading, Divider } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import {
   createDataEntry,
@@ -10,12 +10,12 @@ import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
 import styles from "./Entries.module.css";
 import { useState, useEffect } from "react";
-import { DataEntry } from "../../types";
+import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 
 export default function Entries() {
-  const { dataCategories } = useData();
+  const { dataCategories, dataTypes, SETTINGS } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
 
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
@@ -89,6 +89,49 @@ export default function Entries() {
     updateDataEntry(formData); // Handle form data submission
   };
 
+  const addTestEntries = () => {
+    console.log("Adding test entries.");
+    let numberDataTypeId = "";
+    dataTypes.forEach((dt) => {
+      if (dt.name == "Number") {
+        numberDataTypeId = dt.id;
+      }
+    });
+    const today = new Date();
+    const yesterday = new Date();
+    const anteayer = new Date();
+    yesterday.setDate(today.getDate() - 1);
+    anteayer.setDate(today.getDate() - 2);
+    dataCategories.forEach((cat) => {
+      if (cat.dataTypeId == numberDataTypeId) {
+        const testEntries: FormDataType[] = [
+          {
+            dataCategoryId: cat.id,
+            value: "1",
+            date: today.toISOString().split("T")[0],
+            note: "This is a test entry 1",
+          },
+          {
+            dataCategoryId: cat.id,
+            value: "2",
+            date: yesterday.toISOString().split("T")[0],
+            note: "This is a test entry 2",
+          },
+          {
+            dataCategoryId: cat.id,
+            value: "3",
+            date: anteayer.toISOString().split("T")[0],
+            note: "This is a test entry 2",
+          },
+        ];
+
+        testEntries.forEach((entry) => {
+          createDataEntry(entry);
+        });
+      }
+    });
+  };
+
   return (
     <>
       <Heading level={1}>Data Entries</Heading>
@@ -99,6 +142,10 @@ export default function Entries() {
         buttonText="Add New"
         handleFormData={handleFormData}
       />
+      {SETTINGS.debug && (
+        <Button onClick={addTestEntries}>Add Test Entries</Button>
+      )}
+
       <table>
         <tbody>
           {dataEntries.map((item) => (
@@ -106,12 +153,12 @@ export default function Entries() {
               key={item.id}
               onContextMenu={(e) => handleRightClick(e, item.id)}
             >
-              <FlexForm
-                heading="Update Entry"
-                fields={getUpdateEntryFormField(item)}
-                handleFormData={handleUpdateEntryFormData}
-              >
-                <td className={styles.minWidth}>
+              <td className={styles.minWidth}>
+                <FlexForm
+                  heading="Update Entry"
+                  fields={getUpdateEntryFormField(item)}
+                  handleFormData={handleUpdateEntryFormData}
+                >
                   {item.value} <br />
                   <small>
                     {dataCategories
@@ -144,8 +191,9 @@ export default function Entries() {
                       </small>
                     </>
                   )}
-                </td>
-              </FlexForm>
+                </FlexForm>
+              </td>
+
               <td>
                 <TextButton onClick={() => deleteDataEntry(item.id)}>
                   <span className={styles.small}>❌</span>
