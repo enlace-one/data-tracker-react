@@ -238,9 +238,34 @@ export async function deleteAllDataEntries() {
   }
 }
 
-export async function deleteDataEntry(id: string) {
+export async function deleteDataEntry(id: string): Promise<void> {
   try {
-    await client.models.DataEntry.delete({ id: id });
+    // Fetch the data entry to get the dataCategoryId
+    const { data: dataEntry, errors: fetchErrors } =
+      await client.models.DataEntry.get({ id });
+
+    if (fetchErrors) {
+      console.error("Errors fetching data entry:", fetchErrors);
+      return;
+    }
+
+    if (!dataEntry) {
+      console.error("Data entry not found for ID:", id);
+      return;
+    }
+
+    // Delete the data entry
+    const { errors: deleteErrors } = await client.models.DataEntry.delete({
+      id,
+    });
+
+    if (deleteErrors) {
+      console.error("Errors deleting data entry:", deleteErrors);
+      return;
+    }
+
+    // Decrement the entry count for the category
+    await updateDataCategoryEntryCount(dataEntry.dataCategoryId, -1);
 
     console.log(`Data entry deleted with id ${id}.`);
   } catch (error) {
@@ -288,6 +313,54 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
   }
 }
 
+export async function updateDataCategoryEntryCount(
+  categoryId: string,
+  adjustment: number
+): Promise<void> {
+  try {
+    console.log(
+      "Updating category entry count for category:",
+      categoryId,
+      "with adjustment:",
+      adjustment
+    );
+
+    // Fetch the current entry count for the category
+    const { data: categoryData, errors: fetchErrors } =
+      await client.models.DataCategory.get({ id: categoryId });
+
+    if (fetchErrors) {
+      console.error("Errors fetching category data:", fetchErrors);
+      return;
+    }
+
+    if (!categoryData) {
+      console.error("Category not found for ID:", categoryId);
+      return;
+    }
+
+    // Adjust the entry count
+    const updatedEntryCount = (categoryData.entryCount || 0) + adjustment;
+
+    // Update the category with the new entry count
+    const { errors: updateErrors } = await client.models.DataCategory.update({
+      id: categoryId,
+      entryCount: updatedEntryCount,
+    });
+
+    if (updateErrors) {
+      console.error("Errors updating category entry count:", updateErrors);
+    } else {
+      console.log(
+        "Successfully updated category entry count to:",
+        updatedEntryCount
+      );
+    }
+  } catch (error) {
+    console.error("Error updating data category:", error);
+  }
+}
+
 /**
  * Create a new data entry.
  * @param {string} name - Name of the entry.
@@ -303,7 +376,10 @@ export async function createDataEntry(formData: FormData): Promise<void> {
       value: formData.value!,
       dataCategoryId: formData.dataCategoryId!,
     });
+
     console.log("Errors:", errors);
+
+    updateDataCategoryEntryCount(formData.dataCategoryId!, 1);
   } catch (error) {
     console.error("Error creating data Entry:", error);
   }

@@ -23,7 +23,7 @@ import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅
 interface DataContextType {
   userProfiles: UserProfile[];
   dataCategories: DataCategory[];
-  dataEntries: DataEntry[];
+  // dataEntries: DataEntry[];
   dataTypes: DataType[];
   SETTINGS: { debug: boolean };
   selectedCategory: DataCategory | null;
@@ -63,7 +63,7 @@ async function initializeDataTypes() {
 export function DataProvider({ children }: DataProviderProps) {
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
-  const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
+  // const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
     null
@@ -102,14 +102,14 @@ export function DataProvider({ children }: DataProviderProps) {
   // Reintroduce the subscription to real-time updates
   useEffect(() => {
     const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
-    const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
+    // const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
     // const unsubscribeTypes = subscribeToDataTypes(setDataTypes);
 
     // Cleanup function to unsubscribe when the component is unmounted
     return () => {
       console.log("Cleaning up subscriptions");
       unsubscribeCategories();
-      unsubscribeEntries();
+      // unsubscribeEntries();
       // unsubscribeTypes();
     };
   }, []);
@@ -119,7 +119,7 @@ export function DataProvider({ children }: DataProviderProps) {
       value={{
         userProfiles,
         dataCategories,
-        dataEntries,
+        // dataEntries,
         dataTypes,
         SETTINGS,
         selectedCategory,

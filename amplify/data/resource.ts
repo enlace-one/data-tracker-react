@@ -39,6 +39,7 @@ const schema = a
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
         dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
         dataType: a.belongsTo("DataType", "dataTypeId"),
+        entryCount: a.integer().default(0),
       })
       .secondaryIndexes((index) => [index("name")])
       .authorization((allow) => [

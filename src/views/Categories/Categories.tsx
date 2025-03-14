@@ -9,13 +9,8 @@ import { DataCategory } from "../../types";
 import styles from "./Categories.module.css";
 
 export default function Categories() {
-  const {
-    dataCategories,
-    dataTypes,
-    dataEntries,
-    selectedCategory,
-    setSelectedCategory,
-  } = useData();
+  const { dataCategories, dataTypes, selectedCategory, setSelectedCategory } =
+    useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -90,12 +85,7 @@ export default function Categories() {
                     "Unknown"}
                 </small>
               </td> */}
-              <td className={styles.paddingLeft}>
-                {
-                  dataEntries.filter((de) => de.dataCategoryId === item.id)
-                    .length
-                }
-              </td>
+              <td className={styles.paddingLeft}>{item.entryCount}</td>
               {/* <td>
                 <TextButton onClick={() => deleteDataCategory(item.id)}>
                   ❌

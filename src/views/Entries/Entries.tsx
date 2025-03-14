@@ -33,7 +33,7 @@ export default function Entries() {
         { dummy: 0 },
         {
           sortDirection: "DESC",
-          limit: 50,
+          limit: 10,
           nextToken: token,
         }
       );
