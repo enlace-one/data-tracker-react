@@ -6,6 +6,7 @@ import {
   updateDataEntry,
   fetchDataEntries,
   deleteAllDataEntries,
+  client,
 } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
@@ -14,10 +15,41 @@ import { useState, useEffect } from "react";
 import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
+import { Pagination } from "@aws-amplify/ui-react";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
+
+  const [pageTokens, setPageTokens] = useState([null]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(1);
+  const [hasMorePages, setHasMorePages] = useState(true);
+
+  const handleNextPage = async () => {
+    if (hasMorePages && currentPageIndex === pageTokens.length) {
+      const {
+        data: dataEntries,
+        nextToken,
+        errors,
+      } = await client.models.DataEntry.listByDate(
+        { dummy: 0 },
+        {
+          sortDirection: "DESC",
+          limit: 20,
+          nextToken: pageTokens[pageTokens.length - 1],
+        }
+      );
+      setDataEntries(dataEntries);
+
+      if (!nextToken) {
+        setHasMorePages(false);
+      }
+
+      setPageTokens([...pageTokens, nextToken]);
+    }
+
+    setCurrentPageIndex(currentPageIndex + 1);
+  };
 
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
 
@@ -205,6 +237,14 @@ export default function Entries() {
           ))}
         </tbody>
       </table>
+      <Pagination
+        currentPage={currentPageIndex}
+        totalPages={pageTokens.length}
+        hasMorePages={hasMorePages}
+        onNext={handleNextPage}
+        onPrevious={() => setCurrentPageIndex(currentPageIndex - 1)}
+        onChange={(pageIndex) => setCurrentPageIndex(pageIndex)}
+      />
     </>
   );
 }

@@ -195,7 +195,8 @@ export async function fetchDataEntriesByCategory(
 }
 
 export async function fetchDataEntries(
-  limit: number
+  limit: number,
+  nextToken: string | null = null
 ): Promise<Schema["DataEntry"]["type"][]> {
   try {
     const { data: dataEntries, errors } =
@@ -204,6 +205,7 @@ export async function fetchDataEntries(
         {
           sortDirection: "DESC",
           limit: limit,
+          nextToken: nextToken,
         }
       );
     // await client.models.DataEntry.list({ orderBy: { name: "asc" } });
