@@ -1,4 +1,4 @@
-import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button, Pagination } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
 import {
@@ -8,6 +8,7 @@ import {
   fetchDataEntriesByCategory,
   deleteDataCategory,
   updateDataEntry,
+  client,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
 import { DataCategory, DataEntry } from "../../types";
@@ -26,19 +27,57 @@ export default function CategoryDetail({ category, onBack }: Props) {
   const { dataCategories, dataTypes } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
+  const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [hasMorePages, setHasMorePages] = useState(true);
+
+  const fetchEntries = async (token: string | null) => {
+    const { data: fetchedEntries, nextToken } =
+      await client.models.DataEntry.listCategoryEntries(
+        { dataCategoryId: category.id },
+        {
+          sortDirection: "DESC",
+          limit: 20,
+          nextToken: token,
+        }
+      );
+    setDataEntries(fetchedEntries);
+    return nextToken;
+  };
+
+  const handlePageChange = async (action: "next" | "previous" | number) => {
+    let targetPageIndex = currentPageIndex;
+
+    if (action === "next" && hasMorePages) {
+      targetPageIndex += 1;
+    } else if (action === "previous" && currentPageIndex > 0) {
+      targetPageIndex -= 1;
+    } else if (typeof action === "number") {
+      targetPageIndex = action;
+    }
+
+    const token = pageTokens[targetPageIndex];
+    const nextToken = fetchEntries(token);
+    setCurrentPageIndex(targetPageIndex);
+
+    // Manage nextToken and hasMorePages
+    if (nextToken && !pageTokens.includes(nextToken)) {
+      setPageTokens([...pageTokens, nextToken]);
+      setHasMorePages(true);
+    } else if (!nextToken) {
+      setHasMorePages(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const entries = await fetchDataEntriesByCategory(category.id);
-        setDataEntries(entries);
-      } catch (error) {
-        console.error("Error fetching data entries:", error);
+    const fetchInitialData = async () => {
+      const firstNextToken = await fetchEntries(null);
+      if (firstNextToken && !pageTokens.includes(firstNextToken)) {
+        setPageTokens([...pageTokens, firstNextToken]);
       }
     };
-
-    fetchData();
-  }, [category.id]);
+    fetchInitialData();
+  }, []);
 
   const handleRightClick = (e: React.MouseEvent<Element>, id: string) => {
     e.preventDefault(); // Prevent the default context menu from appearing
@@ -198,6 +237,21 @@ export default function CategoryDetail({ category, onBack }: Props) {
             ))}
         </tbody>
       </table>
+      <Pagination
+        currentPage={currentPageIndex + 1}
+        totalPages={pageTokens.length}
+        onNext={() => handlePageChange("next")}
+        onPrevious={() => handlePageChange("previous")}
+        onChange={(pageIndex) => {
+          if (
+            typeof pageIndex === "number" &&
+            pageIndex >= 1 &&
+            pageIndex <= pageTokens.length
+          ) {
+            handlePageChange(pageIndex - 1); // Adjust for zero-indexing
+          }
+        }}
+      />
     </>
   );
 }
