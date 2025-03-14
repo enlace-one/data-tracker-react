@@ -5,6 +5,7 @@ import {
   deleteDataEntry,
   updateDataEntry,
   fetchDataEntries,
+  deleteAllDataEntries,
 } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
@@ -98,36 +99,20 @@ export default function Entries() {
       }
     });
     const today = new Date();
-    const yesterday = new Date();
-    const anteayer = new Date();
-    yesterday.setDate(today.getDate() - 1);
-    anteayer.setDate(today.getDate() - 2);
     dataCategories.forEach((cat) => {
       if (cat.dataTypeId == numberDataTypeId) {
-        const testEntries: FormDataType[] = [
-          {
+        for (let x = 1; x < 50; x++) {
+          const day = new Date();
+          day.setDate(today.getDate() - x);
+          const entry = {
             dataCategoryId: cat.id,
-            value: "1",
-            date: today.toISOString().split("T")[0],
-            note: "This is a test entry 1",
-          },
-          {
-            dataCategoryId: cat.id,
-            value: "2",
-            date: yesterday.toISOString().split("T")[0],
-            note: "This is a test entry 2",
-          },
-          {
-            dataCategoryId: cat.id,
-            value: "3",
-            date: anteayer.toISOString().split("T")[0],
-            note: "This is a test entry 2",
-          },
-        ];
-
-        testEntries.forEach((entry) => {
+            value: `${x}`,
+            date: day.toISOString().split("T")[0],
+            note: "",
+          };
           createDataEntry(entry);
-        });
+          // You can use 'day' here for further logic
+        }
       }
     });
   };
@@ -136,15 +121,32 @@ export default function Entries() {
     <>
       <Heading level={1}>Data Entries</Heading>
       <Divider />
-      <Form
-        heading="New Entry"
-        fields={formFields}
-        buttonText="Add New"
-        handleFormData={handleFormData}
-      />
-      {SETTINGS.debug && (
-        <Button onClick={addTestEntries}>Add Test Entries</Button>
-      )}
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <Form
+                heading="New Entry"
+                fields={formFields}
+                buttonText="Add New"
+                handleFormData={handleFormData}
+              />
+            </td>
+            {SETTINGS.debug && (
+              <td>
+                <Button onClick={addTestEntries}>Add Test Entries</Button>
+              </td>
+            )}
+            {SETTINGS.debug && (
+              <td>
+                <Button onClick={deleteAllDataEntries}>
+                  Delete All Entries
+                </Button>
+              </td>
+            )}
+          </tr>
+        </tbody>
+      </table>
 
       <table>
         <tbody>

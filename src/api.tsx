@@ -215,6 +215,27 @@ export async function fetchDataEntries(
   }
 }
 
+export async function deleteAllDataEntries() {
+  try {
+    const { data: dataEntries, errors } = await client.models.DataEntry.list();
+
+    if (dataEntries.length === 0) {
+      console.log("No Entries to delete.");
+      return;
+    }
+
+    await Promise.all(
+      dataEntries.map((dataEntry: Schema["DataEntry"]["type"]) =>
+        deleteDataEntry(dataEntry.id)
+      )
+    );
+
+    console.log("✅ All DataTypes have been deleted.");
+  } catch (error) {
+    console.error("Error deleting DataTypes:", error);
+  }
+}
+
 export async function deleteDataEntry(id: string) {
   try {
     await client.models.DataEntry.delete({ id: id });
