@@ -3,10 +3,16 @@ import styles from "./Alert.module.css";
 
 interface Props {
   children: ReactNode;
+  type: string;
 }
 
-const Alert = ({ children }: Props) => {
-  return <div className={styles.alert}>{children}</div>;
+const Alert = ({ children, type }: Props) => {
+  let style = "";
+
+  if (type.toLowerCase() == "error") {
+    style = styles.error;
+  }
+  return <div className={style}>{children}</div>;
 };
 
 export default Alert;

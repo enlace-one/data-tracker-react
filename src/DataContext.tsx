@@ -19,9 +19,14 @@ import type { Schema } from "../amplify/data/resource";
 
 import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
 
+interface AlertInfo {
+  message: string;
+  type: string;
+}
+
 // Define the context value type
 interface DataContextType {
-  actionMessage: string;
+  actionMessage: AlertInfo;
   setActionMessage: React.Dispatch<React.SetStateAction<string>>;
   userProfiles: UserProfile[];
   dataCategories: DataCategory[];
@@ -83,7 +88,10 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   // const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
-  const [actionMessage, _setActionMessage] = useState<string>(""); // Initialize with an empty string
+  const [actionMessage, _setActionMessage] = useState<AlertInfo>({
+    message: "",
+    type: "",
+  }); // Initialize with an empty string
   const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
     null
   ); // Correct as is
@@ -98,15 +106,13 @@ export function DataProvider({ children }: DataProviderProps) {
     return () => sub.unsubscribe();
   }, []);
 
-  const setActionMessage: React.Dispatch<React.SetStateAction<string>> = (
-    message
-  ) => {
-    _setActionMessage(message);
-    console.log("Alert:", message);
+  const setActionMessage = (alertInfo: AlertInfo) => {
+    _setActionMessage(alertInfo);
+    console.log("Alert", alertInfo.type, ":", alertInfo.message);
 
     // Clear the message after 10 seconds
     setTimeout(() => {
-      _setActionMessage("");
+      _setActionMessage({ message: "", type: "" });
     }, 10000); // 10000 milliseconds = 10 seconds
   };
 

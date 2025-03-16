@@ -33,7 +33,7 @@ export default function Categories() {
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage(errorMessage);
+      setActionMessage({ message: errorMessage, type: "error" });
     }
   };
   if (selectedCategory) {

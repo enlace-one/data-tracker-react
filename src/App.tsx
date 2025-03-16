@@ -42,7 +42,7 @@ export default function App() {
       width="70%"
       margin="0 auto"
     >
-      <Alert>{actionMessage}</Alert>
+      <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
 
       {activeTab === "profile" && <Profile signOut={signOut} />}
       {activeTab === "categories" && <Categories />}
