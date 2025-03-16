@@ -73,9 +73,9 @@ export default function Categories() {
                 </span>
                 <br />
                 <small>
-                  {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
-                    "Unknown"}{" "}
-                  - {item.note}{" "}
+                  {/* {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
+                    "Unknown"}{" "} */}
+                  {item.dataType.name} - {item.note}{" "}
                 </small>
               </td>
               {/* <td>

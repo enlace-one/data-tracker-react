@@ -41,6 +41,24 @@ export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
   }
 }
 
+export async function getDataType(
+  id: string
+): Promise<Schema["DataType"]["type"] | {}> {
+  try {
+    const { data, errors } = await client.models.DataType.get({ id: id });
+    console.log("Data Type:", data, "Errors:", errors);
+
+    if (errors && errors.length > 0) {
+      console.error("Errors fetching data type:", errors);
+    }
+
+    return data || {};
+  } catch (error) {
+    console.error("Error fetching data type:", error);
+    return {};
+  }
+}
+
 export async function createUniqueDataType(
   name: string,
   note: string,
@@ -402,18 +420,60 @@ export async function updateDataEntry(formData: FormData): Promise<void> {
   }
 }
 
+type ResolvedDataType = Omit<Schema["DataType"]["type"], "dataCategories"> & {
+  dataCategories?: Schema["DataCategory"]["type"][];
+};
+
+type EnrichedDataCategory = Omit<Schema["DataCategory"]["type"], "dataType"> & {
+  dataType?: ResolvedDataType;
+};
+
 /**
- * Subscribe to real-time updates for data categories.
+ * Subscribe to real-time updates for data categories, including their data types.
  * @param {Function} callback - Function to update state with new data.
  * @returns {Function} Unsubscribe function.
  */
 export function subscribeToDataCategories(
-  callback: (items: Schema["DataCategory"]["type"][]) => void
+  callback: (items: EnrichedDataCategory[]) => void
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
-    next: (result: { items?: Schema["DataCategory"]["type"][] }) => {
+    next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {
       console.log("Updating DataCategories:", result.items);
-      callback(result.items || []);
+
+      if (!result.items) {
+        callback([]);
+        return;
+      }
+
+      const enrichedItems = await Promise.all(
+        result.items.map(async (item) => {
+          try {
+            let dataType: Schema["DataType"]["type"] | undefined;
+
+            if (item.dataType && typeof item.dataType === "function") {
+              // Resolve LazyLoader
+              const resolved = await item.dataType();
+              dataType = resolved?.data ?? undefined;
+            }
+            // else if (item.dataTypeId) {
+            //   // Fallback if LazyLoader isn't present
+            //   dataType = await getDataType(item.dataTypeId);
+            // }
+
+            return { ...item, dataType };
+          } catch (error) {
+            console.error(
+              `Failed to fetch DataType for ID ${item.dataTypeId}:`,
+              error
+            );
+            return { ...item };
+          }
+        })
+      );
+
+      console.log("Enriched Categories:", enrichedItems);
+
+      callback(enrichedItems);
     },
     error: (error: unknown) => {
       console.error("Subscription error:", error);
