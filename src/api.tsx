@@ -41,6 +41,22 @@ export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
   }
 }
 
+export async function updateDataType(formData: FormData): Promise<void> {
+  try {
+    console.log("Updating Type:", formData.name); // Fixed incorrect variable reference
+
+    const { errors } = await client.models.DataType.update({
+      id: formData.id!,
+      name: formData.name || "", // Ensure a default empty string if missing
+      note: formData.note || "", // Default empty string
+      inputType: formData.inputType || "",
+    });
+    console.log("Errors:", errors);
+  } catch (error) {
+    console.error("Error creating data type:", error);
+  }
+}
+
 export async function getDataType(
   id: string
 ): Promise<Schema["DataType"]["type"] | {}> {

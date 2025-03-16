@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent, ReactNode } from "react";
 import styles from "./FlexForm.module.css";
 import { Heading } from "@aws-amplify/ui-react";
+import BooleanField from "../BooleanField/BooleanField";
 
 export interface Option {
   label: string;
@@ -58,6 +59,13 @@ const FlexForm = ({
     }));
   };
 
+  const handleBooleanChange = (id: string, value: boolean) => {
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
@@ -80,6 +88,9 @@ const FlexForm = ({
                   <div key={field.id} className={styles.formGroup}>
                     <label htmlFor={field.id}>{field.name}:</label>
                     {field.type === "select" && field.options ? (
+                      //
+                      // Handle Select Fields
+                      //
                       <select
                         id={field.id}
                         name={field.id}
@@ -94,7 +105,20 @@ const FlexForm = ({
                           </option>
                         ))}
                       </select>
+                    ) : field.type === "boolean" ? (
+                      //
+                      // Handle custom boolean field
+                      //
+                      <BooleanField
+                        default={!!formData[field.id]}
+                        onChange={(value) =>
+                          handleBooleanChange(field.id, value)
+                        }
+                      />
                     ) : (
+                      //
+                      // Handle Other Field Types
+                      //
                       <input
                         type={field.type || "text"}
                         id={field.id}

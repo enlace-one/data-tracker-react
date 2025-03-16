@@ -1,9 +1,16 @@
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
+import FlexForm from "../../components/FlexForm/FlexForm";
 import TextButton from "../../components/TextButton/TextButton";
-import { createDataType, deleteAllDataTypes, deleteDataType } from "../../api"; // Make sure fetchDataTypes is imported
+import {
+  createDataType,
+  deleteAllDataTypes,
+  deleteDataType,
+  updateDataType,
+} from "../../api"; // Make sure fetchDataTypes is imported
 import styles from "./Types.module.css";
+import { DataType } from "../../types";
 
 export default function Types() {
   const { dataTypes } = useData();
@@ -18,6 +25,23 @@ export default function Types() {
   const handleFormData = (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     console.log(createDataType(formData)); // Handle form data submission
+  };
+
+  const getUpdateTypeFormField = (dataType: DataType) => [
+    { name: "Name", id: "name", required: true, default: dataType.name ?? "" },
+    { name: "Note", id: "note", default: dataType.note ?? "" },
+    {
+      name: "Is Complex",
+      id: "isComplex",
+      type: "checkbox",
+      default: dataType.isComplex ?? "",
+    },
+    { name: "Input Type", id: "inputType", default: dataType.inputType ?? "" },
+    { name: "Id", id: "id", default: dataType.id ?? "", hidden: true },
+  ];
+
+  const handleUpdateTypeFormData = (formData: Record<string, any>) => {
+    updateDataType(formData);
   };
 
   return (
@@ -45,9 +69,17 @@ export default function Types() {
           {dataTypes.map((item) => (
             <tr key={item.id}>
               <td>
-                {item.name} <small>{item.isComplex && "(Complex)"}</small>
-                <br />
-                <small>{item.note}</small>
+                <FlexForm
+                  heading="Update Type"
+                  fields={getUpdateTypeFormField(item)}
+                  handleFormData={handleUpdateTypeFormData}
+                >
+                  {item.name} <small>{item.isComplex && "(Complex)"}</small>
+                  <br />
+                  <small>
+                    {item.inputType} - {item.note}
+                  </small>
+                </FlexForm>
               </td>
               <td>
                 <TextButton onClick={() => deleteDataType(item.id)}>

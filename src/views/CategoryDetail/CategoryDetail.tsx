@@ -107,10 +107,11 @@ export default function CategoryDetail({ category, onBack }: Props) {
 
   const addEntryFormFields = [
     // Category added in handleFormData
-    { name: "Value", id: "value" },
+    { name: "Value", id: "value", type: category.dataType.inputType },
     { name: "Date", id: "date", type: "date" },
     { name: "Note", id: "note" },
   ];
+
   const getUpdateEntryFormField = (entry: DataEntry) => {
     return [
       { name: "Value", id: "value", default: entry.value ?? "" },
@@ -191,13 +192,20 @@ export default function CategoryDetail({ category, onBack }: Props) {
                 buttonStyle={styles.lightMargin}
               />
 
-              <Form
+              {/* <Form
                 heading="New Entry"
                 fields={addEntryFormFields}
                 buttonText="Add Entry"
                 handleFormData={handleNewEntryFormData}
                 buttonStyle={styles.lightMargin}
-              />
+              /> */}
+              <FlexForm
+                heading="New Entry"
+                fields={addEntryFormFields}
+                handleFormData={handleNewEntryFormData}
+              >
+                <Button className={styles.lightMargin}>Add Entry</Button>
+              </FlexForm>
             </td>
           </tr>
         </tbody>
