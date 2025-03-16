@@ -6,13 +6,14 @@ import {
   updateDataEntry,
   fetchDataEntries,
   deleteAllDataEntries,
+  getDataCategory,
   client,
 } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import Form from "../../components/Form/Form";
 import styles from "./Entries.module.css";
 import { useState, useEffect } from "react";
-import { DataEntry } from "../../types";
+import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 
 export default function Entries() {
@@ -97,7 +98,6 @@ export default function Entries() {
   };
 
   const getUpdateEntryFormField = (entry: DataEntry) => [
-    { name: "Value", id: "value", default: entry.value ?? "" },
     {
       name: "Data Category",
       id: "dataCategoryId",
@@ -148,12 +148,19 @@ export default function Entries() {
         <tbody>
           <tr>
             <td>
-              <Form
+              {/* <Form
                 heading="New Entry"
                 fields={getUpdateEntryFormField({} as DataEntry)}
                 buttonText="Add New"
                 handleFormData={handleFormData}
-              />
+              /> */}
+              <FlexForm
+                heading="New Entry"
+                fields={getUpdateEntryFormField({} as DataEntry)}
+                handleFormData={handleFormData}
+              >
+                <Button className={styles.lightMargin}>Add Entry</Button>
+              </FlexForm>
             </td>
             {SETTINGS.debug && (
               <td>

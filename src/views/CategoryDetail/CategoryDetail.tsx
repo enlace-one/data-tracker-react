@@ -114,7 +114,12 @@ export default function CategoryDetail({ category, onBack }: Props) {
 
   const getUpdateEntryFormField = (entry: DataEntry) => {
     return [
-      { name: "Value", id: "value", default: entry.value ?? "" },
+      {
+        name: "Value",
+        id: "value",
+        default: entry.value ?? "",
+        type: category.dataType.inputType,
+      },
       { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
       { name: "Note", id: "note", default: entry.note ?? "" },
       { name: "Id", id: "id", default: entry.id ?? "", hidden: true },

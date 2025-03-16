@@ -447,6 +447,37 @@ type EnrichedDataCategory = Omit<Schema["DataCategory"]["type"], "dataType"> & {
 };
 
 /**
+ * Fetch a data category by its ID, including its data type.
+ * @param {string} categoryId - The ID of the data category to fetch.
+ * @returns {Promise<Schema["DataCategory"]["type"] | null>} The data category with its data type or null if not found.
+ */
+export async function getDataCategory(
+  categoryId: string
+): Promise<Schema["DataCategory"]["type"] | null> {
+  try {
+    const { data, errors } = await client.models.DataCategory.get({
+      id: categoryId,
+      include: ["dataType"], // Eagerly load the data type
+    });
+
+    if (errors) {
+      console.error("Errors fetching data category:", errors);
+      return null;
+    }
+
+    if (!data) {
+      console.warn(`Data category with ID ${categoryId} not found.`);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching data category:", error);
+    return null;
+  }
+}
+
+/**
  * Subscribe to real-time updates for data categories, including their data types.
  * @param {Function} callback - Function to update state with new data.
  * @returns {Function} Unsubscribe function.
