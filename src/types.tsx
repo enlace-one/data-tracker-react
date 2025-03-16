@@ -47,6 +47,7 @@ export interface FormDataType {
   addDefault?: boolean;
   dataTypeId?: string;
   dataCategoryId?: string;
+  inputType?: string;
   date?: string;
   value?: string;
   id?: string;

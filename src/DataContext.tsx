@@ -45,9 +45,20 @@ const DEFAULT_DATA_TYPES = [
     name: "Number",
     note: "Stores numeric values such as '1', '-1' and '2.4",
     isComplex: false,
+    inputType: "number",
   },
-  { name: "Boolean", note: "Stores true/false values", isComplex: false },
-  { name: "Text", note: "Stores string values", isComplex: false },
+  {
+    name: "Boolean",
+    note: "Stores true/false values",
+    isComplex: false,
+    inputType: "boolean",
+  },
+  {
+    name: "Text",
+    note: "Stores string values",
+    isComplex: false,
+    inputType: "string",
+  },
 ];
 
 const SETTINGS = { debug: true };
@@ -55,7 +66,12 @@ const SETTINGS = { debug: true };
 async function initializeDataTypes() {
   await Promise.all(
     DEFAULT_DATA_TYPES.map((dataType) =>
-      createUniqueDataType(dataType.name, dataType.note, dataType.isComplex)
+      createUniqueDataType(
+        dataType.name,
+        dataType.note,
+        dataType.inputType,
+        dataType.isComplex
+      )
     )
   );
 }

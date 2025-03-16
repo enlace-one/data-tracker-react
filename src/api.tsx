@@ -62,6 +62,7 @@ export async function getDataType(
 export async function createUniqueDataType(
   name: string,
   note: string,
+  inputType: string,
   isComplex: boolean
 ) {
   try {
@@ -73,6 +74,7 @@ export async function createUniqueDataType(
       await createDataType({
         name: name,
         note: note,
+        inputType: inputType,
         isComplex: isComplex,
       });
       console.log(`✅ Created DataType: ${name}.`);
@@ -434,7 +436,7 @@ type EnrichedDataCategory = Omit<Schema["DataCategory"]["type"], "dataType"> & {
  * @returns {Function} Unsubscribe function.
  */
 export function subscribeToDataCategories(
-  callback: (items: EnrichedDataCategory[]) => void
+  callback: (items: Schema["DataCategory"]["type"][]) => void
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {
