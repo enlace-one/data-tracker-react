@@ -6,6 +6,7 @@ import {
   DataCategory,
   DataEntry,
   DataType,
+  EnrichedDataCategory,
   FormDataType as FormData,
 } from "./types"; // ✅ Import interfaces
 
@@ -438,14 +439,6 @@ export async function updateDataEntry(formData: FormData): Promise<void> {
   }
 }
 
-type ResolvedDataType = Omit<Schema["DataType"]["type"], "dataCategories"> & {
-  dataCategories?: Schema["DataCategory"]["type"][];
-};
-
-type EnrichedDataCategory = Omit<Schema["DataCategory"]["type"], "dataType"> & {
-  dataType?: ResolvedDataType;
-};
-
 /**
  * Fetch a data category by its ID, including its data type.
  * @param {string} categoryId - The ID of the data category to fetch.
@@ -483,7 +476,7 @@ export async function getDataCategory(
  * @returns {Function} Unsubscribe function.
  */
 export function subscribeToDataCategories(
-  callback: (items: Schema["DataCategory"]["type"][]) => void
+  callback: (items: EnrichedDataCategory[]) => void
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {

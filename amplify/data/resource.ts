@@ -24,7 +24,7 @@ const schema = a
       .model({
         name: a.string().required(),
         note: a.string(),
-        inputType: a.string(),
+        inputType: a.string().required(),
         isComplex: a.boolean().required(),
         dataCategories: a.hasMany("DataCategory", "dataTypeId"),
       })

@@ -11,7 +11,7 @@ import {
   client,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
-import { DataCategory, DataEntry } from "../../types";
+import { DataCategory, DataEntry, EnrichedDataCategory } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 
@@ -19,7 +19,7 @@ import styles from "./CategoryDetail.module.css";
 import { useState, useEffect } from "react";
 
 interface Props {
-  category: DataCategory;
+  category: EnrichedDataCategory;
   onBack: () => void;
 }
 

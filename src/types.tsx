@@ -52,3 +52,17 @@ export interface FormDataType {
   value?: string;
   id?: string;
 }
+
+export type ResolvedDataType = Omit<
+  Schema["DataType"]["type"],
+  "dataCategories"
+> & {
+  dataCategories?: Schema["DataCategory"]["type"][];
+};
+
+export type EnrichedDataCategory = Omit<
+  Schema["DataCategory"]["type"],
+  "dataType"
+> & {
+  dataType: ResolvedDataType;
+};
