@@ -10,6 +10,8 @@ import {
   FormDataType as FormData,
 } from "./types"; // ✅ Import interfaces
 
+import { useData } from "./DataContext";
+
 // Initialize the Amplify client
 const client = generateClient<Schema>();
 
@@ -316,20 +318,25 @@ export async function deleteDataEntry(id: string): Promise<void> {
  * @returns {Promise<void>}
  */
 export async function createDataCategory(formData: FormData): Promise<void> {
-  try {
-    console.log("Adding category:", formData.name); // Fixed incorrect variable reference
-
-    const { errors } = await client.models.DataCategory.create({
-      name: formData.name || "", // Ensure a default empty string if missing
-      defaultValue: formData.defaultValue || "", // Default empty string
-      note: formData.note || "", // Default empty string
-      addDefault: formData.addDefault ?? false, // Default to false for boolean
-      dataTypeId: formData.dataTypeId!,
-    });
-    console.log("Errors:", errors);
-  } catch (error) {
-    console.error("Error creating data category:", error);
+  // DOES NOT DO ERROR HANDLING ON PURPOSE
+  const { data } = await client.models.DataCategory.listDataCategoryByName({
+    name: formData.name!,
+  });
+  if (data.length > 0) {
+    console.log("Duplicate category name");
+    throw new Error("Error: Duplicate category name");
   }
+
+  console.log("Adding category:", formData.name); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.DataCategory.create({
+    name: formData.name || "", // Ensure a default empty string if missing
+    defaultValue: formData.defaultValue || "", // Default empty string
+    note: formData.note || "", // Default empty string
+    addDefault: formData.addDefault ?? false, // Default to false for boolean
+    dataTypeId: formData.dataTypeId!,
+  });
+  console.log("Errors:", errors);
 }
 
 export async function updateDataCategory(formData: FormData): Promise<void> {

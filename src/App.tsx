@@ -14,6 +14,7 @@ import Profile from "./views/Profile/Profile";
 import Categories from "./views/Categories/Categories";
 import Entries from "./views/Entries/Entries";
 import Types from "./views/Types/Types";
+import Alert from "./components/Alert/Alert";
 
 export default function App() {
   const [activeTab, _setActiveTab] = useState<
@@ -22,7 +23,7 @@ export default function App() {
 
   const { signOut } = useAuthenticator((context) => [context.user]);
 
-  const { setSelectedCategory } = useData();
+  const { setSelectedCategory, actionMessage } = useData();
 
   // Define setActiveTab as a function expression
   const setActiveTab = (
@@ -41,6 +42,8 @@ export default function App() {
       width="70%"
       margin="0 auto"
     >
+      <Alert>{actionMessage}</Alert>
+
       {activeTab === "profile" && <Profile signOut={signOut} />}
       {activeTab === "categories" && <Categories />}
       {activeTab === "entries" && <Entries />}

@@ -9,8 +9,13 @@ import { DataCategory } from "../../types";
 import styles from "./Categories.module.css";
 
 export default function Categories() {
-  const { dataCategories, dataTypes, selectedCategory, setSelectedCategory } =
-    useData();
+  const {
+    dataCategories,
+    dataTypes,
+    selectedCategory,
+    setSelectedCategory,
+    setActionMessage,
+  } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -20,11 +25,17 @@ export default function Categories() {
     value: dt.id,
   }));
 
-  const handleFormData = (formData: Record<string, any>) => {
+  const handleFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
-    createDataCategory(formData);
+    try {
+      await createDataCategory(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage(errorMessage);
+    }
   };
-
   if (selectedCategory) {
     return (
       <CategoryDetail

@@ -21,6 +21,8 @@ import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅
 
 // Define the context value type
 interface DataContextType {
+  actionMessage: string;
+  setActionMessage: React.Dispatch<React.SetStateAction<string>>;
   userProfiles: UserProfile[];
   dataCategories: DataCategory[];
   // dataEntries: DataEntry[];
@@ -81,10 +83,10 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
   // const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
+  const [actionMessage, _setActionMessage] = useState<string>(""); // Initialize with an empty string
   const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
     null
-  );
-
+  ); // Correct as is
   useEffect(() => {
     const sub = client.models.DataType.observeQuery().subscribe({
       next: ({ items }) => {
@@ -95,6 +97,18 @@ export function DataProvider({ children }: DataProviderProps) {
 
     return () => sub.unsubscribe();
   }, []);
+
+  const setActionMessage: React.Dispatch<React.SetStateAction<string>> = (
+    message
+  ) => {
+    _setActionMessage(message);
+    console.log("Alert:", message);
+
+    // Clear the message after 10 seconds
+    setTimeout(() => {
+      _setActionMessage("");
+    }, 10000); // 10000 milliseconds = 10 seconds
+  };
 
   // // Fetch DataTypes
   // useEffect(() => {
@@ -135,6 +149,8 @@ export function DataProvider({ children }: DataProviderProps) {
       value={{
         userProfiles,
         dataCategories,
+        actionMessage,
+        setActionMessage,
         // dataEntries,
         dataTypes,
         SETTINGS,
