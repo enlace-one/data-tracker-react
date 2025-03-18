@@ -27,7 +27,7 @@ interface AlertInfo {
 // Define the context value type
 interface DataContextType {
   actionMessage: AlertInfo;
-  setActionMessage: React.Dispatch<React.SetStateAction<string>>;
+  setActionMessage: React.Dispatch<React.SetStateAction<AlertInfo>>;
   userProfiles: UserProfile[];
   dataCategories: DataCategory[];
   // dataEntries: DataEntry[];

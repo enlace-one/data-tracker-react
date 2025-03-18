@@ -17,7 +17,7 @@ import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 
 export default function Entries() {
-  const { dataCategories, dataTypes, SETTINGS } = useData();
+  const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -111,12 +111,26 @@ export default function Entries() {
     { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
   ];
 
-  const handleFormData = (formData: Record<string, any>) => {
-    createDataEntry(formData);
+  const handleFormData = async (formData: Record<string, any>) => {
+    try {
+      await createDataEntry(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
   };
 
-  const handleUpdateEntryFormData = (formData: Record<string, any>) => {
-    updateDataEntry(formData);
+  const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+    try {
+      await updateDataEntry(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
   };
 
   const addTestEntries = () => {

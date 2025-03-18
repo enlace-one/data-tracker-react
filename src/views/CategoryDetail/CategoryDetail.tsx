@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function CategoryDetail({ category, onBack }: Props) {
-  const { dataCategories, dataTypes } = useData();
+  const { dataCategories, dataTypes, setActionMessage } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
@@ -141,25 +141,50 @@ export default function CategoryDetail({ category, onBack }: Props) {
     },
   ];
 
-  const handleUpdateCategoryFormData = (formData: Record<string, any>) => {
+  const handleUpdateCategoryFormData = async (
+    formData: Record<string, any>
+  ) => {
     console.log("Received form data:", formData);
     // Add fields that cannot be edited.
     formData.dataTypeId = category.dataTypeId;
     formData.id = category.id;
-    updateDataCategory(formData); // Handle form data submission
+    // Handle form data submission
+    try {
+      await updateDataCategory(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
   };
 
-  const handleNewEntryFormData = (formData: Record<string, any>) => {
+  const handleNewEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     formData.dataCategoryId = category.id;
-    createDataEntry(formData); // Handle form data submission
+    // Handle form data submission
+    try {
+      await createDataEntry(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
   };
 
-  const handleUpdateEntryFormData = (formData: Record<string, any>) => {
+  const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
-    formData.dataCategoryId = category.id;
+    formData.dataCategoryId = category.id; // Handle form data submission
     // formData.id =
-    updateDataEntry(formData); // Handle form data submission
+    try {
+      await updateDataEntry(formData);
+      // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
   };
 
   return (

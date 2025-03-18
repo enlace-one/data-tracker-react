@@ -341,6 +341,14 @@ export async function createDataCategory(formData: FormData): Promise<void> {
 
 export async function updateDataCategory(formData: FormData): Promise<void> {
   try {
+    const { data } = await client.models.DataCategory.listDataCategoryByName({
+      name: formData.name!,
+    });
+    if (data.length > 1) {
+      console.log("Duplicate category name");
+      throw new Error("Error: Duplicate category name");
+    }
+
     console.log("Updating category:", formData.name); // Fixed incorrect variable reference
 
     const { errors } = await client.models.DataCategory.update({
@@ -412,6 +420,15 @@ export async function updateDataCategoryEntryCount(
  */
 export async function createDataEntry(formData: FormData): Promise<void> {
   try {
+    const { data } = await client.models.DataEntry.listCategoryEntries({
+      dataCategoryId: formData.dataCategoryId!,
+      date: { eq: formData.date! },
+    });
+    if (data.length > 0) {
+      console.log("Duplicate entry");
+      throw new Error("Error: Duplicate entry date and category");
+    }
+
     console.log("Adding Entry:", formData.date); // Fixed incorrect variable reference
 
     const { errors } = await client.models.DataEntry.create({
@@ -431,6 +448,15 @@ export async function createDataEntry(formData: FormData): Promise<void> {
 
 export async function updateDataEntry(formData: FormData): Promise<void> {
   try {
+    const { data } = await client.models.DataEntry.listCategoryEntries({
+      dataCategoryId: formData.dataCategoryId!,
+      date: { eq: formData.date! },
+    });
+    if (data.length > 1) {
+      console.log("Duplicate entry");
+      throw new Error("Error: Duplicate entry date and category");
+    }
+
     console.log("Updating Entry:", formData.date); // Fixed incorrect variable reference
 
     const { errors } = await client.models.DataEntry.update({
