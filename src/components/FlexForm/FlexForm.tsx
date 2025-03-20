@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, ReactNode } from "react";
+import { useState, ChangeEvent, useEffect, FormEvent, ReactNode } from "react";
 import styles from "./FlexForm.module.css";
 import { Heading } from "@aws-amplify/ui-react";
 import BooleanField from "../BooleanField/BooleanField";
@@ -41,6 +41,7 @@ const FlexForm = ({
   );
 
   const setDynamicFieldType = (fieldId: string, inputType: string) => {
+    console.log(`Setting field ${fieldId} type to ${inputType}`);
     setDynamicFields((prevFields) =>
       prevFields.map((field) =>
         field.id === fieldId ? { ...field, type: inputType } : field
@@ -52,10 +53,6 @@ const FlexForm = ({
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
     () => {
       return dynamicFields.reduce((acc, field) => {
-        if (field.hasOwnProperty("getType")) {
-          setDynamicFieldType(field.id, field.getType!(fields));
-        }
-
         if (field.type === "date") {
           acc[field.id] =
             field.default || new Date().toISOString().split("T")[0]; // Default to today
@@ -68,7 +65,6 @@ const FlexForm = ({
       }, {} as Record<string, string | boolean>);
     }
   );
-
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -81,6 +77,18 @@ const FlexForm = ({
       [id]: isCheckbox ? (e.target as HTMLInputElement).checked : value,
     }));
   };
+
+  // React to changes in formData after it updates
+  useEffect(() => {
+    dynamicFields.forEach((field) => {
+      if (field.getType) {
+        const newType = field.getType(formData);
+        if (newType !== field.type) {
+          setDynamicFieldType(field.id, newType);
+        }
+      }
+    });
+  }, [formData]); // This ensures it runs only when formData updates
 
   const handleBooleanChange = (id: string, value: boolean) => {
     setFormData((prev) => ({
