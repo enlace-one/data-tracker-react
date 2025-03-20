@@ -103,8 +103,9 @@ export default function Entries() {
     );
     if (category) {
       return category.dataType.inputType;
+    } else {
+      return "text";
     }
-    return undefined; // or a default value like "text" if you prefer
   };
   const getUpdateEntryFormField = (entry: DataEntry) => [
     {

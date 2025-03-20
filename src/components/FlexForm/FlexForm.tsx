@@ -33,17 +33,40 @@ const FlexForm = ({
   buttonStyle = "",
   children,
 }: Props) => {
+  const [dynamicFields, setDynamicFields] = useState<Field[]>(() =>
+    fields.map((field) => ({
+      ...field,
+      type: field.getType ? field.getType(fields) : field.type,
+    }))
+  );
+
+  const setDynamicFieldType = (fieldId: string, inputType: string) => {
+    setDynamicFields((prevFields) =>
+      prevFields.map((field) =>
+        field.id === fieldId ? { ...field, type: inputType } : field
+      )
+    );
+  };
+
   const [isOpen, setIsOpen] = useState(false);
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
-    fields.reduce((acc, field) => {
-      if (field.type === "date") {
-        acc[field.id] = field.default || new Date().toISOString().split("T")[0]; // Default to today
-      } else {
-        acc[field.id] =
-          field.default || (field.type === "checkbox" ? false : "");
-      }
-      return acc;
-    }, {} as Record<string, string | boolean>)
+    () => {
+      return dynamicFields.reduce((acc, field) => {
+        if (field.hasOwnProperty("getType")) {
+          setDynamicFieldType(field.id, field.getType!(fields));
+        }
+
+        if (field.type === "date") {
+          acc[field.id] =
+            field.default || new Date().toISOString().split("T")[0]; // Default to today
+        } else {
+          acc[field.id] =
+            field.default ?? (field.type === "checkbox" ? false : "");
+        }
+
+        return acc;
+      }, {} as Record<string, string | boolean>);
+    }
   );
 
   const handleChange = (
@@ -83,7 +106,7 @@ const FlexForm = ({
           <div className={styles.modal}>
             <Heading level={2}>{heading}</Heading>
             <form onSubmit={handleSubmit}>
-              {fields.map((field) =>
+              {dynamicFields.map((field) =>
                 field.hidden ? null : ( // Check if the field is hidden
                   <div key={field.id} className={styles.formGroup}>
                     <label htmlFor={field.id}>{field.name}:</label>
