@@ -16,8 +16,8 @@ export interface Field {
   type?: string; // e.g. "text", "checkbox", "select", etc.
   options?: Option[]; // Only needed for select fields
   default?: string | boolean; // Default value for the field
+  getType?: (formData: Record<string, any>) => string; // Function to determine the field type
 }
-
 interface Props {
   heading: string;
   fields: Field[];

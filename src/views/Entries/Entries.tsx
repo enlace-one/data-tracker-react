@@ -97,6 +97,15 @@ export default function Entries() {
     setSelectedEntry((prev) => (prev === id ? null : id));
   };
 
+  const getType = (formData: FormDataType) => {
+    const category = dataCategories.find(
+      (dc) => dc.id === formData.dataCategoryId
+    );
+    if (category) {
+      return category.dataType.inputType;
+    }
+    return undefined; // or a default value like "text" if you prefer
+  };
   const getUpdateEntryFormField = (entry: DataEntry) => [
     {
       name: "Data Category",
@@ -105,6 +114,12 @@ export default function Entries() {
       options: dataCategoryOptions,
       required: true,
       default: entry.dataCategoryId,
+    },
+    {
+      name: "Value",
+      id: "value",
+      default: entry.value ?? "",
+      getType: getType,
     },
     { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
     { name: "Note", id: "note", default: entry.note ?? "" },
