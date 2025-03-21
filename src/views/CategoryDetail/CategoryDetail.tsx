@@ -137,6 +137,7 @@ export default function CategoryDetail({ category, onBack }: Props) {
     {
       name: "Default Value",
       id: "defaultValue",
+      type: category.dataType.inputType,
       default: category.defaultValue ?? "",
     },
   ];
