@@ -131,7 +131,7 @@ export default function CategoryDetail({ category, onBack }: Props) {
     {
       name: "Add Default",
       id: "addDefault",
-      type: "checkbox",
+      type: "boolean",
       default: category.addDefault ?? false,
     },
     {
@@ -214,13 +214,13 @@ export default function CategoryDetail({ category, onBack }: Props) {
               >
                 Delete
               </Button>
-              <Form
+              <FlexForm
                 heading="Update Category"
                 fields={updateCategoryFormFields}
-                buttonText="Update"
                 handleFormData={handleUpdateCategoryFormData}
-                buttonStyle={styles.lightMargin}
-              />
+              >
+                <Button className={styles.lightMargin}>Update</Button>
+              </FlexForm>
 
               {/* <Form
                 heading="New Entry"

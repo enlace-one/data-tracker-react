@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Heading, Divider } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import Form from "../../components/Form/Form";
+import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteDataCategory } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import { DataCategory } from "../../types";
+import { DataCategory, FormDataType } from "../../types";
 import styles from "./Categories.module.css";
 
 export default function Categories() {
@@ -45,17 +46,23 @@ export default function Categories() {
     );
   }
 
+  const getType = (formData: FormDataType) => {
+    const dataType = dataTypes.find((dt) => dt.id === formData.dataTypeId);
+    if (dataType) {
+      return dataType.inputType;
+    } else {
+      return "text";
+    }
+  };
+
   return (
     <>
       <Heading level={1}>Data Categories</Heading>
       <Divider />
-      <Form
+      <FlexForm
         heading="New Category"
         fields={[
           { name: "Name", id: "name", required: true },
-          { name: "Note", id: "note" },
-          { name: "Add Default", id: "addDefault", type: "checkbox" },
-          { name: "Default Value", id: "defaultValue" },
           {
             name: "Data Type",
             id: "dataTypeId",
@@ -63,10 +70,14 @@ export default function Categories() {
             options: dataTypeOptions,
             required: true,
           },
+          { name: "Note", id: "note" },
+          { name: "Add Default", id: "addDefault", type: "boolean" },
+          { name: "Default Value", id: "defaultValue", getType: getType },
         ]}
-        buttonText="Add New"
         handleFormData={handleFormData}
-      />
+      >
+        <Button className={styles.lightMargin}>Add Category</Button>
+      </FlexForm>
 
       <table className={styles.table}>
         <tbody>
