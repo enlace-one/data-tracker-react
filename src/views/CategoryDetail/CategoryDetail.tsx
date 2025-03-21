@@ -187,6 +187,45 @@ export default function CategoryDetail({ category, onBack }: Props) {
     }
   };
 
+  interface ListCategoryEntriesResponse {
+    data: DataEntry[]; // Assuming `DataEntry` is the correct type
+    nextToken?: string | null;
+  }
+
+  const handleExportToCSV = async (): Promise<void> => {
+    try {
+      let allEntries: DataEntry[] = [];
+      let nextToken: string | null | undefined = undefined;
+
+      do {
+        const response: ListCategoryEntriesResponse =
+          await client.models.DataEntry.listCategoryEntries(
+            { dataCategoryId: category.id },
+            {
+              sortDirection: "DESC",
+              limit: 100,
+              nextToken, // Include nextToken for pagination
+            }
+          );
+
+        // Extract data with proper typing
+        const { data: fetchedEntries, nextToken: tempNextToken } = response;
+
+        if (Array.isArray(fetchedEntries)) {
+          allEntries.push(...fetchedEntries); // Append fetched entries
+        }
+
+        nextToken = tempNextToken ?? null; // Update nextToken
+      } while (nextToken); // Continue if there's another page of results
+
+      console.log("Fetched Entries:", allEntries);
+
+      // Now process `allEntries` for CSV export
+    } catch (error) {
+      console.error("Error fetching entries:", error);
+    }
+  };
+
   return (
     <>
       {/* <Button onClick={onBack}>⬅ Back</Button> */}
@@ -213,6 +252,12 @@ export default function CategoryDetail({ category, onBack }: Props) {
                 onClick={() => deleteDataCategory(category.id)}
               >
                 Delete
+              </Button>
+              <Button
+                className={styles.lightMargin}
+                onClick={handleExportToCSV}
+              >
+                Export
               </Button>
               <FlexForm
                 heading="Update Category"
