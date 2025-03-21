@@ -1,6 +1,5 @@
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import Form from "../../components/Form/Form";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import TextButton from "../../components/TextButton/TextButton";
 import {
@@ -49,13 +48,14 @@ export default function Types() {
       <Heading level={1}>Data Types</Heading>
       <Divider />
       <div>
-        <Form
+        <FlexForm
           heading="New Type"
           fields={formFields}
-          buttonText="Add New"
           handleFormData={handleFormData}
-          buttonStyle={styles.horizontalMargin}
-        />
+        >
+          <Button className={styles.horizontalMargin}>Add New</Button>
+        </FlexForm>
+
         <Button
           className={styles.horizontalMargin}
           onClick={deleteAllDataTypes}

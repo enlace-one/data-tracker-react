@@ -1,6 +1,5 @@
 import { Heading, Divider, Button, Pagination } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import Form from "../../components/Form/Form";
 import {
   createDataEntry,
   deleteDataEntry,

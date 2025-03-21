@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import Form from "../../components/Form/Form";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteDataCategory } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";

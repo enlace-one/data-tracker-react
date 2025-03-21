@@ -10,7 +10,6 @@ import {
   client,
 } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
-import Form from "../../components/Form/Form";
 import styles from "./Entries.module.css";
 import { useState, useEffect } from "react";
 import { DataEntry, FormDataType } from "../../types";
