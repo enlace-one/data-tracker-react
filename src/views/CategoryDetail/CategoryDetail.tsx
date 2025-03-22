@@ -10,9 +10,15 @@ import {
   client,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
-import { DataCategory, DataEntry, EnrichedDataCategory } from "../../types";
+import {
+  DataCategory,
+  DataEntry,
+  FormDataType,
+  EnrichedDataCategory,
+} from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
+import Popup from "../../components/Popup/Popup";
 
 import styles from "./CategoryDetail.module.css";
 import { useState, useEffect } from "react";
@@ -25,6 +31,7 @@ interface Props {
 export default function CategoryDetail({ category, onBack }: Props) {
   const { dataCategories, dataTypes, setActionMessage } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
+  const [fileUpload, setFileUpload] = useState<Boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
   const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -192,6 +199,39 @@ export default function CategoryDetail({ category, onBack }: Props) {
     nextToken?: string | null;
   }
 
+  const exportToCSV = (entries: DataEntry[], filename = "export.csv") => {
+    if (!entries.length) {
+      console.warn("No data to export.");
+      return;
+    }
+
+    // Extract headers dynamically from the first entry
+    // Exclude specific fields
+    const excludeFields = new Set(["category", "dummy", "owner"]);
+    const headers = Object.keys(entries[0]).filter(
+      (header) => !excludeFields.has(header)
+    );
+
+    // Convert array of objects to CSV rows
+    const csvRows = entries.map((entry) =>
+      headers
+        .map((header) => `"${(entry as Record<string, any>)[header] || ""}"`)
+        .join(",")
+    );
+
+    // Combine headers and rows
+    const csvContent = [headers.join(","), ...csvRows].join("\n");
+
+    // Create a Blob and trigger a download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const handleExportToCSV = async (): Promise<void> => {
     try {
       let allEntries: DataEntry[] = [];
@@ -220,10 +260,65 @@ export default function CategoryDetail({ category, onBack }: Props) {
 
       console.log("Fetched Entries:", allEntries);
 
+      exportToCSV(allEntries, `${category.name}_export.csv`);
+
       // Now process `allEntries` for CSV export
     } catch (error) {
       console.error("Error fetching entries:", error);
     }
+  };
+
+  const importFromCSV = (
+    file: File,
+    callback: (data: Record<string, any>[]) => void
+  ) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (!event.target?.result) return;
+
+      const text = event.target.result as string;
+      const [headerLine, ...rows] = text.split("\n").map((line) => line.trim());
+
+      if (!headerLine) return;
+
+      const headers = headerLine
+        .split(",")
+        .map((h) => h.replace(/"/g, "").trim());
+
+      const data = rows.map((row) => {
+        const values = row
+          .split(",")
+          .map((value) => value.replace(/"/g, "").trim());
+        return headers.reduce((acc, header, index) => {
+          acc[header] = values[index] ?? "";
+          return acc;
+        }, {} as Record<string, any>);
+      });
+
+      callback(data);
+    };
+
+    reader.readAsText(file);
+  };
+
+  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      importFromCSV(file, (parsedData) => {
+        console.log("Imported Data:", parsedData);
+
+        parsedData.forEach((row) => {
+          console.log("Row", row);
+          createDataEntry(row as FormDataType); // Ensure `row` is the correct type
+        });
+
+        // You can now store this data in state or send it to Amplify
+      });
+    }
+    setFileUpload(false);
+  };
+  const handleImport = () => {
+    setFileUpload(true);
   };
 
   return (
@@ -259,6 +354,13 @@ export default function CategoryDetail({ category, onBack }: Props) {
               >
                 Export
               </Button>
+              <Button className={styles.lightMargin} onClick={handleImport}>
+                Import
+              </Button>
+              <Popup isOpen={fileUpload}>
+                <input type="file" accept=".csv" onChange={handleFileUpload} />
+                <Button onClick={() => setFileUpload(false)}>Cancel</Button>
+              </Popup>
               <FlexForm
                 heading="Update Category"
                 fields={updateCategoryFormFields}
