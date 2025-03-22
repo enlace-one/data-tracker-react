@@ -4,24 +4,18 @@ import {
   createDataEntry,
   deleteDataEntry,
   updateDataCategory,
-  fetchDataEntriesByCategory,
   deleteDataCategory,
   updateDataEntry,
   client,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
-import {
-  DataCategory,
-  DataEntry,
-  FormDataType,
-  EnrichedDataCategory,
-} from "../../types";
+import { DataEntry, FormDataType, EnrichedDataCategory } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import Popup from "../../components/Popup/Popup";
 
 import styles from "./CategoryDetail.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 
 interface Props {
   category: EnrichedDataCategory;
@@ -29,7 +23,7 @@ interface Props {
 }
 
 export default function CategoryDetail({ category, onBack }: Props) {
-  const { dataCategories, dataTypes, setActionMessage } = useData();
+  const { dataTypes, setActionMessage } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [fileUpload, setFileUpload] = useState<Boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
