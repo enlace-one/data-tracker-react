@@ -68,7 +68,7 @@ const DEFAULT_DATA_TYPES = [
   },
 ];
 
-const SETTINGS = { debug: true };
+const SETTINGS = { debug: false };
 
 async function initializeDataTypes() {
   await Promise.all(
