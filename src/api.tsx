@@ -3,9 +3,6 @@ import type { Schema } from "../amplify/data/resource";
 
 import {
   UserProfile,
-  DataCategory,
-  DataEntry,
-  DataType,
   EnrichedDataCategory,
   FormDataType as FormData,
 } from "./types"; // ✅ Import interfaces
