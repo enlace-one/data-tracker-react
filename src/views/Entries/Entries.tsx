@@ -4,9 +4,7 @@ import {
   createDataEntry,
   deleteDataEntry,
   updateDataEntry,
-  fetchDataEntries,
   deleteAllDataEntries,
-  getDataCategory,
   client,
 } from "../../api";
 import TextButton from "../../components/TextButton/TextButton";
@@ -14,6 +12,7 @@ import styles from "./Entries.module.css";
 import { useState, useEffect } from "react";
 import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
+import DateSpan from "../../components/DateSpan/DateSpan";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
@@ -231,6 +230,20 @@ export default function Entries() {
                   </small>
                   <br />
                   <small>{item.note}</small>
+                  {item.id == selectedEntry && (
+                    <>
+                      <br />
+                      <small>
+                        Created at: <DateSpan date={item.createdAt} />
+                      </small>
+                      <br />
+                      <small>
+                        Updated at: <DateSpan date={item.updatedAt} />
+                      </small>
+                      <br />
+                      <small>ID: {item.id}</small>
+                    </>
+                  )}
                 </FlexForm>
               </td>
               <td>

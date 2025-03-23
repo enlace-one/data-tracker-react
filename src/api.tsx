@@ -1,13 +1,9 @@
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../amplify/data/resource";
 
-import {
-  UserProfile,
-  EnrichedDataCategory,
-  FormDataType as FormData,
-} from "./types"; // ✅ Import interfaces
+import { EnrichedDataCategory, FormDataType as FormData } from "./types"; // ✅ Import interfaces
 
-import { useData } from "./DataContext";
+// import { useData } from "./DataContext";
 
 // Initialize the Amplify client
 const client = generateClient<Schema>();
@@ -82,7 +78,7 @@ export async function createUniqueDataType(
   isComplex: boolean
 ) {
   try {
-    const { data: dataTypes, errors } = await client.models.DataType.list({
+    const { data: dataTypes } = await client.models.DataType.list({
       filter: { name: { eq: name } },
     });
 
@@ -142,7 +138,7 @@ export function subscribeToDataTypes(
 
 export async function deleteAllDataTypes() {
   try {
-    const { data: dataTypes, errors } = await client.models.DataType.list();
+    const { data: dataTypes } = await client.models.DataType.list();
 
     if (dataTypes.length === 0) {
       console.log("No DataTypes to delete.");
@@ -256,7 +252,7 @@ export async function fetchDataEntries(
 
 export async function deleteAllDataEntries() {
   try {
-    const { data: dataEntries, errors } = await client.models.DataEntry.list();
+    const { data: dataEntries } = await client.models.DataEntry.list();
 
     if (dataEntries.length === 0) {
       console.log("No Entries to delete.");

@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Button,
-  Heading,
-  Flex,
-  View,
-  Grid,
-  Divider,
-} from "@aws-amplify/ui-react";
+import { Button, Flex, Divider } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { SETTINGS, useData } from "./DataContext"; // Import provider

@@ -1,11 +1,10 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import { createDataCategory, deleteDataCategory } from "../../api";
-import TextButton from "../../components/TextButton/TextButton";
+import { createDataCategory } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import { DataCategory, FormDataType } from "../../types";
+import { FormDataType } from "../../types";
 import styles from "./Categories.module.css";
 
 export default function Categories() {

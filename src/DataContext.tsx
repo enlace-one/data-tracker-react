@@ -8,22 +8,12 @@ import {
 import {
   fetchUserProfiles,
   subscribeToDataCategories,
-  subscribeToDataEntries,
-  subscribeToDataTypes,
-  fetchDataTypes,
   createUniqueDataType,
+  fetchDataTypes,
   client,
 } from "./api";
 
-import type { Schema } from "../amplify/data/resource";
-
-import {
-  UserProfile,
-  DataCategory,
-  EnrichedDataCategory,
-  DataEntry,
-  DataType,
-} from "./types"; // ✅ Import interfaces
+import { UserProfile, EnrichedDataCategory, DataType } from "./types"; // ✅ Import interfaces
 
 interface AlertInfo {
   message: string;
@@ -124,15 +114,15 @@ export function DataProvider({ children }: DataProviderProps) {
     }, 10000); // 10000 milliseconds = 10 seconds
   };
 
-  // // Fetch DataTypes
-  // useEffect(() => {
-  //   async function loadAndSetDataTypes() {
-  //     await initializeDataTypes();
-  //     const types = await fetchDataTypes();
-  //     setDataTypes(types);
-  //   }
-  //   loadAndSetDataTypes();
-  // }, []);
+  // Fetch DataTypes
+  useEffect(() => {
+    async function loadAndSetDataTypes() {
+      await initializeDataTypes();
+      const types = await fetchDataTypes();
+      setDataTypes(types);
+    }
+    loadAndSetDataTypes();
+  }, []);
 
   // Fetch user profiles on mount
   useEffect(() => {

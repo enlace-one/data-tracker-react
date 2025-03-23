@@ -22,7 +22,7 @@ interface Props {
   onBack: () => void;
 }
 
-export default function CategoryDetail({ category, onBack }: Props) {
+export default function CategoryDetail({ category }: Props) {
   const { dataTypes, setActionMessage } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [fileUpload, setFileUpload] = useState<Boolean>(false);
