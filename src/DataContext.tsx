@@ -17,25 +17,32 @@ import {
 
 import type { Schema } from "../amplify/data/resource";
 
-import { UserProfile, DataCategory, DataEntry, DataType } from "./types"; // ✅ Import interfaces
+import {
+  UserProfile,
+  DataCategory,
+  EnrichedDataCategory,
+  DataEntry,
+  DataType,
+} from "./types"; // ✅ Import interfaces
 
 interface AlertInfo {
   message: string;
   type: string;
 }
+type SetActionMessageFunction = (alertInfo: AlertInfo) => void;
 
 // Define the context value type
 interface DataContextType {
   actionMessage: AlertInfo;
-  setActionMessage: React.Dispatch<React.SetStateAction<AlertInfo>>;
+  setActionMessage: SetActionMessageFunction;
   userProfiles: UserProfile[];
-  dataCategories: DataCategory[];
+  dataCategories: EnrichedDataCategory[];
   // dataEntries: DataEntry[];
   dataTypes: DataType[];
   SETTINGS: { debug: boolean };
-  selectedCategory: DataCategory | null;
+  selectedCategory: EnrichedDataCategory | null;
   setSelectedCategory: React.Dispatch<
-    React.SetStateAction<DataCategory | null>
+    React.SetStateAction<EnrichedDataCategory | null>
   >;
 }
 
@@ -85,16 +92,17 @@ async function initializeDataTypes() {
 
 export function DataProvider({ children }: DataProviderProps) {
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
-  const [dataCategories, setDataCategories] = useState<DataCategory[]>([]);
+  const [dataCategories, setDataCategories] = useState<EnrichedDataCategory[]>(
+    []
+  );
   // const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
   const [actionMessage, _setActionMessage] = useState<AlertInfo>({
     message: "",
     type: "",
   }); // Initialize with an empty string
-  const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
-    null
-  ); // Correct as is
+  const [selectedCategory, setSelectedCategory] =
+    useState<EnrichedDataCategory | null>(null); // Correct as is
   useEffect(() => {
     const sub = client.models.DataType.observeQuery().subscribe({
       next: ({ items }) => {

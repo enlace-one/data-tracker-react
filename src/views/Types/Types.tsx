@@ -18,6 +18,7 @@ export default function Types() {
   const formFields = [
     { name: "Name", id: "name", required: true },
     { name: "Note", id: "note" },
+    { name: "Input Type", id: "inputType" },
     { name: "Is Complex", id: "isComplex", type: "checkbox" },
   ];
 
