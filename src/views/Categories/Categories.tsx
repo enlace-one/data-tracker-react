@@ -6,6 +6,8 @@ import { createDataCategory } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
 import { FormDataType } from "../../types";
 import styles from "./Categories.module.css";
+import { useState, useEffect } from "react";
+import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 
 export default function Categories() {
   const {
@@ -18,6 +20,14 @@ export default function Categories() {
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (dataCategories) {
+      setLoading(false);
+    }
+  }, [dataCategories]);
 
   const dataTypeOptions = dataTypes.map((dt) => ({
     label: dt.name,
@@ -77,44 +87,47 @@ export default function Categories() {
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm>
 
-      <table className={styles.table}>
-        <tbody>
-          {dataCategories.map((item) => (
-            <tr className={styles.tableRow} key={item.id}>
-              <td className={styles.minWidth}>
-                <span
-                  onClick={() => setSelectedCategory(item)}
-                  style={{
-                    padding: "2px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {item.name}
-                </span>
-                <br />
-                <small>
-                  {/* {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
+      {loading && <LoadingSymbol size={50} />}
+      {!loading && (
+        <table className={styles.table}>
+          <tbody>
+            {dataCategories.map((item) => (
+              <tr className={styles.tableRow} key={item.id}>
+                <td className={styles.minWidth}>
+                  <span
+                    onClick={() => setSelectedCategory(item)}
+                    style={{
+                      padding: "2px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {item.name}
+                  </span>
+                  <br />
+                  <small>
+                    {/* {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
                     "Unknown"}{" "} */}
-                  {item.dataType.name} - {item.note}{" "}
-                </small>
-              </td>
-              {/* <td>
+                    {item.dataType.name} - {item.note}{" "}
+                  </small>
+                </td>
+                {/* <td>
                 <small>
                   
                   {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
                     "Unknown"}
                 </small>
               </td> */}
-              <td className={styles.paddingLeft}>{item.entryCount}</td>
-              {/* <td>
+                <td className={styles.paddingLeft}>{item.entryCount}</td>
+                {/* <td>
                 <TextButton onClick={() => deleteDataCategory(item.id)}>
                   ❌
                 </TextButton>
               </td> */}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </>
   );
 }

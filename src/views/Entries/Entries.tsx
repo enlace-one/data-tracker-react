@@ -86,8 +86,8 @@ export default function Entries() {
       const firstNextToken = await fetchEntries(null);
       if (firstNextToken && !pageTokens.includes(firstNextToken)) {
         setPageTokens([...pageTokens, firstNextToken]);
-        setLoading(false);
       }
+      setLoading(false);
     };
     fetchInitialData();
   }, []);
