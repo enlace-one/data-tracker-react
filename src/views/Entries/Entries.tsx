@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
+import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
@@ -25,6 +26,8 @@ export default function Entries() {
     label: dt.name,
     value: dt.id,
   }));
+
+  const [loading, setLoading] = useState(true);
 
   const fetchEntries = async (token: string | null) => {
     const { data: fetchedEntries, nextToken } =
@@ -83,6 +86,7 @@ export default function Entries() {
       const firstNextToken = await fetchEntries(null);
       if (firstNextToken && !pageTokens.includes(firstNextToken)) {
         setPageTokens([...pageTokens, firstNextToken]);
+        setLoading(false);
       }
     };
     fetchInitialData();
@@ -206,55 +210,59 @@ export default function Entries() {
         </tbody>
       </table>
 
-      <table>
-        <tbody>
-          {dataEntries.map((item) => (
-            <tr
-              key={item.id}
-              onContextMenu={(e) => handleRightClick(e, item.id)}
-            >
-              <td className={styles.minWidth}>
-                <FlexForm
-                  heading="Update Entry"
-                  fields={getUpdateEntryFormField(item)}
-                  handleFormData={handleUpdateEntryFormData}
-                >
-                  {item.value}
-                  <br />
-                  <small>
-                    {
-                      dataCategories.find((dt) => dt.id === item.dataCategoryId)
-                        ?.name
-                    }{" "}
-                    - {item.date}
-                  </small>
-                  <br />
-                  <small>{item.note}</small>
-                  {item.id == selectedEntry && (
-                    <>
-                      <br />
-                      <small>
-                        Created at: <DateSpan date={item.createdAt} />
-                      </small>
-                      <br />
-                      <small>
-                        Updated at: <DateSpan date={item.updatedAt} />
-                      </small>
-                      <br />
-                      <small>ID: {item.id}</small>
-                    </>
-                  )}
-                </FlexForm>
-              </td>
-              <td>
-                <TextButton onClick={() => deleteDataEntry(item.id)}>
-                  <span className={styles.small}>❌</span>
-                </TextButton>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {loading && <LoadingSymbol size={50} />}
+      {!loading && (
+        <table>
+          <tbody>
+            {dataEntries.map((item) => (
+              <tr
+                key={item.id}
+                onContextMenu={(e) => handleRightClick(e, item.id)}
+              >
+                <td className={styles.minWidth}>
+                  <FlexForm
+                    heading="Update Entry"
+                    fields={getUpdateEntryFormField(item)}
+                    handleFormData={handleUpdateEntryFormData}
+                  >
+                    {item.value}
+                    <br />
+                    <small>
+                      {
+                        dataCategories.find(
+                          (dt) => dt.id === item.dataCategoryId
+                        )?.name
+                      }{" "}
+                      - {item.date}
+                    </small>
+                    <br />
+                    <small>{item.note}</small>
+                    {item.id == selectedEntry && (
+                      <>
+                        <br />
+                        <small>
+                          Created at: <DateSpan date={item.createdAt} />
+                        </small>
+                        <br />
+                        <small>
+                          Updated at: <DateSpan date={item.updatedAt} />
+                        </small>
+                        <br />
+                        <small>ID: {item.id}</small>
+                      </>
+                    )}
+                  </FlexForm>
+                </td>
+                <td>
+                  <TextButton onClick={() => deleteDataEntry(item.id)}>
+                    <span className={styles.small}>❌</span>
+                  </TextButton>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       <Pagination
         currentPage={currentPageIndex + 1}
