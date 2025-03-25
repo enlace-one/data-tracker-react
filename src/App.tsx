@@ -34,6 +34,7 @@ export default function App() {
       direction="column"
       width="70%"
       margin="0 auto"
+      style={{ color: "black" }}
     >
       <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
 
