@@ -363,47 +363,43 @@ export async function updateDataCategoryEntryCount(
   categoryId: string,
   adjustment: number
 ): Promise<void> {
-  try {
+  console.log(
+    "Updating category entry count for category:",
+    categoryId,
+    "with adjustment:",
+    adjustment
+  );
+
+  // Fetch the current entry count for the category
+  const { data: categoryData, errors: fetchErrors } =
+    await client.models.DataCategory.get({ id: categoryId });
+
+  if (fetchErrors) {
+    console.error("Errors fetching category data:", fetchErrors);
+    return;
+  }
+
+  if (!categoryData) {
+    console.error("Category not found for ID:", categoryId);
+    return;
+  }
+
+  // Adjust the entry count
+  const updatedEntryCount = (categoryData.entryCount || 0) + adjustment;
+
+  // Update the category with the new entry count
+  const { errors: updateErrors } = await client.models.DataCategory.update({
+    id: categoryId,
+    entryCount: updatedEntryCount,
+  });
+
+  if (updateErrors) {
+    console.error("Errors updating category entry count:", updateErrors);
+  } else {
     console.log(
-      "Updating category entry count for category:",
-      categoryId,
-      "with adjustment:",
-      adjustment
+      "Successfully updated category entry count to:",
+      updatedEntryCount
     );
-
-    // Fetch the current entry count for the category
-    const { data: categoryData, errors: fetchErrors } =
-      await client.models.DataCategory.get({ id: categoryId });
-
-    if (fetchErrors) {
-      console.error("Errors fetching category data:", fetchErrors);
-      return;
-    }
-
-    if (!categoryData) {
-      console.error("Category not found for ID:", categoryId);
-      return;
-    }
-
-    // Adjust the entry count
-    const updatedEntryCount = (categoryData.entryCount || 0) + adjustment;
-
-    // Update the category with the new entry count
-    const { errors: updateErrors } = await client.models.DataCategory.update({
-      id: categoryId,
-      entryCount: updatedEntryCount,
-    });
-
-    if (updateErrors) {
-      console.error("Errors updating category entry count:", updateErrors);
-    } else {
-      console.log(
-        "Successfully updated category entry count to:",
-        updatedEntryCount
-      );
-    }
-  } catch (error) {
-    console.error("Error updating data category:", error);
   }
 }
 
@@ -413,31 +409,27 @@ export async function updateDataCategoryEntryCount(
  * @returns {Promise<void>}
  */
 export async function createDataEntry(formData: FormData): Promise<void> {
-  try {
-    const { data } = await client.models.DataEntry.listCategoryEntries({
-      dataCategoryId: formData.dataCategoryId!,
-      date: { eq: formData.date! },
-    });
-    if (data.length > 0) {
-      console.log("Duplicate entry");
-      throw new Error("Error: Duplicate entry date and category");
-    }
-
-    console.log("Adding Entry:", formData.date); // Fixed incorrect variable reference
-
-    const { errors } = await client.models.DataEntry.create({
-      date: formData.date!, // Ensure a default empty string if missing
-      note: formData.note || "", // Default empty string
-      value: formData.value!,
-      dataCategoryId: formData.dataCategoryId!,
-    });
-
-    console.log("Errors:", errors);
-
-    updateDataCategoryEntryCount(formData.dataCategoryId!, 1);
-  } catch (error) {
-    console.error("Error creating data Entry:", error);
+  const { data } = await client.models.DataEntry.listCategoryEntries({
+    dataCategoryId: formData.dataCategoryId!,
+    date: { eq: formData.date! },
+  });
+  if (data.length > 0) {
+    console.log("Duplicate entry");
+    throw new Error("Error: Duplicate entry date and category");
   }
+
+  console.log("Adding Entry:", formData.date); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.DataEntry.create({
+    date: formData.date!, // Ensure a default empty string if missing
+    note: formData.note || "", // Default empty string
+    value: formData.value!,
+    dataCategoryId: formData.dataCategoryId!,
+  });
+
+  console.log("Errors:", errors);
+
+  updateDataCategoryEntryCount(formData.dataCategoryId!, 1);
 }
 
 export async function updateDataEntry(formData: FormData): Promise<void> {

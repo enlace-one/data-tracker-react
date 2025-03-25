@@ -37,7 +37,9 @@ export default function Categories() {
   const handleFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     try {
+      setLoading(true);
       await createDataCategory(formData);
+      setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
       const errorMessage =

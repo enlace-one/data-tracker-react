@@ -131,12 +131,15 @@ export default function Entries() {
 
   const handleFormData = async (formData: Record<string, any>) => {
     try {
+      setLoading(true);
       await createDataEntry(formData);
+      setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An error occurred.";
       setActionMessage({ message: errorMessage, type: "error" });
+      setLoading(false);
     }
   };
 
