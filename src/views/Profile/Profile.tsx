@@ -8,6 +8,8 @@ import {
 } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import DateSpan from "../../components/DateSpan/DateSpan";
+import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import { useState, useEffect } from "react";
 
 interface ProfileProps {
   signOut: () => void;
@@ -15,6 +17,15 @@ interface ProfileProps {
 
 export default function Profile({ signOut }: ProfileProps) {
   const { userProfiles } = useData();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (userProfiles) {
+      setLoading(false);
+    }
+  }, [userProfiles]);
+
+  if (loading) return <LoadingSymbol size={50} />; // Use Spinner component
 
   return (
     <>
