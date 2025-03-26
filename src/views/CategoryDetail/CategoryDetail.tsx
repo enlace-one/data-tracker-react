@@ -154,7 +154,9 @@ export default function CategoryDetail({ category }: Props) {
     formData.id = category.id;
     // Handle form data submission
     try {
+      setLoading(true);
       await updateDataCategory(formData);
+      setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
       const errorMessage =
@@ -168,7 +170,9 @@ export default function CategoryDetail({ category }: Props) {
     formData.dataCategoryId = category.id;
     // Handle form data submission
     try {
+      setLoading(true);
       await createDataEntry(formData);
+      setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
       const errorMessage =
@@ -182,8 +186,26 @@ export default function CategoryDetail({ category }: Props) {
     formData.dataCategoryId = category.id; // Handle form data submission
     // formData.id =
     try {
+      setLoading(true);
       await updateDataEntry(formData);
+      setLoading(false);
       // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
+  };
+
+  const handleDeleteDataCategory = async (catId: string) => {
+    try {
+      setLoading(true);
+      await handleDeleteDataCategory(catId);
+      setActionMessage({
+        message: "Data entry deleted successfully.",
+        type: "success",
+      });
+      setLoading(false);
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An error occurred.";
@@ -298,22 +320,25 @@ export default function CategoryDetail({ category }: Props) {
     reader.readAsText(file);
   };
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    setLoading(true);
     if (file) {
-      importFromCSV(file, (parsedData) => {
+      importFromCSV(file, async (parsedData) => {
         console.log("Imported Data:", parsedData);
 
-        parsedData.forEach((row) => {
+        for (const row of parsedData) {
           console.log("Row", row);
-          createDataEntry(row as FormDataType); // Ensure `row` is the correct type
-        });
+          await createDataEntry(row as FormDataType); // Ensure `row` is the correct type
+        }
+        setLoading(false);
 
         // You can now store this data in state or send it to Amplify
       });
     }
     setFileUpload(false);
   };
+
   const handleImport = () => {
     setFileUpload(true);
   };
@@ -341,7 +366,7 @@ export default function CategoryDetail({ category }: Props) {
             <td>
               <Button
                 className={styles.lightMargin}
-                onClick={() => deleteDataCategory(category.id)}
+                onClick={() => handleDeleteDataCategory(category.id)}
               >
                 Delete
               </Button>

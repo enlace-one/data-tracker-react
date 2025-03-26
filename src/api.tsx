@@ -175,33 +175,29 @@ export async function deleteDataCategory(id: string) {
     return;
   }
 
-  try {
-    // Get the IDs of the associated DataEntries
-    const { data: categoryWithEntries } = await client.models.DataCategory.get(
-      { id: id },
-      { selectionSet: ["id", "dataEntries.*"] }
-    );
+  // Get the IDs of the associated DataEntries
+  const { data: categoryWithEntries } = await client.models.DataCategory.get(
+    { id: id },
+    { selectionSet: ["id", "dataEntries.*"] }
+  );
 
-    // Check if categoryWithEntries is null
-    if (!categoryWithEntries) {
-      console.error(`Data Category with id ${id} not found.`);
-      return;
-    }
-
-    // Delete all associated DataEntries in parallel
-    await Promise.all(
-      categoryWithEntries.dataEntries.map((entry) =>
-        client.models.DataEntry.delete({ id: entry.id })
-      )
-    );
-
-    // Delete the DataCategory
-    await client.models.DataCategory.delete({ id: categoryWithEntries.id });
-
-    console.log(`Data Category and associated entries deleted with id ${id}.`);
-  } catch (error) {
-    console.error("Error deleting DataCategory and associated entries:", error);
+  // Check if categoryWithEntries is null
+  if (!categoryWithEntries) {
+    console.error(`Data Category with id ${id} not found.`);
+    throw new Error("Error deleting data category");
   }
+
+  // Delete all associated DataEntries in parallel
+  await Promise.all(
+    categoryWithEntries.dataEntries.map((entry) =>
+      client.models.DataEntry.delete({ id: entry.id })
+    )
+  );
+
+  // Delete the DataCategory
+  await client.models.DataCategory.delete({ id: categoryWithEntries.id });
+
+  console.log(`Data Category and associated entries deleted with id ${id}.`);
 }
 
 // Function to fetch all existing DataTypes
@@ -272,38 +268,34 @@ export async function deleteAllDataEntries() {
 }
 
 export async function deleteDataEntry(id: string): Promise<void> {
-  try {
-    // Fetch the data entry to get the dataCategoryId
-    const { data: dataEntry, errors: fetchErrors } =
-      await client.models.DataEntry.get({ id });
+  // Fetch the data entry to get the dataCategoryId
+  const { data: dataEntry, errors: fetchErrors } =
+    await client.models.DataEntry.get({ id });
 
-    if (fetchErrors) {
-      console.error("Errors fetching data entry:", fetchErrors);
-      return;
-    }
-
-    if (!dataEntry) {
-      console.error("Data entry not found for ID:", id);
-      return;
-    }
-
-    // Delete the data entry
-    const { errors: deleteErrors } = await client.models.DataEntry.delete({
-      id,
-    });
-
-    if (deleteErrors) {
-      console.error("Errors deleting data entry:", deleteErrors);
-      return;
-    }
-
-    // Decrement the entry count for the category
-    await updateDataCategoryEntryCount(dataEntry.dataCategoryId, -1);
-
-    console.log(`Data entry deleted with id ${id}.`);
-  } catch (error) {
-    console.error("Error deleting DataEntry:", error);
+  if (fetchErrors) {
+    console.error("Errors fetching data entry:", fetchErrors);
+    return;
   }
+
+  if (!dataEntry) {
+    console.error("Data entry not found for ID:", id);
+    return;
+  }
+
+  // Delete the data entry
+  const { errors: deleteErrors } = await client.models.DataEntry.delete({
+    id,
+  });
+
+  if (deleteErrors) {
+    console.error("Errors deleting data entry:", deleteErrors);
+    throw new Error("Error deleting data entry");
+  }
+
+  // Decrement the entry count for the category
+  await updateDataCategoryEntryCount(dataEntry.dataCategoryId, -1);
+
+  console.log(`Data entry deleted with id ${id}.`);
 }
 
 /**
@@ -334,29 +326,25 @@ export async function createDataCategory(formData: FormData): Promise<void> {
 }
 
 export async function updateDataCategory(formData: FormData): Promise<void> {
-  try {
-    const { data } = await client.models.DataCategory.listDataCategoryByName({
-      name: formData.name!,
-    });
-    if (data.length > 1) {
-      console.log("Duplicate category name");
-      throw new Error("Error: Duplicate category name");
-    }
-
-    console.log("Updating category:", formData.name); // Fixed incorrect variable reference
-
-    const { errors } = await client.models.DataCategory.update({
-      id: formData.id!,
-      name: formData.name || "", // Ensure a default empty string if missing
-      defaultValue: formData.defaultValue || "", // Default empty string
-      note: formData.note || "", // Default empty string
-      addDefault: formData.addDefault ?? false, // Default to false for boolean
-      dataTypeId: formData.dataTypeId!,
-    });
-    console.log("Errors:", errors);
-  } catch (error) {
-    console.error("Error creating data category:", error);
+  const { data } = await client.models.DataCategory.listDataCategoryByName({
+    name: formData.name!,
+  });
+  if (data.length > 1) {
+    console.log("Duplicate category name");
+    throw new Error("Error: Duplicate category name");
   }
+
+  console.log("Updating category:", formData.name); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.DataCategory.update({
+    id: formData.id!,
+    name: formData.name || "", // Ensure a default empty string if missing
+    defaultValue: formData.defaultValue || "", // Default empty string
+    note: formData.note || "", // Default empty string
+    addDefault: formData.addDefault ?? false, // Default to false for boolean
+    dataTypeId: formData.dataTypeId!,
+  });
+  console.log("Errors:", errors);
 }
 
 export async function updateDataCategoryEntryCount(
@@ -394,7 +382,9 @@ export async function updateDataCategoryEntryCount(
   });
 
   if (updateErrors) {
+    console.log("Amplify API auth mode:", client.models.DataCategory);
     console.error("Errors updating category entry count:", updateErrors);
+    throw new Error("Error updating category entry count");
   } else {
     console.log(
       "Successfully updated category entry count to:",
@@ -433,29 +423,25 @@ export async function createDataEntry(formData: FormData): Promise<void> {
 }
 
 export async function updateDataEntry(formData: FormData): Promise<void> {
-  try {
-    const { data } = await client.models.DataEntry.listCategoryEntries({
-      dataCategoryId: formData.dataCategoryId!,
-      date: { eq: formData.date! },
-    });
-    if (data.length > 1) {
-      console.log("Duplicate entry");
-      throw new Error("Error: Duplicate entry date and category");
-    }
-
-    console.log("Updating Entry:", formData.date); // Fixed incorrect variable reference
-
-    const { errors } = await client.models.DataEntry.update({
-      id: formData.id!,
-      date: formData.date!, // Ensure a default empty string if missing
-      note: formData.note || "", // Default empty string
-      value: formData.value!,
-      dataCategoryId: formData.dataCategoryId!,
-    });
-    console.log("Errors:", errors);
-  } catch (error) {
-    console.error("Error creating data entry:", error);
+  const { data } = await client.models.DataEntry.listCategoryEntries({
+    dataCategoryId: formData.dataCategoryId!,
+    date: { eq: formData.date! },
+  });
+  if (data.length > 1) {
+    console.log("Duplicate entry");
+    throw new Error("Error: Duplicate entry date and category");
   }
+
+  console.log("Updating Entry:", formData.date); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.DataEntry.update({
+    id: formData.id!,
+    date: formData.date!, // Ensure a default empty string if missing
+    note: formData.note || "", // Default empty string
+    value: formData.value!,
+    dataCategoryId: formData.dataCategoryId!,
+  });
+  console.log("Errors:", errors);
 }
 
 /**

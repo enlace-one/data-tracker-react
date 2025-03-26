@@ -81,14 +81,15 @@ export default function Entries() {
     setCurrentPageIndex(targetPageIndex);
   };
 
+  const fetchInitialData = async () => {
+    const firstNextToken = await fetchEntries(null);
+    if (firstNextToken && !pageTokens.includes(firstNextToken)) {
+      setPageTokens([...pageTokens, firstNextToken]);
+    }
+    setLoading(false);
+  };
+
   useEffect(() => {
-    const fetchInitialData = async () => {
-      const firstNextToken = await fetchEntries(null);
-      if (firstNextToken && !pageTokens.includes(firstNextToken)) {
-        setPageTokens([...pageTokens, firstNextToken]);
-      }
-      setLoading(false);
-    };
     fetchInitialData();
   }, []);
 
@@ -133,6 +134,7 @@ export default function Entries() {
     try {
       setLoading(true);
       await createDataEntry(formData);
+      await fetchInitialData();
       setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
@@ -145,8 +147,28 @@ export default function Entries() {
 
   const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
     try {
+      setLoading(true);
       await updateDataEntry(formData);
+      await fetchInitialData();
+      setLoading(false);
       // setActionMessage("Category created successfully.");
+    } catch (e) {
+      const errorMessage =
+        e instanceof Error ? e.message : "An error occurred.";
+      setActionMessage({ message: errorMessage, type: "error" });
+    }
+  };
+
+  const handleDeleteDataEntry = async (entryId: string) => {
+    try {
+      setLoading(true);
+      await deleteDataEntry(entryId);
+      await fetchInitialData();
+      setActionMessage({
+        message: "Data entry deleted successfully.",
+        type: "success",
+      });
+      setLoading(false);
     } catch (e) {
       const errorMessage =
         e instanceof Error ? e.message : "An error occurred.";
@@ -257,7 +279,7 @@ export default function Entries() {
                   </FlexForm>
                 </td>
                 <td>
-                  <TextButton onClick={() => deleteDataEntry(item.id)}>
+                  <TextButton onClick={() => handleDeleteDataEntry(item.id)}>
                     <span className={styles.small}>❌</span>
                   </TextButton>
                 </td>
