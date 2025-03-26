@@ -24,7 +24,7 @@ interface Props {
 }
 
 export default function CategoryDetail({ category }: Props) {
-  const { dataTypes, setActionMessage } = useData();
+  const { dataTypes, setActionMessage, setSelectedCategory } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [fileUpload, setFileUpload] = useState<Boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
@@ -85,14 +85,14 @@ export default function CategoryDetail({ category }: Props) {
     setCurrentPageIndex(targetPageIndex);
   };
 
+  const fetchInitialData = async () => {
+    const firstNextToken = await fetchEntries(null);
+    if (firstNextToken && !pageTokens.includes(firstNextToken)) {
+      setPageTokens([...pageTokens, firstNextToken]);
+    }
+    setLoading(false);
+  };
   useEffect(() => {
-    const fetchInitialData = async () => {
-      const firstNextToken = await fetchEntries(null);
-      if (firstNextToken && !pageTokens.includes(firstNextToken)) {
-        setPageTokens([...pageTokens, firstNextToken]);
-      }
-      setLoading(false);
-    };
     fetchInitialData();
   }, []);
 
@@ -156,6 +156,7 @@ export default function CategoryDetail({ category }: Props) {
     try {
       setLoading(true);
       await updateDataCategory(formData);
+      await fetchInitialData();
       setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
@@ -172,6 +173,7 @@ export default function CategoryDetail({ category }: Props) {
     try {
       setLoading(true);
       await createDataEntry(formData);
+      await fetchInitialData();
       setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
@@ -188,6 +190,7 @@ export default function CategoryDetail({ category }: Props) {
     try {
       setLoading(true);
       await updateDataEntry(formData);
+      await fetchInitialData();
       setLoading(false);
       // setActionMessage("Category created successfully.");
     } catch (e) {
@@ -200,9 +203,10 @@ export default function CategoryDetail({ category }: Props) {
   const handleDeleteDataCategory = async (catId: string) => {
     try {
       setLoading(true);
-      await handleDeleteDataCategory(catId);
+      await deleteDataCategory(catId);
+      setSelectedCategory(null);
       setActionMessage({
-        message: "Data entry deleted successfully.",
+        message: "Data category deleted successfully.",
         type: "success",
       });
       setLoading(false);
