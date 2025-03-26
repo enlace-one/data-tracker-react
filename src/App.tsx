@@ -8,10 +8,11 @@ import Categories from "./views/Categories/Categories";
 import Entries from "./views/Entries/Entries";
 import Types from "./views/Types/Types";
 import Alert from "./components/Alert/Alert";
+import Graph from "./views/Graph/Graph";
 
 export default function App() {
   const [activeTab, _setActiveTab] = useState<
-    "profile" | "categories" | "entries" | "types"
+    "profile" | "categories" | "entries" | "types" | "graph"
   >("profile");
 
   const { signOut } = useAuthenticator((context) => [context.user]);
@@ -20,7 +21,7 @@ export default function App() {
 
   // Define setActiveTab as a function expression
   const setActiveTab = (
-    state: "profile" | "categories" | "entries" | "types"
+    state: "profile" | "categories" | "entries" | "types" | "graph"
   ) => {
     _setActiveTab(state);
     setSelectedCategory(null);
@@ -42,6 +43,7 @@ export default function App() {
       {activeTab === "categories" && <Categories />}
       {activeTab === "entries" && <Entries />}
       {activeTab === "types" && <Types />}
+      {activeTab === "graph" && <Graph />}
 
       <Divider />
 
@@ -49,6 +51,7 @@ export default function App() {
         <Button onClick={() => setActiveTab("profile")}>Profile</Button>
         <Button onClick={() => setActiveTab("categories")}>Categories</Button>
         <Button onClick={() => setActiveTab("entries")}>Entries</Button>
+        <Button onClick={() => setActiveTab("graph")}>Graph</Button>
         {SETTINGS.debug && (
           <>
             <Button onClick={() => setActiveTab("types")}>Types</Button>
