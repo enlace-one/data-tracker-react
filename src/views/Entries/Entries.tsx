@@ -110,6 +110,18 @@ export default function Entries() {
       return "text";
     }
   };
+
+  const getNote = (formData: FormDataType) => {
+    const category = dataCategories.find(
+      (dc) => dc.id === formData.dataCategoryId
+    );
+    if (category) {
+      return category.note || "";
+    } else {
+      return "";
+    }
+  };
+
   const getUpdateEntryFormField = (entry: DataEntry) => [
     {
       name: "Data Category",
@@ -124,6 +136,7 @@ export default function Entries() {
       id: "value",
       default: entry.value ?? "",
       getType: getType,
+      getNote: getNote,
     },
     { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
     { name: "Note", id: "note", default: entry.note ?? "" },

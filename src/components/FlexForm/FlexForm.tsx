@@ -41,7 +41,7 @@ const FlexForm = ({
     fields.map((field) => ({
       ...field,
       type: field.getType ? field.getType(fields) : field.type,
-      // note: field.getNote ? field.getNote(fields) : field.note,
+      note: field.getNote ? field.getNote(fields) : field.note,
     }))
   );
 
@@ -50,6 +50,15 @@ const FlexForm = ({
     setDynamicFields((prevFields) =>
       prevFields.map((field) =>
         field.id === fieldId ? { ...field, type: inputType } : field
+      )
+    );
+  };
+
+  const setDynamicFieldNote = (fieldId: string, note: string) => {
+    console.log(`Setting field ${fieldId} note to ${note}`);
+    setDynamicFields((prevFields) =>
+      prevFields.map((field) =>
+        field.id === fieldId ? { ...field, note: note } : field
       )
     );
   };
@@ -90,6 +99,12 @@ const FlexForm = ({
         const newType = field.getType(formData);
         if (newType !== field.type) {
           setDynamicFieldType(field.id, newType);
+        }
+      }
+      if (field.getNote) {
+        const newNote = field.getNote(formData);
+        if (newNote !== field.note) {
+          setDynamicFieldNote(field.id, newNote);
         }
       }
     });
