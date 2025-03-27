@@ -17,6 +17,8 @@ export interface Field {
   options?: Option[]; // Only needed for select fields
   default?: string | boolean; // Default value for the field
   getType?: (formData: Record<string, any>) => string; // Function to determine the field type
+  getNote?: (formData: Record<string, any>) => string;
+  note?: string | null;
 }
 interface Props {
   heading: string;
@@ -33,10 +35,13 @@ const FlexForm = ({
   buttonStyle = "",
   children,
 }: Props) => {
+  console.log("Fields:", fields);
+
   const [dynamicFields, setDynamicFields] = useState<Field[]>(() =>
     fields.map((field) => ({
       ...field,
       type: field.getType ? field.getType(fields) : field.type,
+      // note: field.getNote ? field.getNote(fields) : field.note,
     }))
   );
 
@@ -117,6 +122,7 @@ const FlexForm = ({
               {dynamicFields.map((field) =>
                 field.hidden ? null : ( // Check if the field is hidden
                   <div key={field.id} className={styles.formGroup}>
+                    <small>{field.note}</small>
                     <label htmlFor={field.id}>{field.name}:</label>
                     {field.type === "select" && field.options ? (
                       //
@@ -150,6 +156,7 @@ const FlexForm = ({
                       //
                       // Handle Other Field Types
                       //
+
                       <input
                         type={field.type || "text"}
                         id={field.id}

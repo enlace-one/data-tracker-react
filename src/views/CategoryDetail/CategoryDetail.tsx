@@ -110,7 +110,12 @@ export default function CategoryDetail({ category }: Props) {
 
   const addEntryFormFields = [
     // Category added in handleFormData
-    { name: "Value", id: "value", type: category.dataType.inputType },
+    {
+      name: "Value",
+      id: "value",
+      type: category.dataType.inputType,
+      note: category.note,
+    },
     { name: "Date", id: "date", type: "date" },
     { name: "Note", id: "note" },
   ];
@@ -122,6 +127,7 @@ export default function CategoryDetail({ category }: Props) {
         id: "value",
         default: entry.value ?? "",
         type: category.dataType.inputType,
+        note: category.note,
       },
       { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
       { name: "Note", id: "note", default: entry.note ?? "" },
