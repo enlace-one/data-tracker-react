@@ -8,6 +8,7 @@ import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { AccessEntry } from "aws-cdk-lib/aws-eks";
+import HoverText from "../../components/HoverText/HoverText";
 
 export default function Graph() {
   const {
@@ -16,6 +17,7 @@ export default function Graph() {
     selectedCategory,
     setSelectedCategory,
     setActionMessage,
+    screenWidth,
   } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
@@ -23,12 +25,12 @@ export default function Graph() {
 
   const [loading, setLoading] = useState(true);
   const [labelsToShow, setlabelsToShow] = useState(1);
+  const [entryCountMax, setEntryCountMax] = useState(10);
+  const [hoveredText, setHoveredText] = useState<string | null>(null);
 
-  const [data, setData] = useState<{ name: string; value: number }[]>([
-    { name: "Jan", value: 10 },
-    { name: "Feb", value: 20 },
-    { name: "Mar", value: 30 },
-  ]);
+  const [data, setData] = useState<
+    { name: string; value: number; note: string }[]
+  >([]);
 
   useEffect(() => {
     if (dataCategories) {
@@ -39,7 +41,7 @@ export default function Graph() {
   const handleCategoryChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const newData: { name: string; value: number }[] = [];
+    const newData: { name: string; value: number; note: string }[] = [];
     const selectedOptions = Array.from(event.target.selectedOptions).map(
       (option) => option.value
     );
@@ -49,12 +51,13 @@ export default function Graph() {
       const entries = await fetchDataEntriesByCategory(catId);
 
       // Reverse the entries and take the last 30
-      const reversedEntries = entries.slice(0, 20).reverse();
+      const reversedEntries = entries.slice(0, entryCountMax).reverse();
 
       reversedEntries.forEach((entry) => {
         newData.push({
           name: entry.date, // Assuming `entry.date` is accessible
           value: Number(entry.value), // Assuming `entry.value` is accessible
+          note: entry.note || "",
         });
       });
 
@@ -86,7 +89,7 @@ export default function Graph() {
     setData(newData);
   };
 
-  const width = 400;
+  const width = Math.max(screenWidth - 600, 400);
   const height = 300;
   const padding = 40;
   const xAxisLabel = "Time";
@@ -102,6 +105,19 @@ export default function Graph() {
     .map((d, i) => `${i === 0 ? "M" : "L"} ${scaleX(i)} ${scaleY(d.value)}`)
     .join(" ");
 
+  const handleMouseEnter = (text: string) => {
+    setHoveredText(text); // Set the hovered text when mouse enters
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredText(null); // Clear the hovered text when mouse leaves
+  };
+
+  const handleCountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setEntryCountMax(Number(value));
+  };
+
   return (
     <>
       <Heading level={1}>Graph</Heading>
@@ -109,6 +125,28 @@ export default function Graph() {
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
         <div>
+          {/* Display hover text */}
+          {hoveredText && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)", // Centers the element
+                backgroundColor: "rgba(0, 0, 0, 0.8)", // Optional: background for better visibility
+                color: "white", // Optional: text color
+                padding: "0px 10px", // Optional: padding for a better look
+                borderRadius: "4px", // Optional: rounded corners
+                zIndex: 1, // Optional: to ensure it appears on top of other content
+              }}
+            >
+              <p style={{ textAlign: "center" }}>
+                {hoveredText.split("\n")[0]} <br />
+                {hoveredText.split("\n")[1]}
+              </p>{" "}
+              {/* Custom hover text */}
+            </div>
+          )}
           <svg width={width} height={height}>
             {/* X and Y axis */}
             <line
@@ -127,14 +165,14 @@ export default function Graph() {
             />
 
             {/* X and Y axis labels */}
-            <text
+            {/* <text
               x={width / 2}
-              y={height - 2} // Lowered X-axis label even more
+              y={height} // Lowered X-axis label even more
               textAnchor="middle"
               fontSize="14"
             >
               {xAxisLabel}
-            </text>
+            </text> */}
             <text
               x={padding - 30} // Shifted Y-axis label left
               y={height / 2}
@@ -156,6 +194,12 @@ export default function Graph() {
                   cy={scaleY(d.value)}
                   r="5"
                   fill="lightgreen"
+                  onMouseEnter={() =>
+                    handleMouseEnter(
+                      `Date: ${d.name}. Value: ${d.value}\nNote: ${d.note}`
+                    )
+                  } // Set hover text
+                  onMouseLeave={handleMouseLeave} // Clear hover text
                 />
                 {/* Labels for data points */}
                 <text
@@ -164,7 +208,11 @@ export default function Graph() {
                   textAnchor="middle"
                   fontSize="12"
                 >
-                  {d.value}
+                  {(data.length < 20 && width < 500) ||
+                  (data.length < 40 && width < 1000 && width >= 500) ||
+                  width >= 1000
+                    ? d.value
+                    : null}
                 </text>
               </g>
             ))}
@@ -188,20 +236,34 @@ export default function Graph() {
         </div>
       )}
 
-      <select
-        multiple
-        onChange={handleCategoryChange}
-        className={styles.multiSelect}
-      >
-        {dataCategories.map(
-          (item) =>
-            item.dataType.inputType === "number" && (
-              <option className={styles.tableRow} key={item.id} value={item.id}>
-                {item.name}
-              </option>
-            )
-        )}
-      </select>
+      <div className={styles.formGroup}>
+        {/* <label>Category</label> */}
+        <select onChange={handleCategoryChange} className={styles.multiSelect}>
+          <option className={styles.tableRow}>Choose a Category</option>
+          {dataCategories.map(
+            (item) =>
+              item.dataType.inputType === "number" && (
+                <option
+                  className={styles.tableRow}
+                  key={item.id}
+                  value={item.id}
+                >
+                  {item.name}
+                </option>
+              )
+          )}
+        </select>
+      </div>
+      <div className={styles.formGroup}>
+        <label>Entry Count to Graph:</label>
+        <input
+          type="number"
+          min={2}
+          max={100}
+          onChange={handleCountChange}
+          defaultValue={entryCountMax}
+        ></input>
+      </div>
     </>
   );
 }

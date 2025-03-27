@@ -34,6 +34,7 @@ interface DataContextType {
   setSelectedCategory: React.Dispatch<
     React.SetStateAction<EnrichedDataCategory | null>
   >;
+  screenWidth: number;
 }
 
 // Create the context
@@ -148,6 +149,20 @@ export function DataProvider({ children }: DataProviderProps) {
     };
   }, []);
 
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  const handleResize = () => {
+    setScreenWidth(window.innerWidth);
+  };
+
+  useEffect(() => {
+    // Set up event listener for window resize
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <DataContext.Provider
       value={{
@@ -160,6 +175,7 @@ export function DataProvider({ children }: DataProviderProps) {
         SETTINGS,
         selectedCategory,
         setSelectedCategory,
+        screenWidth,
       }}
     >
       {children}
