@@ -1,24 +1,14 @@
 // import { useState } from "react";
-import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import { createDataCategory, fetchDataEntriesByCategory } from "../../api";
-import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import { FormDataType } from "../../types";
+import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { AccessEntry } from "aws-cdk-lib/aws-eks";
-import HoverText from "../../components/HoverText/HoverText";
+// import HoverText from "../../components/HoverText/HoverText";
 
 export default function Graph() {
-  const {
-    dataCategories,
-    dataTypes,
-    selectedCategory,
-    setSelectedCategory,
-    setActionMessage,
-    screenWidth,
-  } = useData();
+  const { dataCategories, screenWidth } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -92,7 +82,7 @@ export default function Graph() {
   const width = Math.max(screenWidth - 600, 400);
   const height = 300;
   const padding = 40;
-  const xAxisLabel = "Time";
+  // const xAxisLabel = "Time";
   const yAxisLabel = "Value";
 
   const maxValue = Math.max(...data.map((d) => d.value));
