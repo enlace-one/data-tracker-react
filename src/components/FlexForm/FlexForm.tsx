@@ -35,7 +35,7 @@ const FlexForm = ({
   buttonStyle = "",
   children,
 }: Props) => {
-  console.log("Fields:", fields);
+  // console.log("Fields:", fields);
 
   const [dynamicFields, setDynamicFields] = useState<Field[]>(() =>
     fields.map((field) => ({
@@ -46,7 +46,7 @@ const FlexForm = ({
   );
 
   const setDynamicFieldType = (fieldId: string, inputType: string) => {
-    console.log(`Setting field ${fieldId} type to ${inputType}`);
+    // console.log(`Setting field ${fieldId} type to ${inputType}`);
     setDynamicFields((prevFields) =>
       prevFields.map((field) =>
         field.id === fieldId ? { ...field, type: inputType } : field
@@ -55,7 +55,7 @@ const FlexForm = ({
   };
 
   const setDynamicFieldNote = (fieldId: string, note: string) => {
-    console.log(`Setting field ${fieldId} note to ${note}`);
+    // console.log(`Setting field ${fieldId} note to ${note}`);
     setDynamicFields((prevFields) =>
       prevFields.map((field) =>
         field.id === fieldId ? { ...field, note: note } : field
