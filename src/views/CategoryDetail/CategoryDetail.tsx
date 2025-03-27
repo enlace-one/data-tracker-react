@@ -14,7 +14,11 @@ import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import Popup from "../../components/Popup/Popup";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-
+import {
+  getUpdateEntryFormFieldsWithSetCategory,
+  getAddEntryFormFieldsWithCategory,
+  getUpdateCategoryFormFields,
+} from "../../formFields";
 import styles from "./CategoryDetail.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 
@@ -104,52 +108,7 @@ export default function CategoryDetail({ category }: Props) {
     } else {
       setSelectedEntry(id);
     }
-
-    // Add your right-click logic here
   };
-
-  const addEntryFormFields = [
-    // Category added in handleFormData
-    {
-      name: "Value",
-      id: "value",
-      type: category.dataType.inputType,
-      note: category.note,
-    },
-    { name: "Date", id: "date", type: "date" },
-    { name: "Note", id: "note" },
-  ];
-
-  const getUpdateEntryFormField = (entry: DataEntry) => {
-    return [
-      {
-        name: "Value",
-        id: "value",
-        default: entry.value ?? "",
-        type: category.dataType.inputType,
-        note: category.note,
-      },
-      { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
-      { name: "Note", id: "note", default: entry.note ?? "" },
-      { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
-    ];
-  };
-  const updateCategoryFormFields = [
-    { name: "Name", id: "name", required: true, default: category.name ?? "" },
-    { name: "Note", id: "note", default: category.note ?? "" },
-    {
-      name: "Add Default",
-      id: "addDefault",
-      type: "boolean",
-      default: category.addDefault ?? false,
-    },
-    {
-      name: "Default Value",
-      id: "defaultValue",
-      type: category.dataType.inputType,
-      default: category.defaultValue ?? "",
-    },
-  ];
 
   const handleUpdateCategoryFormData = async (
     formData: Record<string, any>
@@ -172,22 +131,47 @@ export default function CategoryDetail({ category }: Props) {
     }
   };
 
-  const handleNewEntryFormData = async (formData: Record<string, any>) => {
+  function standardWrapper<T extends (...args: any[]) => Promise<any>>(
+    fn: T
+  ): T {
+    return async function (...args: Parameters<T>) {
+      try {
+        setLoading(true);
+        const result = await fn(...args); // Await the result of the function
+        setLoading(false);
+        return result;
+      } catch (e) {
+        const errorMessage =
+          e instanceof Error ? e.message : "An error occurred.";
+        setActionMessage({ message: errorMessage, type: "error" });
+        setLoading(false); // Ensure loading is stopped even if there's an error
+      }
+    } as T;
+  }
+
+  // const handleNewEntryFormData = async (formData: Record<string, any>) => {
+  //   console.log("Received form data:", formData);
+  //   formData.dataCategoryId = category.id;
+  //   // Handle form data submission
+  //   try {
+  //     setLoading(true);
+  //     await createDataEntry(formData);
+  //     await fetchInitialData();
+  //     setLoading(false);
+  //     // setActionMessage("Category created successfully.");
+  //   } catch (e) {
+  //     const errorMessage =
+  //       e instanceof Error ? e.message : "An error occurred.";
+  //     setActionMessage({ message: errorMessage, type: "error" });
+  //   }
+  // };
+  const _handleNewEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     formData.dataCategoryId = category.id;
-    // Handle form data submission
-    try {
-      setLoading(true);
-      await createDataEntry(formData);
-      await fetchInitialData();
-      setLoading(false);
-      // setActionMessage("Category created successfully.");
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
+    await createDataEntry(formData);
+    await fetchInitialData();
   };
+  const handleNewEntryFormData = standardWrapper(_handleNewEntryFormData);
 
   const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
@@ -395,22 +379,14 @@ export default function CategoryDetail({ category }: Props) {
               </Popup>
               <FlexForm
                 heading="Update Category"
-                fields={updateCategoryFormFields}
+                fields={getUpdateCategoryFormFields(category)}
                 handleFormData={handleUpdateCategoryFormData}
               >
                 <Button className={styles.lightMargin}>Update</Button>
               </FlexForm>
-
-              {/* <Form
-                heading="New Entry"
-                fields={addEntryFormFields}
-                buttonText="Add Entry"
-                handleFormData={handleNewEntryFormData}
-                buttonStyle={styles.lightMargin}
-              /> */}
               <FlexForm
                 heading="New Entry"
-                fields={addEntryFormFields}
+                fields={getAddEntryFormFieldsWithCategory(category)}
                 handleFormData={handleNewEntryFormData}
               >
                 <Button className={styles.lightMargin}>Add Entry</Button>
@@ -436,7 +412,10 @@ export default function CategoryDetail({ category }: Props) {
                   >
                     <FlexForm
                       heading="Update Entry"
-                      fields={getUpdateEntryFormField(item)}
+                      fields={getUpdateEntryFormFieldsWithSetCategory(
+                        item,
+                        category
+                      )}
                       handleFormData={handleUpdateEntryFormData}
                     >
                       <b>{item.value}</b>
