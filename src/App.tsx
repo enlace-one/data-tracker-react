@@ -47,10 +47,12 @@ export default function App() {
 
       <Divider />
 
-      <Flex gap="1rem" margin="1rem">
+      <Flex gap="1rem" margin="0.5rem 1rem 0 1rem">
         <Button onClick={() => setActiveTab("profile")}>Profile</Button>
         <Button onClick={() => setActiveTab("categories")}>Categories</Button>
         <Button onClick={() => setActiveTab("entries")}>Entries</Button>
+      </Flex>
+      <Flex gap="1rem" margin="0 rem 1rem">
         <Button onClick={() => setActiveTab("graph")}>Graph</Button>
         {SETTINGS.debug && (
           <>
