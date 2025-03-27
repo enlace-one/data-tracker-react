@@ -1,12 +1,13 @@
 // import { useState } from "react";
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import { createDataCategory } from "../../api";
+import { createDataCategory, fetchDataEntriesByCategory } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
 import { FormDataType } from "../../types";
 import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import { AccessEntry } from "aws-cdk-lib/aws-eks";
 
 export default function Graph() {
   const {
@@ -21,6 +22,13 @@ export default function Graph() {
   // );
 
   const [loading, setLoading] = useState(true);
+  const [labelsToShow, setlabelsToShow] = useState(1);
+
+  const [data, setData] = useState<{ name: string; value: number }[]>([
+    { name: "Jan", value: 10 },
+    { name: "Feb", value: 20 },
+    { name: "Mar", value: 30 },
+  ]);
 
   useEffect(() => {
     if (dataCategories) {
@@ -28,19 +36,171 @@ export default function Graph() {
     }
   }, [dataCategories]);
 
+  const handleCategoryChange = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const newData: { name: string; value: number }[] = [];
+    const selectedOptions = Array.from(event.target.selectedOptions).map(
+      (option) => option.value
+    );
+    console.log("Selected Categories:", selectedOptions);
+
+    for (const catId of selectedOptions) {
+      const entries = await fetchDataEntriesByCategory(catId);
+
+      // Reverse the entries and take the last 30
+      const reversedEntries = entries.slice(0, 20).reverse();
+
+      reversedEntries.forEach((entry) => {
+        newData.push({
+          name: entry.date, // Assuming `entry.date` is accessible
+          value: Number(entry.value), // Assuming `entry.value` is accessible
+        });
+      });
+
+      if (reversedEntries.length >= 50) {
+        setlabelsToShow(10);
+      } else if (reversedEntries.length >= 30) {
+        setlabelsToShow(6);
+      } else if (reversedEntries.length >= 20) {
+        setlabelsToShow(5);
+      } else if (reversedEntries.length >= 15) {
+        setlabelsToShow(4);
+      } else if (reversedEntries.length >= 10) {
+        setlabelsToShow(3);
+      } else if (reversedEntries.length > 5) {
+        setlabelsToShow(2);
+      } else {
+        setlabelsToShow(1);
+      }
+
+      console.log(
+        `Label length ${
+          reversedEntries.length
+        } and labels to show ${labelsToShow} resulting in ${
+          reversedEntries.length / labelsToShow
+        }`
+      );
+    }
+
+    setData(newData);
+  };
+
+  const width = 400;
+  const height = 300;
+  const padding = 40;
+  const xAxisLabel = "Time";
+  const yAxisLabel = "Value";
+
+  const maxValue = Math.max(...data.map((d) => d.value));
+  const scaleX = (index: number) =>
+    (index / (data.length - 1)) * (width - padding * 2) + padding;
+  const scaleY = (value: number) =>
+    height - padding - (value / maxValue) * (height - padding * 2);
+
+  const pathData = data
+    .map((d, i) => `${i === 0 ? "M" : "L"} ${scaleX(i)} ${scaleY(d.value)}`)
+    .join(" ");
+
   return (
     <>
       <Heading level={1}>Graph</Heading>
       <Divider />
       {loading && <LoadingSymbol size={50} />}
-      {!loading && <div>GRAPH HERE</div>}
+      {!loading && (
+        <div>
+          <svg width={width} height={height}>
+            {/* X and Y axis */}
+            <line
+              x1={padding}
+              y1={height - padding}
+              x2={width - padding}
+              y2={height - padding}
+              stroke="black"
+            />
+            <line
+              x1={padding}
+              y1={padding}
+              x2={padding}
+              y2={height - padding}
+              stroke="black"
+            />
 
-      <select multiple>
-        {dataCategories.map((item) => (
-          <option className={styles.tableRow} key={item.id} value={item.id}>
-            {item.name}
-          </option>
-        ))}
+            {/* X and Y axis labels */}
+            <text
+              x={width / 2}
+              y={height - 2} // Lowered X-axis label even more
+              textAnchor="middle"
+              fontSize="14"
+            >
+              {xAxisLabel}
+            </text>
+            <text
+              x={padding - 30} // Shifted Y-axis label left
+              y={height / 2}
+              textAnchor="middle"
+              fontSize="14"
+              transform={`rotate(-90, ${padding - 30}, ${height / 2})`}
+            >
+              {yAxisLabel}
+            </text>
+
+            {/* Line chart */}
+            <path d={pathData} stroke="lightblue" fill="none" strokeWidth="2" />
+
+            {/* Data points */}
+            {data.map((d, i) => (
+              <g key={i}>
+                <circle
+                  cx={scaleX(i)}
+                  cy={scaleY(d.value)}
+                  r="5"
+                  fill="lightgreen"
+                />
+                {/* Labels for data points */}
+                <text
+                  x={scaleX(i)}
+                  y={scaleY(d.value) - (i === 0 ? 20 : 12)} // Move first label higher
+                  textAnchor="middle"
+                  fontSize="12"
+                >
+                  {d.value}
+                </text>
+              </g>
+            ))}
+
+            {/* X-axis labels */}
+            {data.map(
+              (d, i) =>
+                i % labelsToShow == 0 && (
+                  <text
+                    key={i}
+                    x={scaleX(i)}
+                    y={height - padding + 25} // Increased padding for better spacing
+                    textAnchor="middle"
+                    fontSize="12"
+                  >
+                    {d.name}
+                  </text>
+                )
+            )}
+          </svg>
+        </div>
+      )}
+
+      <select
+        multiple
+        onChange={handleCategoryChange}
+        className={styles.multiSelect}
+      >
+        {dataCategories.map(
+          (item) =>
+            item.dataType.inputType === "number" && (
+              <option className={styles.tableRow} key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            )
+        )}
       </select>
     </>
   );

@@ -1,17 +1,4 @@
-.tableRow {
-  /* border: solid;
-  border-width: 1px 0;
-  padding-bottom: 25px; */
-}
-
-.table {
-  border-collapse: collapse;
-}
-
-.paddingLeft {
-  padding-left: 20px;
-}
-
-.minWidth {
+.multiSelect {
   min-width: 200px;
+  width: 100%;
 }
