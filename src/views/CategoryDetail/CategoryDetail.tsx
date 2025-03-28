@@ -110,27 +110,6 @@ export default function CategoryDetail({ category }: Props) {
     }
   };
 
-  const handleUpdateCategoryFormData = async (
-    formData: Record<string, any>
-  ) => {
-    console.log("Received form data:", formData);
-    // Add fields that cannot be edited.
-    formData.dataTypeId = category.dataTypeId;
-    formData.id = category.id;
-    // Handle form data submission
-    try {
-      setLoading(true);
-      await updateDataCategory(formData);
-      await fetchInitialData();
-      setLoading(false);
-      // setActionMessage("Category created successfully.");
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
-  };
-
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
   ): T {
@@ -149,22 +128,19 @@ export default function CategoryDetail({ category }: Props) {
     } as T;
   }
 
-  // const handleNewEntryFormData = async (formData: Record<string, any>) => {
-  //   console.log("Received form data:", formData);
-  //   formData.dataCategoryId = category.id;
-  //   // Handle form data submission
-  //   try {
-  //     setLoading(true);
-  //     await createDataEntry(formData);
-  //     await fetchInitialData();
-  //     setLoading(false);
-  //     // setActionMessage("Category created successfully.");
-  //   } catch (e) {
-  //     const errorMessage =
-  //       e instanceof Error ? e.message : "An error occurred.";
-  //     setActionMessage({ message: errorMessage, type: "error" });
-  //   }
-  // };
+  const _handleUpdateCategoryFormData = async (
+    formData: Record<string, any>
+  ) => {
+    console.log("Received form data:", formData);
+    // Add fields that cannot be edited.
+    formData.dataTypeId = category.dataTypeId;
+    formData.id = category.id;
+    await updateDataCategory(formData);
+  };
+  const handleUpdateCategoryFormData = standardWrapper(
+    _handleUpdateCategoryFormData
+  );
+
   const _handleNewEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     formData.dataCategoryId = category.id;
@@ -173,39 +149,24 @@ export default function CategoryDetail({ category }: Props) {
   };
   const handleNewEntryFormData = standardWrapper(_handleNewEntryFormData);
 
-  const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+  const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     formData.dataCategoryId = category.id; // Handle form data submission
-    // formData.id =
-    try {
-      setLoading(true);
-      await updateDataEntry(formData);
-      await fetchInitialData();
-      setLoading(false);
-      // setActionMessage("Category created successfully.");
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
+    await updateDataEntry(formData);
+    await fetchInitialData();
   };
 
-  const handleDeleteDataCategory = async (catId: string) => {
-    try {
-      setLoading(true);
-      await deleteDataCategory(catId);
-      setSelectedCategory(null);
-      setActionMessage({
-        message: "Data category deleted successfully.",
-        type: "success",
-      });
-      setLoading(false);
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
+  const handleUpdateEntryFormData = standardWrapper(_handleUpdateEntryFormData);
+
+  const _handleDeleteDataCategory = async (catId: string) => {
+    await deleteDataCategory(catId);
+    setSelectedCategory(null);
+    setActionMessage({
+      message: "Data category deleted successfully.",
+      type: "success",
+    });
   };
+  const handleDeleteDataCategory = standardWrapper(_handleDeleteDataCategory);
 
   interface ListCategoryEntriesResponse {
     data: DataEntry[]; // Assuming `DataEntry` is the correct type
@@ -325,8 +286,6 @@ export default function CategoryDetail({ category }: Props) {
           console.log("Row", row);
           await createDataEntry(row as FormDataType); // Ensure `row` is the correct type
         }
-        setLoading(false);
-
         // You can now store this data in state or send it to Amplify
       });
     }
