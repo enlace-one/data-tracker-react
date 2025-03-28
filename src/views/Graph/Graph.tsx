@@ -46,10 +46,17 @@ export default function Graph() {
       reversedEntries.forEach((entry) => {
         newData.push({
           name: entry.date, // Assuming `entry.date` is accessible
-          value: Number(entry.value), // Assuming `entry.value` is accessible
+          value:
+            entry.value === "true"
+              ? 1
+              : entry.value === "false"
+              ? 0
+              : Number(entry.value),
           note: entry.note || "",
         });
       });
+
+      console.log("Data is", newData);
 
       if (reversedEntries.length >= 50) {
         setlabelsToShow(10);
@@ -232,7 +239,8 @@ export default function Graph() {
           <option className={styles.tableRow}>Choose a Category</option>
           {dataCategories.map(
             (item) =>
-              item.dataType.inputType === "number" && (
+              (item.dataType.inputType === "number" ||
+                item.dataType.inputType === "boolean") && (
                 <option
                   className={styles.tableRow}
                   key={item.id}
