@@ -64,6 +64,12 @@ const DEFAULT_DATA_TYPES = [
     isComplex: false,
     inputType: "string",
   },
+  {
+    name: "Time",
+    note: "Stores time values such as 10:00 PM",
+    isComplex: false,
+    inputType: "time",
+  },
 ];
 
 const SETTINGS = { debug: false };

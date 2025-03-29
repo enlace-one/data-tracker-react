@@ -29,7 +29,7 @@ const schema = a
         dataCategories: a.hasMany("DataCategory", "dataTypeId"),
       })
       .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.authenticated(), allow.publicApiKey()]),
+      .authorization((allow) => [allow.owner()]),
     DataCategory: a
       .model({
         name: a.string().required(),
