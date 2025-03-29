@@ -9,6 +9,7 @@ export const getAddEntryFormFieldsWithCategory = (
     id: "value",
     type: category.dataType.inputType,
     note: category.note,
+    default: category.defaultValue ?? "",
   },
   { name: "Date", id: "date", type: "date" },
   { name: "Note", id: "note" },
@@ -21,7 +22,7 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
   {
     name: "Value",
     id: "value",
-    default: entry.value ?? "",
+    default: entry.value ?? category.defaultValue ?? "",
     type: category.dataType.inputType,
     note: category.note,
   },

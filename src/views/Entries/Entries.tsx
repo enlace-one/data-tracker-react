@@ -122,6 +122,7 @@ export default function Entries() {
     }
   };
 
+
   const getUpdateEntryFormField = (entry: DataEntry) => [
     {
       name: "Data Category",

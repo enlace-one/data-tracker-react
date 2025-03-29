@@ -133,6 +133,13 @@ const FlexForm = ({
         <div className={styles.overlay}>
           <div className={styles.modal}>
             <Heading level={2}>{heading}</Heading>
+            {console.log(
+              "FormData:",
+              formData,
+              "DynamicFields:",
+              dynamicFields
+            ) ??
+              (true && <br />)}
             <form onSubmit={handleSubmit}>
               {dynamicFields.map((field) =>
                 field.hidden ? null : ( // Check if the field is hidden
