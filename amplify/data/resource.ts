@@ -46,7 +46,7 @@ const schema = a
       .authorization((allow) => [
         allow.owner(),
         allow.groups(["Admins"]).to(["read"]),
-        allow.publicApiKey(), // TODO: Remove. FOR TESTING
+        // allow.publicApiKey(), // TODO: Remove. FOR TESTING
       ]),
     DataEntry: a
       .model({
@@ -71,7 +71,7 @@ const schema = a
       .authorization((allow) => [
         allow.owner(),
         allow.groups(["Admins"]).to(["read"]),
-        allow.publicApiKey(), // TODO: Remove. FOR TESTING
+        // allow.publicApiKey(), // TODO: Remove. FOR TESTING
       ]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
