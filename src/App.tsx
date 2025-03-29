@@ -9,10 +9,11 @@ import Entries from "./views/Entries/Entries";
 import Types from "./views/Types/Types";
 import Alert from "./components/Alert/Alert";
 import Graph from "./views/Graph/Graph";
+import Day from "./views/Day/Day";
 
 export default function App() {
   const [activeTab, _setActiveTab] = useState<
-    "profile" | "categories" | "entries" | "types" | "graph"
+    "profile" | "categories" | "entries" | "types" | "graph" | "day"
   >("profile");
 
   const { signOut } = useAuthenticator((context) => [context.user]);
@@ -21,7 +22,7 @@ export default function App() {
 
   // Define setActiveTab as a function expression
   const setActiveTab = (
-    state: "profile" | "categories" | "entries" | "types" | "graph"
+    state: "profile" | "categories" | "entries" | "types" | "graph" | "day"
   ) => {
     _setActiveTab(state);
     setSelectedCategory(null);
@@ -44,6 +45,7 @@ export default function App() {
       {activeTab === "entries" && <Entries />}
       {activeTab === "types" && <Types />}
       {activeTab === "graph" && <Graph />}
+      {activeTab === "day" && <Day />}
 
       <Divider />
 
@@ -53,6 +55,7 @@ export default function App() {
         <Button onClick={() => setActiveTab("entries")}>Entries</Button>
       </Flex>
       <Flex gap="1rem" margin="0 rem 1rem">
+        <Button onClick={() => setActiveTab("day")}>Day</Button>
         <Button onClick={() => setActiveTab("graph")}>Graph</Button>
         {SETTINGS.debug && (
           <>

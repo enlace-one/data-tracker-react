@@ -1,7 +1,11 @@
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../amplify/data/resource";
 
-import { EnrichedDataCategory, FormDataType as FormData } from "./types"; // ✅ Import interfaces
+import {
+  EnrichedDataCategory,
+  EnrichedDataEntry,
+  FormDataType as FormData,
+} from "./types"; // ✅ Import interfaces
 
 // import { useData } from "./DataContext";
 
@@ -238,6 +242,68 @@ export async function fetchDataEntriesByCategory(
     console.error("Error fetching data entries:", error);
     return [];
   }
+}
+
+export async function fetchDataEntriesByDate(
+  date: string
+): Promise<Schema["DataEntry"]["type"][]> {
+  try {
+    const { data: dataEntries, errors } =
+      await client.models.DataEntry.listDateEntries({
+        date: date,
+      });
+    // await client.models.DataEntry.list({ orderBy: { name: "asc" } });
+    console.log("Data Entry:", dataEntries, " Errors: ", errors);
+    return dataEntries || [];
+  } catch (error) {
+    console.error("Error fetching data entries:", error);
+    return [];
+  }
+}
+export async function fetchEnrichedDataEntriesByDate(
+  date: string
+): Promise<EnrichedDataEntry[]> {
+  // Corrected return type
+  const { data: dataEntries, errors } =
+    await client.models.DataEntry.listDateEntries({
+      date: date,
+    });
+
+  if (errors) {
+    console.error("Errors fetching data entries:", errors);
+    return []; // Return an empty array in case of errors
+  }
+
+  const enrichedItems = await Promise.all(
+    dataEntries.map(async (item) => {
+      // Corrected variable name
+      try {
+        let dataCategory: Schema["DataCategory"]["type"] | undefined;
+
+        if (item.dataCategory && typeof item.dataCategory === "function") {
+          // Resolve LazyLoader
+          const resolved = await item.dataCategory();
+          dataCategory = resolved?.data ?? undefined;
+        }
+        // else if (item.dataTypeId) {
+        //   // Fallback if LazyLoader isn't present
+        //   dataType = await getDataType(item.dataTypeId);
+        // }
+
+        return { ...item, dataCategory };
+      } catch (error) {
+        console.error(
+          `Failed to fetch dataCategory for ID ${item.dataCategoryId}:`,
+          error
+        );
+        return { ...item };
+      }
+    })
+  );
+
+  console.log("Enriched Entries:", enrichedItems);
+
+  return enrichedItems; // Corrected return statement
 }
 
 export async function fetchDataEntries(

@@ -66,6 +66,7 @@ const schema = a
           .name("entriesByDate")
           .queryField("listByDate")
           .sortKeys(["date"]),
+        index("date").name("dateEntries").queryField("listDateEntries"),
       ])
       // client.models.DataEntry.listDataentryByDataCategoryId({dataCategoryId: "ID"})
       .authorization((allow) => [
