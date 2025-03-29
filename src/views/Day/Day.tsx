@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button, Flex } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
@@ -83,16 +83,24 @@ export default function Day() {
             {dataEntries.map((entry) => (
               <tr className={styles.tableRow} key={entry.id}>
                 <td className={styles.minWidth}>
-                  <span
+                  <small>{entry.dataCategory?.name}</small>
+                  <br />
+                  {entry.value}
+                  <span className={styles.ButtonHolder}>
+                    <button className={styles.PlusSymbolButton}>{"+"}</button>
+                    <button className={styles.MinusSymbolButton}>{"-"}</button>
+                  </span>
+
+                  {/* <span
                     // onClick={() => setSelectedCategory(item)}
                     style={{
                       padding: "2px",
                       cursor: "pointer",
                     }}
                   >
-                    {entry.dataCategory.name}
+                    {entry.dataCategory?.name}
                     {entry.value}
-                  </span>
+                  </span> */}
                 </td>
               </tr>
             ))}

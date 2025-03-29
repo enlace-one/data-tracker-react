@@ -280,9 +280,9 @@ export async function fetchEnrichedDataEntriesByDate(
       try {
         let dataCategory: Schema["DataCategory"]["type"] | undefined;
 
-        if (item.dataCategory && typeof item.dataCategory === "function") {
+        if (item.category && typeof item.category === "function") {
           // Resolve LazyLoader
-          const resolved = await item.dataCategory();
+          const resolved = await item.category();
           dataCategory = resolved?.data ?? undefined;
         }
         // else if (item.dataTypeId) {
@@ -303,7 +303,7 @@ export async function fetchEnrichedDataEntriesByDate(
 
   console.log("Enriched Entries:", enrichedItems);
 
-  return enrichedItems; // Corrected return statement
+  return enrichedItems as unknown as EnrichedDataEntry[]; // Corrected return statement
 }
 
 export async function fetchDataEntries(
