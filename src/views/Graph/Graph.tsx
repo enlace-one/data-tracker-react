@@ -4,6 +4,7 @@ import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
+import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 // import HoverText from "../../components/HoverText/HoverText";
 
@@ -18,9 +19,7 @@ export default function Graph() {
   const [entryCountMax, setEntryCountMax] = useState(10);
   const [hoveredText, setHoveredText] = useState<string | null>(null);
 
-  const [data, setData] = useState<
-    { name: string; value: number; note: string }[]
-  >([]);
+  const [data, setData] = useState<DataPoint[]>([]);
 
   useEffect(() => {
     if (dataCategories) {
@@ -28,10 +27,32 @@ export default function Graph() {
     }
   }, [dataCategories]);
 
+  const parseTimeToNumber = (time: string) => {
+    const [hours, minutes] = time.split(":").map(Number);
+    const decimalMinutes = (minutes / 60) * 100;
+    return hours + Math.round(decimalMinutes) / 100; // Convert HH:mm to HH.MM
+  };
+
+  const parseBooleanToNumber = (boolean: string) => {
+    return boolean === "true" ? 1 : 0;
+  };
+
+  const parseTimeToDisplayValue = (time: string): string => {
+    const [hourStr, minuteStr] = time.split(":");
+    let hour = parseInt(hourStr, 10);
+    const minutes = minuteStr; // Keep minutes as a string for display
+    const period = hour >= 12 ? "PM" : "AM";
+
+    // Convert hour from 24-hour to 12-hour format
+    hour = hour % 12 || 12; // Convert 0 to 12 for midnight and 12 to 12 for noon
+
+    return `${hour}:${minutes} ${period}`;
+  };
+
   const handleCategoryChange = async (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    const newData: { name: string; value: number; note: string }[] = [];
+    const newData: DataPoint[] = [];
     const selectedOptions = Array.from(event.target.selectedOptions).map(
       (option) => option.value
     );
@@ -39,6 +60,12 @@ export default function Graph() {
 
     for (const catId of selectedOptions) {
       const entries = await fetchDataEntriesByCategory(catId);
+      let inputType = "";
+      dataCategories.map((cat) => {
+        if (cat.id == catId) {
+          inputType = cat.dataType.inputType;
+        }
+      });
 
       // Reverse the entries and take the last 30
       const reversedEntries = entries.slice(0, entryCountMax).reverse();
@@ -46,11 +73,15 @@ export default function Graph() {
       reversedEntries.forEach((entry) => {
         newData.push({
           name: entry.date, // Assuming `entry.date` is accessible
+          displayValue:
+            inputType == "time"
+              ? parseTimeToDisplayValue(entry.value)
+              : entry.value,
           value:
-            entry.value === "true"
-              ? 1
-              : entry.value === "false"
-              ? 0
+            inputType == "boolean"
+              ? parseBooleanToNumber(entry.value)
+              : inputType == "time"
+              ? parseTimeToNumber(entry.value)
               : Number(entry.value),
           note: entry.note || "",
         });
@@ -208,7 +239,7 @@ export default function Graph() {
                   {(data.length < 20 && width < 500) ||
                   (data.length < 40 && width < 1000 && width >= 500) ||
                   width >= 1000
-                    ? d.value
+                    ? d.displayValue
                     : null}
                 </text>
               </g>
@@ -240,7 +271,8 @@ export default function Graph() {
           {dataCategories.map(
             (item) =>
               (item.dataType.inputType === "number" ||
-                item.dataType.inputType === "boolean") && (
+                item.dataType.inputType === "boolean" ||
+                item.dataType.inputType === "time") && (
                 <option
                   className={styles.tableRow}
                   key={item.id}

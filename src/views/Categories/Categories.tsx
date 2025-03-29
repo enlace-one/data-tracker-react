@@ -2,7 +2,7 @@
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import { createDataCategory } from "../../api";
+import { createDataCategory, deleteAllDataCategories } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
 import { FormDataType } from "../../types";
 import styles from "./Categories.module.css";
@@ -16,6 +16,7 @@ export default function Categories() {
     selectedCategory,
     setSelectedCategory,
     setActionMessage,
+    SETTINGS,
   } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
@@ -88,6 +89,14 @@ export default function Categories() {
       >
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm>
+      {SETTINGS.debug && (
+        <Button
+          className={styles.horizontalMargin}
+          onClick={() => deleteAllDataCategories(dataCategories)}
+        >
+          Delete All
+        </Button>
+      )}
 
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
@@ -109,7 +118,7 @@ export default function Categories() {
                   <small>
                     {/* {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
                     "Unknown"}{" "} */}
-                    {item.dataType.name} - {item.note}{" "}
+                    {item.dataType?.name} - {item.note}{" "}
                   </small>
                 </td>
                 {/* <td>

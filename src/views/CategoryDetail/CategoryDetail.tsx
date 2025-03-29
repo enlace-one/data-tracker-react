@@ -304,11 +304,7 @@ export default function CategoryDetail({ category }: Props) {
         <tbody>
           <tr>
             <td className={styles.minWidth}>
-              Type:{" "}
-              {dataTypes
-                .filter((dt) => dt.id === category.dataTypeId)
-                .map((dt) => dt.name)
-                .join(", ")}
+              Type: {category.dataType?.name}
               <br />
               Note: {category.note}
               <br />

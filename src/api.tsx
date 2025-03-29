@@ -166,13 +166,30 @@ export async function deleteDataType(id: string) {
     console.error("Error deleting DataTypes:", error);
   }
 }
-export async function deleteDataCategory(id: string) {
-  const isConfirmed = window.confirm(
-    "Are you sure you want to delete this Data Category? It will delete all associated entries."
-  );
-  if (!isConfirmed) {
-    console.log("Deletion cancelled by user.");
-    return;
+
+export async function deleteAllDataCategories(
+  dataCategories: EnrichedDataCategory[]
+) {
+  for (const dataCategory of dataCategories) {
+    await deleteDataCategory(dataCategory.id, true);
+    console.log(`DataCategory with ID ${dataCategory.id} has been deleted.`);
+  }
+
+  console.log("All DataCategories have been deleted.");
+}
+
+export async function deleteDataCategory(
+  id: string,
+  skipConfirmation: boolean = false
+) {
+  if (!skipConfirmation) {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this Data Category? It will delete all associated entries."
+    );
+    if (!isConfirmed) {
+      console.log("Deletion cancelled by user.");
+      return;
+    }
   }
 
   // Get the IDs of the associated DataEntries

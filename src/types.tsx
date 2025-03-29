@@ -66,3 +66,10 @@ export type EnrichedDataCategory = Omit<
 > & {
   dataType: ResolvedDataType;
 };
+
+export type DataPoint = {
+  name: string;
+  value: number;
+  displayValue: string;
+  note: string;
+};
