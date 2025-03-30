@@ -350,19 +350,19 @@ export async function deleteAllDataEntries() {
   }
 }
 
-export async function deleteDataEntry(id: string): Promise<void> {
+export async function deleteDataEntry(id: string): Promise<boolean> {
   // Fetch the data entry to get the dataCategoryId
   const { data: dataEntry, errors: fetchErrors } =
     await client.models.DataEntry.get({ id });
 
   if (fetchErrors) {
     console.error("Errors fetching data entry:", fetchErrors);
-    return;
+    return false;
   }
 
   if (!dataEntry) {
     console.error("Data entry not found for ID:", id);
-    return;
+    return false;
   }
 
   // Delete the data entry
@@ -379,6 +379,7 @@ export async function deleteDataEntry(id: string): Promise<void> {
   await updateDataCategoryEntryCount(dataEntry.dataCategoryId, -1);
 
   console.log(`Data entry deleted with id ${id}.`);
+  return true;
 }
 
 /**

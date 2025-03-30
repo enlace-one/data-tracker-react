@@ -168,6 +168,12 @@ export default function CategoryDetail({ category }: Props) {
   };
   const handleDeleteDataCategory = standardWrapper(_handleDeleteDataCategory);
 
+  const _handleDeleteDataEntry = async (entryId: string) => {
+    await deleteDataEntry(entryId);
+    setDataEntries(dataEntries.filter((entry) => entry.id !== entryId));
+  };
+  const handleDeleteDataEntry = standardWrapper(_handleDeleteDataEntry);
+
   interface ListCategoryEntriesResponse {
     data: DataEntry[]; // Assuming `DataEntry` is the correct type
     nextToken?: string | null;
@@ -400,7 +406,7 @@ export default function CategoryDetail({ category }: Props) {
                   </td>
                   {/* <td>{item.value}</td> */}
                   <td>
-                    <TextButton onClick={() => deleteDataEntry(item.id)}>
+                    <TextButton onClick={() => handleDeleteDataEntry(item.id)}>
                       <span className={styles.small}>❌</span>
                     </TextButton>
                   </td>
