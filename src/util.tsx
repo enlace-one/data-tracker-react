@@ -30,3 +30,11 @@ export const parseTimeToDisplayValue = (time: string): string => {
 
   return `${hour}:${minutes} ${period}`;
 };
+
+export function sleep(seconds: number) {
+  return new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+}
+
+export function getRandomInt(max: number) {
+  return Math.floor(Math.random() * max);
+}

@@ -1,4 +1,9 @@
-import { DataEntry, FormDataType, EnrichedDataCategory } from "./types";
+import {
+  DataEntry,
+  FormDataType,
+  EnrichedDataCategory,
+  DataType,
+} from "./types";
 
 export const getAddEntryFormFieldsWithCategory = (
   category: EnrichedDataCategory
@@ -7,7 +12,7 @@ export const getAddEntryFormFieldsWithCategory = (
   {
     name: "Value",
     id: "value",
-    type: category.dataType.inputType,
+    type: category.dataType?.inputType ?? "text",
     note: category.note,
     default: category.defaultValue ?? "",
   },
@@ -23,7 +28,7 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
     name: "Value",
     id: "value",
     default: entry.value ?? category.defaultValue ?? "",
-    type: category.dataType.inputType,
+    type: category.dataType?.inputType ?? "text",
     note: category.note,
   },
   { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
@@ -43,7 +48,7 @@ export const getUpdateCategoryFormFields = (category: EnrichedDataCategory) => [
   {
     name: "Default Value",
     id: "defaultValue",
-    type: category.dataType.inputType,
+    type: category.dataType?.inputType ?? "text",
     default: String(category.defaultValue ?? ""),
   },
   {
@@ -158,6 +163,23 @@ export const getSelectCategoryFormFields = (
       id: "dataCategoryId",
       type: "select",
       options: dataCategoryOptions,
+      required: true,
+    },
+  ];
+};
+
+export const getSelectDataTypeFormFields = (dataTypes: DataType[]) => {
+  const dataTypeOptions = dataTypes.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+  }));
+
+  return [
+    {
+      name: "Data Type",
+      id: "dataTypeId",
+      type: "select",
+      options: dataTypeOptions,
       required: true,
     },
   ];

@@ -6,6 +6,7 @@ import {
   EnrichedDataEntry,
   FormDataType as FormData,
 } from "./types"; // ✅ Import interfaces
+import { getRandomInt, sleep } from "./util";
 
 // import { useData } from "./DataContext";
 
@@ -82,6 +83,8 @@ export async function createUniqueDataType(
   isComplex: boolean
 ) {
   try {
+    // Reduce conflicts by sleeping between 0 and 10 seconds
+    await sleep(getRandomInt(10));
     const { data: dataTypes } = await client.models.DataType.list({
       filter: { name: { eq: name } },
     });
