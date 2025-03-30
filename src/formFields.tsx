@@ -36,34 +36,49 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
   { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
 ];
 
-export const getUpdateCategoryFormFields = (category: EnrichedDataCategory) => [
-  { name: "Name", id: "name", required: true, default: category.name ?? "" },
-  { name: "Note", id: "note", default: category.note ?? "" },
-  {
-    name: "Add Default",
-    id: "addDefault",
-    type: "boolean",
-    default: String(category.addDefault ?? "false"),
-  },
-  {
-    name: "Default Value",
-    id: "defaultValue",
-    type: category.dataType?.inputType ?? "text",
-    default: String(category.defaultValue ?? ""),
-  },
-  {
-    name: "Positive Increment",
-    id: "positiveIncrement",
-    type: "number",
-    default: String(category.positiveIncrement) ?? "1",
-  },
-  {
-    name: "Negative Increment",
-    id: "negativeIncrement",
-    type: "number",
-    default: String(category.negativeIncrement) ?? "1",
-  },
-];
+export const getUpdateCategoryFormFields = (
+  category: EnrichedDataCategory,
+  showDataType = false
+) => {
+  let formData = [
+    { name: "Name", id: "name", required: true, default: category.name ?? "" },
+    { name: "Note", id: "note", default: category.note ?? "" },
+    {
+      name: "Add Default",
+      id: "addDefault",
+      type: "boolean",
+      default: String(category.addDefault ?? "false"),
+    },
+    {
+      name: "Default Value",
+      id: "defaultValue",
+      type: category.dataType?.inputType ?? "text",
+      default: String(category.defaultValue ?? ""),
+    },
+    {
+      name: "Positive Increment",
+      id: "positiveIncrement",
+      type: "number",
+      default: String(category.positiveIncrement) ?? "1",
+    },
+    {
+      name: "Negative Increment",
+      id: "negativeIncrement",
+      type: "number",
+      default: String(category.negativeIncrement) ?? "1",
+    },
+  ];
+  if (showDataType) {
+    formData.append({
+      name: "Data Type",
+      id: "dataTypeId",
+      type: "select",
+      options: dataTypeOptions,
+      required: true,
+    });
+  }
+  return formData;
+};
 
 export const getAddCategoryFormFields = (
   dataTypeOptions: {
