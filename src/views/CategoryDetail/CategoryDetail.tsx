@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function CategoryDetail({ category }: Props) {
-  const { dataTypes, setActionMessage, setSelectedCategory } = useData();
+  const { setActionMessage, setSelectedCategory } = useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [fileUpload, setFileUpload] = useState<Boolean>(false);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
@@ -311,6 +311,10 @@ export default function CategoryDetail({ category }: Props) {
               Add Default: {category.addDefault ? "True" : "False"}
               <br />
               Default Value: {category.defaultValue}
+              <br />
+              Positive Increment: {category.positiveIncrement}
+              <br />
+              Negative Increment: {category.negativeIncrement}
             </td>
             <td>
               <Button

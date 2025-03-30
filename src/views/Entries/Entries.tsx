@@ -10,7 +10,7 @@ import {
 import TextButton from "../../components/TextButton/TextButton";
 import styles from "./Entries.module.css";
 import { useState, useEffect } from "react";
-import { DataEntry, FormDataType } from "../../types";
+import { DataEntry } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";

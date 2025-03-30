@@ -38,25 +38,25 @@ export const getUpdateCategoryFormFields = (category: EnrichedDataCategory) => [
     name: "Add Default",
     id: "addDefault",
     type: "boolean",
-    default: category.addDefault ?? false,
+    default: String(category.addDefault ?? "false"),
   },
   {
     name: "Default Value",
     id: "defaultValue",
     type: category.dataType.inputType,
-    default: category.defaultValue ?? "",
+    default: String(category.defaultValue ?? ""),
   },
   {
     name: "Positive Increment",
     id: "positiveIncrement",
     type: "number",
-    default: category.positiveIncrement ?? "1",
+    default: String(category.positiveIncrement) ?? "1",
   },
   {
     name: "Negative Increment",
     id: "negativeIncrement",
     type: "number",
-    default: category.negativeIncrement ?? "1",
+    default: String(category.negativeIncrement) ?? "1",
   },
 ];
 

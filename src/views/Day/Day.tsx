@@ -1,46 +1,21 @@
 // import { useState } from "react";
-import { Heading, Divider, Button, Flex } from "@aws-amplify/ui-react";
+import { Heading, Divider } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
-  createDataCategory,
   createDataEntry,
-  deleteAllDataCategories,
   fetchEnrichedDataEntriesByDate,
   updateDataEntry,
 } from "../../api";
-import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import {
-  EnrichedDataCategory,
-  FormDataType,
-  EnrichedDataEntry,
-  DataEntry,
-} from "../../types";
+import { EnrichedDataCategory, EnrichedDataEntry } from "../../types";
 import BooleanField from "../../components/BooleanField/BooleanField";
 import styles from "./Day.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import {
-  parseBooleanToNumber,
-  parseTimeToDisplayValue,
-  parseNumberToTime,
-  parseTimeToNumber,
-} from "../../util";
-import {
-  getSelectCategoryFormFields,
-  getUpdateEntryFormFields,
-} from "../../formFields";
-import { AccessEntry } from "aws-cdk-lib/aws-eks";
-
+import { parseNumberToTime, parseTimeToNumber } from "../../util";
+import { getUpdateEntryFormFields } from "../../formFields";
 export default function Day() {
-  const {
-    dataCategories,
-    dataTypes,
-    selectedCategory,
-    setSelectedCategory,
-    setActionMessage,
-    SETTINGS,
-  } = useData();
+  const { dataCategories, setActionMessage } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -251,9 +226,6 @@ export default function Day() {
       }
     }
   };
-
-  const addDataFields = [];
-
   return (
     <>
       <Heading level={1}>Day</Heading>
