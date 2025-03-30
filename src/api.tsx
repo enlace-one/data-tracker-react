@@ -97,6 +97,9 @@ export async function createUniqueDataType(
         isComplex: isComplex,
       });
       console.log(`✅ Created DataType: ${name}.`);
+    } else if (dataTypes.length > 1) {
+      console.log(`ERROR - DataType "${name}" exists more than once. Deleting`);
+      await deleteDataType(dataTypes[0].id);
     } else {
       console.log(`DataType "${name}" already exists, skipping.`);
     }
