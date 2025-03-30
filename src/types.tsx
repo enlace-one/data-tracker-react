@@ -51,6 +51,8 @@ export interface FormDataType {
   date?: string;
   value?: string;
   id?: string;
+  negativeIncrement?: string;
+  positiveIncrement?: string;
 }
 
 export type ResolvedDataType = Omit<

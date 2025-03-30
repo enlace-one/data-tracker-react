@@ -40,6 +40,9 @@ const schema = a
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
         dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
         dataType: a.belongsTo("DataType", "dataTypeId"),
+        lastEntryDate: a.date(),
+        positiveIncrement: a.float().default(1),
+        negativeIncrement: a.float().default(1),
         entryCount: a.integer().default(0),
       })
       .secondaryIndexes((index) => [index("name")])

@@ -6,6 +6,11 @@ import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import {
+  parseBooleanToNumber,
+  parseTimeToDisplayValue,
+  parseTimeToNumber,
+} from "../../util";
 // import HoverText from "../../components/HoverText/HoverText";
 
 export default function Graph() {
@@ -26,28 +31,6 @@ export default function Graph() {
       setLoading(false);
     }
   }, [dataCategories]);
-
-  const parseTimeToNumber = (time: string) => {
-    const [hours, minutes] = time.split(":").map(Number);
-    const decimalMinutes = (minutes / 60) * 100;
-    return hours + Math.round(decimalMinutes) / 100; // Convert HH:mm to HH.MM
-  };
-
-  const parseBooleanToNumber = (boolean: string) => {
-    return boolean === "true" ? 1 : 0;
-  };
-
-  const parseTimeToDisplayValue = (time: string): string => {
-    const [hourStr, minuteStr] = time.split(":");
-    let hour = parseInt(hourStr, 10);
-    const minutes = minuteStr; // Keep minutes as a string for display
-    const period = hour >= 12 ? "PM" : "AM";
-
-    // Convert hour from 24-hour to 12-hour format
-    hour = hour % 12 || 12; // Convert 0 to 12 for midnight and 12 to 12 for noon
-
-    return `${hour}:${minutes} ${period}`;
-  };
 
   const handleCategoryChange = async (
     event: React.ChangeEvent<HTMLSelectElement>

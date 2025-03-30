@@ -8,6 +8,7 @@ import { FormDataType } from "../../types";
 import styles from "./Categories.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import { getAddCategoryFormFields } from "../../formFields";
 
 export default function Categories() {
   const {
@@ -72,19 +73,7 @@ export default function Categories() {
       <Divider />
       <FlexForm
         heading="New Category"
-        fields={[
-          { name: "Name", id: "name", required: true },
-          {
-            name: "Data Type",
-            id: "dataTypeId",
-            type: "select",
-            options: dataTypeOptions,
-            required: true,
-          },
-          { name: "Note", id: "note" },
-          { name: "Add Default", id: "addDefault", type: "boolean" },
-          { name: "Default Value", id: "defaultValue", getType: getType },
-        ]}
+        fields={getAddCategoryFormFields(dataTypeOptions, getType)}
         handleFormData={handleFormData}
       >
         <Button className={styles.lightMargin}>Add Category</Button>

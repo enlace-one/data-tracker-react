@@ -404,6 +404,8 @@ export async function createDataCategory(formData: FormData): Promise<void> {
     note: formData.note || "", // Default empty string
     addDefault: formData.addDefault ?? false, // Default to false for boolean
     dataTypeId: formData.dataTypeId!,
+    positiveIncrement: Number(formData.positiveIncrement || "1"),
+    negativeIncrement: Number(formData.negativeIncrement || "1"),
   });
   console.log("Errors:", errors);
 }
@@ -426,6 +428,8 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
     note: formData.note || "", // Default empty string
     addDefault: formData.addDefault ?? false, // Default to false for boolean
     dataTypeId: formData.dataTypeId!,
+    positiveIncrement: Number(formData.positiveIncrement || "1"),
+    negativeIncrement: Number(formData.negativeIncrement || "1"),
   });
   console.log("Errors:", errors);
 }

@@ -46,4 +46,48 @@ export const getUpdateCategoryFormFields = (category: EnrichedDataCategory) => [
     type: category.dataType.inputType,
     default: category.defaultValue ?? "",
   },
+  {
+    name: "Positive Increment",
+    id: "positiveIncrement",
+    type: "number",
+    default: category.positiveIncrement ?? "1",
+  },
+  {
+    name: "Negative Increment",
+    id: "negativeIncrement",
+    type: "number",
+    default: category.negativeIncrement ?? "1",
+  },
+];
+
+export const getAddCategoryFormFields = (
+  dataTypeOptions: {
+    label: string;
+    value: string;
+  }[],
+  getType: (formData: Record<string, any>) => string
+) => [
+  { name: "Name", id: "name", required: true },
+  {
+    name: "Data Type",
+    id: "dataTypeId",
+    type: "select",
+    options: dataTypeOptions,
+    required: true,
+  },
+  { name: "Note", id: "note" },
+  { name: "Add Default", id: "addDefault", type: "boolean" },
+  { name: "Default Value", id: "defaultValue", getType: getType },
+  {
+    name: "Positive Increment",
+    id: "positiveIncrement",
+    type: "number",
+    default: "1",
+  },
+  {
+    name: "Negative Increment",
+    id: "negativeIncrement",
+    type: "number",
+    default: "1",
+  },
 ];

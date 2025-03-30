@@ -69,7 +69,7 @@ const FlexForm = ({
       return dynamicFields.reduce((acc, field) => {
         if (field.type === "date") {
           acc[field.id] =
-            field.default || new Date().toISOString().split("T")[0]; // Default to today
+            field.default || new Date().toLocaleDateString("en-CA"); // Default to today
         } else {
           acc[field.id] =
             field.default ?? (field.type === "checkbox" ? false : "");
@@ -190,7 +190,7 @@ const FlexForm = ({
                               value:
                                 field.type === "date"
                                   ? (formData[field.id] as string) ||
-                                    new Date().toISOString().split("T")[0] // Default to today’s date
+                                    new Date().toLocaleDateString("en-CA") // Default to today’s date
                                   : String(formData[field.id] ?? ""),
                             })}
                         required={
