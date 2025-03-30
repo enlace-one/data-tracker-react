@@ -15,8 +15,9 @@ import {
   EnrichedDataEntry,
   DataEntry,
 } from "../../types";
+import BooleanField from "../../components/BooleanField/BooleanField";
 import styles from "./Day.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import {
   parseBooleanToNumber,
@@ -119,8 +120,8 @@ export default function Day() {
     entry: EnrichedDataEntry
   ) => {
     let value = null;
-    const { data: dt } = await entry.dataCategory.dataType();
-    const inputType = dt!.inputType;
+    // const { data: dt } = await entry.dataCategory.dataType();
+    const inputType = entry.dataCategory.dataType.inputType;
 
     // Parse Value
     if (inputType === "number") {
@@ -155,13 +156,44 @@ export default function Day() {
     setDataEntries((prevEntries) =>
       prevEntries.map((e) => (e.id === entry.id ? { ...e, value } : e))
     );
-    updateDataEntry({
+
+    Array.from(
+      document.getElementsByClassName("ValueInput" + entry.id)
+    ).forEach((element) => {
+      if (element instanceof HTMLInputElement) {
+        element.value = value; // Update input field
+      }
+    });
+
+    updateDataEntryValue(entry, value);
+  };
+
+  const updateDataEntryValue = async (
+    entry: EnrichedDataEntry,
+    value: string
+  ) => {
+    await updateDataEntry({
       id: entry.id,
       date: entry.date, // Ensure a default empty string if missing
       note: entry.note || "", // Default empty string
       value: value,
       dataCategoryId: entry.dataCategoryId,
     });
+  };
+
+  const handleValueInputChange = (
+    entry: EnrichedDataEntry,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    const { value } = e.target;
+    updateDataEntryValue(entry, String(value));
+  };
+
+  const handleValueBooleanChange = (
+    entry: EnrichedDataEntry,
+    value: boolean
+  ) => {
+    updateDataEntryValue(entry, String(value));
   };
 
   const addDataFields = [];
@@ -187,21 +219,47 @@ export default function Day() {
                 <td className={styles.minWidth}>
                   <small>{entry.dataCategory?.name}</small>
                   <br />
-                  <span className={"ValueSpan" + entry.id}>{entry.value}</span>
-                  <span className={styles.ButtonHolder}>
-                    <button
-                      onClick={() => modifyCurrentValue("+", entry)}
-                      className={styles.PlusSymbolButton}
-                    >
-                      {"+"}
-                    </button>
-                    <button
-                      onClick={() => modifyCurrentValue("-", entry)}
-                      className={styles.MinusSymbolButton}
-                    >
-                      {"-"}
-                    </button>
-                  </span>
+                  {/* NEED TO ADD SUPPORT FOR BOOLEAN FIELDS */}
+                  <div className={styles.flexContainer}>
+                    {entry.dataCategory.dataType.inputType === "boolean" && (
+                      <BooleanField
+                        default={entry.value == "true" ? true : false}
+                        onChange={(value) =>
+                          handleValueBooleanChange(entry, value)
+                        }
+                      ></BooleanField>
+                    )}
+                    {entry.dataCategory.dataType.inputType != "boolean" && (
+                      <input
+                        type={entry.dataCategory.dataType.inputType}
+                        className={"ValueInput" + entry.id}
+                        defaultValue={entry.value}
+                        style={{ maxWidth: "9rem" }}
+                        onChange={(event) =>
+                          handleValueInputChange(entry, event)
+                        }
+                      ></input>
+                    )}
+                    {/* className={styles.ButtonHolder} */}
+
+                    {(entry.dataCategory.dataType.inputType === "number" ||
+                      entry.dataCategory.dataType.inputType === "time") && (
+                      <>
+                        <button
+                          onClick={() => modifyCurrentValue("+", entry)}
+                          className={styles.PlusSymbolButton}
+                        >
+                          {"+"}
+                        </button>
+                        <button
+                          onClick={() => modifyCurrentValue("-", entry)}
+                          className={styles.MinusSymbolButton}
+                        >
+                          {"-"}
+                        </button>
+                      </>
+                    )}
+                  </div>
 
                   {/* <span
                     // onClick={() => setSelectedCategory(item)}

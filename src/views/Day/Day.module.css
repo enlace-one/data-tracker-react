@@ -4,6 +4,13 @@
   /* padding-bottom: 25px; */
 }
 
+.flexContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Align vertically in the center */
+  width: 100%; /* Ensures it spans the full width */
+}
+
 .FlexRow {
   padding-left: 5px;
   padding-right: 0px;

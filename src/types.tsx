@@ -76,11 +76,18 @@ export type ResolvedDataCategory = Omit<
   dataEntries?: Schema["DataEntry"]["type"][];
 };
 
-export type EnrichedDataEntry = Omit<
+export type _EnrichedDataEntry = Omit<
   Schema["DataEntry"]["type"],
   "dataCategory"
 > & {
   dataCategory: ResolvedDataCategory;
+};
+
+export type EnrichedDataEntry = Omit<
+  Schema["DataEntry"]["type"],
+  "dataCategory"
+> & {
+  dataCategory: EnrichedDataCategory; // This already includes ResolvedDataType
 };
 
 export type DataPoint = {

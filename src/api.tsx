@@ -278,12 +278,12 @@ export async function fetchEnrichedDataEntriesByDate(
     dataEntries.map(async (item) => {
       // Corrected variable name
       try {
-        let dataCategory: Schema["DataCategory"]["type"] | undefined;
+        let dataCategory: EnrichedDataCategory | undefined;
 
         if (item.category && typeof item.category === "function") {
           // Resolve LazyLoader
-          const resolved = await item.category();
-          dataCategory = resolved?.data ?? undefined;
+          const resolved = await getDataCategory(item.dataCategoryId);
+          dataCategory = resolved ?? undefined;
         }
         // else if (item.dataTypeId) {
         //   // Fallback if LazyLoader isn't present
@@ -538,12 +538,39 @@ export async function updateDataEntry(formData: FormData): Promise<void> {
  */
 export async function getDataCategory(
   categoryId: string
-): Promise<Schema["DataCategory"]["type"] | null> {
+): Promise<EnrichedDataCategory | null> {
   try {
     const { data, errors } = await client.models.DataCategory.get({
       id: categoryId,
       include: ["dataType"], // Eagerly load the data type
     } as any); // Type assertion since I'm, 70% sure include works:)
+
+    if (!data) {
+      return null;
+    }
+
+    let enrichedItem = null;
+    try {
+      let dataType: Schema["DataType"]["type"] | undefined;
+
+      if (data.dataType && typeof data.dataType === "function") {
+        // Resolve LazyLoader
+        const resolved = await data.dataType();
+        dataType = resolved?.data ?? undefined;
+      }
+      // else if (item.dataTypeId) {
+      //   // Fallback if LazyLoader isn't present
+      //   dataType = await getDataType(item.dataTypeId);
+      // }
+
+      enrichedItem = { ...data, dataType };
+    } catch (error) {
+      console.error(
+        `Failed to fetch dataType for ID ${data.dataTypeId}:`,
+        error
+      );
+      enrichedItem = { ...data };
+    }
 
     if (errors) {
       console.error("Errors fetching data category:", errors);
@@ -555,7 +582,7 @@ export async function getDataCategory(
       return null;
     }
 
-    return data;
+    return enrichedItem as unknown as EnrichedDataCategory;
   } catch (error) {
     console.error("Error fetching data category:", error);
     return null;
