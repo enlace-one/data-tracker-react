@@ -606,7 +606,7 @@ export function subscribeToDataCategories(
         return;
       }
 
-      const enrichedItems = await Promise.all(
+      let enrichedItems = await Promise.all(
         result.items.map(async (item) => {
           try {
             let dataType: Schema["DataType"]["type"] | undefined;
@@ -633,6 +633,10 @@ export function subscribeToDataCategories(
       );
 
       console.log("Enriched Categories:", enrichedItems);
+
+      enrichedItems = enrichedItems.sort((a, b) =>
+        a.name.localeCompare(b.name)
+      );
 
       // Cheat to appease the TypeScript gods.
       callback(enrichedItems as unknown as EnrichedDataCategory[]);

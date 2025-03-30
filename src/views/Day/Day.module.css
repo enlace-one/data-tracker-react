@@ -34,12 +34,22 @@
   min-width: 50px;
 }
 
+.CategorySelect {
+  min-width: 50px;
+}
+
 .SymbolButton {
   font-weight: bold;
   width: 2rem;
   height: 1.5rem;
   padding: 0rem 0.5rem 0rem 0.5rem;
   margin: 0rem 0.25rem;
+}
+
+.FullWidthSymbolButton {
+  font-weight: bold;
+  width: 100%;
+  padding: 0rem 0.5rem 0rem 0.5rem;
 }
 
 .PlusSymbolButton {

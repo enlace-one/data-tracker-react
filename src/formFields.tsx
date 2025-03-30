@@ -91,3 +91,74 @@ export const getAddCategoryFormFields = (
     default: "1",
   },
 ];
+
+export const getUpdateEntryFormFields = (
+  entry: DataEntry,
+  dataCategories: EnrichedDataCategory[]
+) => {
+  const dataCategoryOptions = dataCategories.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+  }));
+  const getType = (formData: FormDataType) => {
+    const category = dataCategories.find(
+      (dc) => dc.id === formData.dataCategoryId
+    );
+    if (category) {
+      return category.dataType.inputType;
+    } else {
+      return "text";
+    }
+  };
+
+  const getNote = (formData: FormDataType) => {
+    const category = dataCategories.find(
+      (dc) => dc.id === formData.dataCategoryId
+    );
+    if (category) {
+      return category.note || "";
+    } else {
+      return "";
+    }
+  };
+
+  return [
+    {
+      name: "Data Category",
+      id: "dataCategoryId",
+      type: "select",
+      options: dataCategoryOptions,
+      required: true,
+      default: entry.dataCategoryId,
+    },
+    {
+      name: "Value",
+      id: "value",
+      default: entry.value ?? "",
+      getType: getType,
+      getNote: getNote,
+    },
+    { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
+    { name: "Note", id: "note", default: entry.note ?? "" },
+    { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
+  ];
+};
+
+export const getSelectCategoryFormFields = (
+  dataCategories: EnrichedDataCategory[]
+) => {
+  const dataCategoryOptions = dataCategories.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+  }));
+
+  return [
+    {
+      name: "Data Category",
+      id: "dataCategoryId",
+      type: "select",
+      options: dataCategoryOptions,
+      required: true,
+    },
+  ];
+};

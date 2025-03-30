@@ -4,6 +4,7 @@ import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataCategory,
+  createDataEntry,
   deleteAllDataCategories,
   fetchEnrichedDataEntriesByDate,
   updateDataEntry,
@@ -25,6 +26,11 @@ import {
   parseNumberToTime,
   parseTimeToNumber,
 } from "../../util";
+import {
+  getSelectCategoryFormFields,
+  getUpdateEntryFormFields,
+} from "../../formFields";
+import { AccessEntry } from "aws-cdk-lib/aws-eks";
 
 export default function Day() {
   const {
@@ -47,7 +53,9 @@ export default function Day() {
   });
   const [categoriesToShow, setcategoriesToShow] = useState<
     EnrichedDataCategory[]
-  >([]);
+  >(() => {
+    return dataCategories;
+  });
 
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
@@ -67,18 +75,34 @@ export default function Day() {
     } as T;
   }
 
-  useEffect(() => {
-    if (dataCategories) {
-      setLoading(false);
-    }
-  }, [dataCategories]);
-
   const _fetchEntries = async () => {
     const fetchedEntries = await fetchEnrichedDataEntriesByDate(date);
-    setDataEntries(fetchedEntries);
+
+    setDataEntries(
+      fetchedEntries.sort((a, b) =>
+        a.dataCategory.name.localeCompare(b.dataCategory.name)
+      )
+    );
+
+    const entryCategoryIds = new Set(
+      fetchedEntries.map((entry) => entry.dataCategoryId)
+    );
+
+    setcategoriesToShow(
+      dataCategories
+        .filter((category) => !entryCategoryIds.has(category.id))
+        .sort((a, b) => a.name.localeCompare(b.name)) // Use localeCompare for string sorting
+    );
   };
 
   const fetchEntries = standardWrapper(_fetchEntries);
+
+  const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+    await updateDataEntry(formData);
+    await fetchEntries();
+  };
+
+  const handleUpdateEntryFormData = standardWrapper(_handleUpdateEntryFormData);
 
   useEffect(() => {
     fetchEntries();
@@ -196,6 +220,38 @@ export default function Day() {
     updateDataEntryValue(entry, String(value));
   };
 
+  const handleAddCategory = async () => {
+    console.log("Adding cat");
+
+    const elements = Array.from(
+      document.getElementsByClassName(styles.CategorySelect)
+    );
+
+    for (const element of elements) {
+      if (element instanceof HTMLSelectElement) {
+        console.log("Value", element.value);
+
+        const category = dataCategories.find(
+          (category) => category.id === element.value
+        );
+
+        if (category) {
+          try {
+            await createDataEntry({
+              dataCategoryId: element.value,
+              date: date,
+              value: category.defaultValue ?? "", // Ensure a valid default value is set
+            });
+            console.log("Category added successfully");
+            await fetchEntries(); // Refresh entries after adding a new one
+          } catch (error) {
+            console.error("Error adding category:", error);
+          }
+        }
+      }
+    }
+  };
+
   const addDataFields = [];
 
   return (
@@ -217,8 +273,16 @@ export default function Day() {
             {dataEntries.map((entry) => (
               <tr className={styles.tableRow} key={entry.id}>
                 <td className={styles.minWidth}>
-                  <small>{entry.dataCategory?.name}</small>
-                  <br />
+                  <FlexForm
+                    heading="Update Entry"
+                    fields={getUpdateEntryFormFields(entry, dataCategories)}
+                    handleFormData={handleUpdateEntryFormData}
+                  >
+                    <small>{entry.dataCategory?.name}</small>
+                  </FlexForm>
+
+                  {/* <br /> */}
+
                   {/* NEED TO ADD SUPPORT FOR BOOLEAN FIELDS */}
                   <div className={styles.flexContainer}>
                     {entry.dataCategory.dataType.inputType === "boolean" && (
@@ -274,6 +338,29 @@ export default function Day() {
                 </td>
               </tr>
             ))}
+            <tr className={styles.tableRow} key="new">
+              <td className={styles.minWidth}>
+                {/* <small>Add Entry for Another Category</small>
+                <br /> */}
+
+                <select className={styles.CategorySelect}>
+                  <option key="default" value="">
+                    Pick a Category
+                  </option>
+                  {categoriesToShow.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={handleAddCategory}
+                  className={styles.SymbolButton}
+                >
+                  {"+"}
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       )}

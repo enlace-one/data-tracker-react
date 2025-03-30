@@ -14,6 +14,7 @@ import { DataEntry, FormDataType } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import { getUpdateEntryFormFields } from "../../formFields";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
@@ -21,11 +22,6 @@ export default function Entries() {
   const [pageTokens, setPageTokens] = useState<(string | null)[]>([null]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [hasMorePages, setHasMorePages] = useState(true);
-
-  const dataCategoryOptions = dataCategories.map((dt) => ({
-    label: dt.name,
-    value: dt.id,
-  }));
 
   const [loading, setLoading] = useState(true);
 
@@ -99,50 +95,6 @@ export default function Entries() {
     e.preventDefault();
     setSelectedEntry((prev) => (prev === id ? null : id));
   };
-
-  const getType = (formData: FormDataType) => {
-    const category = dataCategories.find(
-      (dc) => dc.id === formData.dataCategoryId
-    );
-    if (category) {
-      return category.dataType.inputType;
-    } else {
-      return "text";
-    }
-  };
-
-  const getNote = (formData: FormDataType) => {
-    const category = dataCategories.find(
-      (dc) => dc.id === formData.dataCategoryId
-    );
-    if (category) {
-      return category.note || "";
-    } else {
-      return "";
-    }
-  };
-
-
-  const getUpdateEntryFormField = (entry: DataEntry) => [
-    {
-      name: "Data Category",
-      id: "dataCategoryId",
-      type: "select",
-      options: dataCategoryOptions,
-      required: true,
-      default: entry.dataCategoryId,
-    },
-    {
-      name: "Value",
-      id: "value",
-      default: entry.value ?? "",
-      getType: getType,
-      getNote: getNote,
-    },
-    { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
-    { name: "Note", id: "note", default: entry.note ?? "" },
-    { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
-  ];
 
   const handleFormData = async (formData: Record<string, any>) => {
     try {
@@ -227,7 +179,10 @@ export default function Entries() {
               /> */}
               <FlexForm
                 heading="New Entry"
-                fields={getUpdateEntryFormField({} as DataEntry)}
+                fields={getUpdateEntryFormFields(
+                  {} as DataEntry,
+                  dataCategories
+                )}
                 handleFormData={handleFormData}
               >
                 <Button className={styles.lightMargin}>Add Entry</Button>
@@ -261,7 +216,7 @@ export default function Entries() {
                 <td className={styles.minWidth}>
                   <FlexForm
                     heading="Update Entry"
-                    fields={getUpdateEntryFormField(item)}
+                    fields={getUpdateEntryFormFields(item, dataCategories)}
                     handleFormData={handleUpdateEntryFormData}
                   >
                     {item.value}
