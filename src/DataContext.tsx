@@ -72,7 +72,10 @@ const DEFAULT_DATA_TYPES = [
   },
 ];
 
-const SETTINGS = { debug: false };
+const urlParams = new URLSearchParams(window.location.search);
+const isDebugMode = urlParams.get("debug") === "true";
+
+const SETTINGS = { debug: isDebugMode };
 
 async function initializeDataTypes() {
   await Promise.all(
