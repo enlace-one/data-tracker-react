@@ -18,7 +18,6 @@ import {
   getUpdateEntryFormFieldsWithSetCategory,
   getAddEntryFormFieldsWithCategory,
   getUpdateCategoryFormFields,
-  getSelectDataTypeFormFields,
 } from "../../formFields";
 import styles from "./CategoryDetail.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
@@ -125,7 +124,7 @@ export default function CategoryDetail({ category }: Props) {
         const errorMessage =
           e instanceof Error ? e.message : "An error occurred.";
         setActionMessage({ message: errorMessage, type: "error" });
-        console.log(e.stack); // Log the error
+        console.log(e instanceof Error ? e.stack : "No stack available"); // Log the error
         setLoading(false); // Ensure loading is stopped even if there's an error
       }
     } as T;
@@ -136,7 +135,7 @@ export default function CategoryDetail({ category }: Props) {
   ) => {
     console.log("Received form data:", formData);
     // Add fields that cannot be edited.
-    formData.dataTypeId = category.dataTypeId;
+    formData.dataTypeId = formData.dataTypeId ?? category.dataTypeId;
     formData.id = category.id;
     await updateDataCategory(formData);
   };
@@ -176,14 +175,6 @@ export default function CategoryDetail({ category }: Props) {
     setDataEntries(dataEntries.filter((entry) => entry.id !== entryId));
   };
   const handleDeleteDataEntry = standardWrapper(_handleDeleteDataEntry);
-
-  const _handleChangeDataType = async (formData: Record<string, any>) => {
-    console.log("Received form data:", formData);
-    formData.id = category.id; // Handle form data submission
-    await updateDataCategory(formData);
-  };
-
-  const handleChangeDataType = standardWrapper(_handleChangeDataType);
 
   interface ListCategoryEntriesResponse {
     data: DataEntry[]; // Assuming `DataEntry` is the correct type
@@ -340,17 +331,6 @@ export default function CategoryDetail({ category }: Props) {
               >
                 Delete
               </Button>
-              {SETTINGS.debug && (
-                <FlexForm
-                  heading="Change DataType"
-                  fields={getSelectDataTypeFormFields(dataTypes)}
-                  handleFormData={handleChangeDataType}
-                >
-                  <Button className={styles.lightMargin}>
-                    Change DataType
-                  </Button>
-                </FlexForm>
-              )}
               <Button
                 className={styles.lightMargin}
                 onClick={handleExportToCSV}
@@ -366,7 +346,11 @@ export default function CategoryDetail({ category }: Props) {
               </Popup>
               <FlexForm
                 heading="Update Category"
-                fields={getUpdateCategoryFormFields(category)}
+                fields={getUpdateCategoryFormFields(
+                  category,
+                  SETTINGS.debug,
+                  dataTypes
+                )}
                 handleFormData={handleUpdateCategoryFormData}
               >
                 <Button className={styles.lightMargin}>Update</Button>
