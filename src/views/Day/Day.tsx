@@ -103,7 +103,6 @@ export default function Day() {
     console.log("Setting date to ", newDateFormatted);
 
     await setDate(newDateFormatted); // Update state first
-    fetchEntries(); // Fetch new data after state update
 
     Array.from(document.getElementsByClassName(styles.DateInput)).forEach(
       (element) => {
