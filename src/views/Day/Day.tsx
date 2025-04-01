@@ -193,34 +193,26 @@ export default function Day() {
     updateDataEntryValue(entry, String(value));
   };
 
-  const handleAddCategory = async () => {
+  const handleAddCategory = async (e: ChangeEvent<HTMLSelectElement>) => {
     console.log("Adding cat");
 
-    const elements = Array.from(
-      document.getElementsByClassName(styles.CategorySelect)
-    );
+    const value = e.target.value;
 
-    for (const element of elements) {
-      if (element instanceof HTMLSelectElement) {
-        console.log("Value", element.value);
+    console.log("Value", value);
 
-        const category = dataCategories.find(
-          (category) => category.id === element.value
-        );
+    const category = dataCategories.find((category) => category.id === value);
 
-        if (category) {
-          try {
-            await createDataEntry({
-              dataCategoryId: element.value,
-              date: date,
-              value: category.defaultValue ?? "", // Ensure a valid default value is set
-            });
-            console.log("Category added successfully");
-            await fetchEntries(); // Refresh entries after adding a new one
-          } catch (error) {
-            console.error("Error adding category:", error);
-          }
-        }
+    if (category) {
+      try {
+        await createDataEntry({
+          dataCategoryId: value,
+          date: date,
+          value: category.defaultValue ?? "", // Ensure a valid default value is set
+        });
+        console.log("Category added successfully");
+        await fetchEntries(); // Refresh entries after adding a new one
+      } catch (error) {
+        console.error("Error adding category:", error);
       }
     }
   };
@@ -313,7 +305,10 @@ export default function Day() {
                 {/* <small>Add Entry for Another Category</small>
                 <br /> */}
 
-                <select className={styles.CategorySelect}>
+                <select
+                  onChange={handleAddCategory}
+                  className={styles.CategorySelect}
+                >
                   <option key="default" value="">
                     Pick a Category
                   </option>
@@ -323,12 +318,6 @@ export default function Day() {
                     </option>
                   ))}
                 </select>
-                <button
-                  onClick={handleAddCategory}
-                  className={styles.SymbolButton}
-                >
-                  {"+"}
-                </button>
               </td>
             </tr>
           </tbody>
