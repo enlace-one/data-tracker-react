@@ -104,11 +104,13 @@ export const getAddCategoryFormFields = (
   },
 ];
 
-const getAddCategorySecondaryFormFields = async (
+export const getAddCategorySecondaryFormFields = async (
   formData: Record<string, any>,
-  params: { dataTypes: DataType[] }
+  params: unknown
 ) => {
-  const dataTypes = params["dataTypes"];
+  const assertedParams = params as { dataTypes: DataType[] };
+
+  const dataTypes = assertedParams["dataTypes"];
 
   const dataTypeId = String(formData["dataTypeId"]); // Ensure string comparison
   const dataType = dataTypes.find((dt) => String(dt.id) === dataTypeId);
@@ -197,6 +199,8 @@ export const getUpdateEntryFormFields = (
     { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
   ];
 };
+
+// getAddDataEntrySecondaryFormFields
 
 export const getSelectCategoryFormFields = (
   dataCategories: EnrichedDataCategory[]

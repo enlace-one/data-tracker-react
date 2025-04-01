@@ -183,6 +183,8 @@ export default function Entries() {
                   {} as DataEntry,
                   dataCategories
                 )}
+                // getSecondaryFields={getAddDataEntrySecondaryFormFields}
+                // getSecondaryFieldsParams={{ dataTypes: dataTypes }}
                 handleFormData={handleFormData}
               >
                 <Button className={styles.lightMargin}>Add Entry</Button>

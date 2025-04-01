@@ -113,4 +113,5 @@ export type FlexFormField = {
   getType?: (formData: Record<string, any>) => string; // Function to determine the field type
   getNote?: (formData: Record<string, any>) => string;
   note?: string | null;
+  pattern?: string | null;
 };

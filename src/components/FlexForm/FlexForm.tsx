@@ -2,34 +2,16 @@ import { useState, ChangeEvent, useEffect, FormEvent, ReactNode } from "react";
 import styles from "./FlexForm.module.css";
 import { Heading } from "@aws-amplify/ui-react";
 import BooleanField from "../BooleanField/BooleanField";
-
-export interface Option {
-  label: string;
-  value: string;
-}
-
-export interface Field {
-  id: string;
-  name: string;
-  hidden?: boolean;
-  required?: boolean;
-  type?: string; // e.g. "text", "checkbox", "select", etc.
-  options?: Option[]; // Only needed for select fields
-  default?: string | boolean; // Default value for the field
-  getType?: (formData: Record<string, any>) => string; // Function to determine the field type
-  getNote?: (formData: Record<string, any>) => string;
-  note?: string | null;
-  pattern?: string | null;
-}
+import { FlexFormField } from "../../types";
 
 interface Props {
   heading: string;
-  fields: Field[];
+  fields: FlexFormField[];
   handleFormData: (data: Record<string, string | boolean>) => void;
   getSecondaryFields?: (
     data: Record<string, string | boolean>,
     getSecondaryFieldsParams: unknown
-  ) => Field[];
+  ) => Promise<FlexFormField[]>;
   getSecondaryFieldsParams?: unknown;
   buttonStyle?: string;
   children: ReactNode;
@@ -51,7 +33,7 @@ const FlexForm = ({
   const [primaryData, setPrimaryData] = useState<
     Record<string, string | boolean>
   >({});
-  const [secondaryFields, setSecondaryFields] = useState<Field[]>([]);
+  const [secondaryFields, setSecondaryFields] = useState<FlexFormField[]>([]);
   const [formData, setFormData] = useState<Record<string, string | boolean>>(
     {}
   );
