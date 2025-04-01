@@ -14,7 +14,7 @@ import Day from "./views/Day/Day";
 export default function App() {
   const [activeTab, _setActiveTab] = useState<
     "profile" | "categories" | "entries" | "types" | "graph" | "day"
-  >("profile");
+  >("day");
 
   const { signOut } = useAuthenticator((context) => [context.user]);
 

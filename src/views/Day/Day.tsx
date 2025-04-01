@@ -119,7 +119,7 @@ export default function Day() {
   ) => {
     let value = null;
     // const { data: dt } = await entry.dataCategory.dataType();
-    const inputType = entry.dataCategory.dataType.inputType;
+    const inputType = entry.dataCategory.dataType?.inputType;
 
     // Parse Value
     if (inputType === "number") {
@@ -150,11 +150,6 @@ export default function Day() {
 
     console.log("Setting value to:", value);
 
-    // Update the state to trigger a re-render
-    setDataEntries((prevEntries) =>
-      prevEntries.map((e) => (e.id === entry.id ? { ...e, value } : e))
-    );
-
     Array.from(
       document.getElementsByClassName("ValueInput" + entry.id)
     ).forEach((element) => {
@@ -170,6 +165,10 @@ export default function Day() {
     entry: EnrichedDataEntry,
     value: string
   ) => {
+    // Update the state to trigger a re-render
+    setDataEntries((prevEntries) =>
+      prevEntries.map((e) => (e.id === entry.id ? { ...e, value } : e))
+    );
     await updateDataEntry({
       id: entry.id,
       date: entry.date, // Ensure a default empty string if missing
@@ -256,7 +255,7 @@ export default function Day() {
 
                   {/* NEED TO ADD SUPPORT FOR BOOLEAN FIELDS */}
                   <div className={styles.flexContainer}>
-                    {entry.dataCategory.dataType.inputType === "boolean" && (
+                    {entry.dataCategory.dataType?.inputType === "boolean" && (
                       <BooleanField
                         default={entry.value == "true" ? true : false}
                         onChange={(value) =>
@@ -264,9 +263,9 @@ export default function Day() {
                         }
                       ></BooleanField>
                     )}
-                    {entry.dataCategory.dataType.inputType != "boolean" && (
+                    {entry.dataCategory.dataType?.inputType != "boolean" && (
                       <input
-                        type={entry.dataCategory.dataType.inputType}
+                        type={entry.dataCategory.dataType?.inputType}
                         className={"ValueInput" + entry.id}
                         defaultValue={entry.value}
                         style={{ maxWidth: "9rem" }}
@@ -277,8 +276,8 @@ export default function Day() {
                     )}
                     {/* className={styles.ButtonHolder} */}
 
-                    {(entry.dataCategory.dataType.inputType === "number" ||
-                      entry.dataCategory.dataType.inputType === "time") && (
+                    {(entry.dataCategory.dataType?.inputType === "number" ||
+                      entry.dataCategory.dataType?.inputType === "time") && (
                       <>
                         <button
                           onClick={() => modifyCurrentValue("+", entry)}

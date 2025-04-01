@@ -133,7 +133,7 @@ export const getUpdateEntryFormFields = (
       (dc) => dc.id === formData.dataCategoryId
     );
     if (category) {
-      return category.dataType.inputType;
+      return category.dataType?.inputType;
     } else {
       return "text";
     }
