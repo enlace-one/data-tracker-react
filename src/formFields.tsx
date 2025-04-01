@@ -104,6 +104,48 @@ export const getAddCategoryFormFields = (
   },
 ];
 
+const getAddCategorySecondaryFormFields = async (
+  formData: Record<string, any>,
+  params: { dataTypes: DataType[] }
+) => {
+  const dataTypes = params["dataTypes"];
+
+  const dataTypeId = String(formData["dataTypeId"]); // Ensure string comparison
+  const dataType = dataTypes.find((dt) => String(dt.id) === dataTypeId);
+
+  if (!dataType) {
+    throw new Error(
+      `No DataType Selected. Received: ${JSON.stringify(formData)}`
+    );
+  }
+
+  let fields: FlexFormField[] = [
+    { name: "Name", id: "name", required: true },
+    { name: "Note", id: "note" },
+    { name: "Add Default", id: "addDefault", type: "boolean" },
+    { name: "Default Value", id: "defaultValue", type: dataType.inputType },
+  ];
+
+  if (["time", "number"].includes(dataType.inputType)) {
+    fields.push(
+      {
+        name: "Positive Increment",
+        id: "positiveIncrement",
+        type: "number",
+        default: "1",
+      },
+      {
+        name: "Negative Increment",
+        id: "negativeIncrement",
+        type: "number",
+        default: "1",
+      }
+    );
+  }
+
+  return fields;
+};
+
 export const getUpdateEntryFormFields = (
   entry: DataEntry,
   dataCategories: EnrichedDataCategory[]

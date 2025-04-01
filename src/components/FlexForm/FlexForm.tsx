@@ -26,7 +26,11 @@ interface Props {
   heading: string;
   fields: Field[];
   handleFormData: (data: Record<string, string | boolean>) => void;
-  getSecondaryFields?: (data: Record<string, string | boolean>) => Field[];
+  getSecondaryFields?: (
+    data: Record<string, string | boolean>,
+    getSecondaryFieldsParams: unknown
+  ) => Field[];
+  getSecondaryFieldsParams?: unknown;
   buttonStyle?: string;
   children: ReactNode;
 }
@@ -36,6 +40,7 @@ const FlexForm = ({
   fields,
   handleFormData,
   getSecondaryFields,
+  getSecondaryFieldsParams,
   buttonStyle = "",
   children,
 }: Props) => {
@@ -56,7 +61,10 @@ const FlexForm = ({
       if (formStage === "secondary" && getSecondaryFields) {
         console.log("Fetching secondary fields with primaryData:", primaryData); // Debugging
         try {
-          const generatedFields = await getSecondaryFields(primaryData);
+          const generatedFields = await getSecondaryFields(
+            primaryData,
+            getSecondaryFieldsParams
+          );
           setSecondaryFields(generatedFields);
           setFormData(
             generatedFields.reduce((acc, field) => {
@@ -123,6 +131,11 @@ const FlexForm = ({
     }
   };
 
+  const handleCancel = async () => {
+    setIsOpen(false);
+    setFormStage("primary"); // Reset for next time
+  };
+
   return (
     <>
       <div onClick={() => setIsOpen(true)} className={buttonStyle}>
@@ -132,7 +145,7 @@ const FlexForm = ({
         <div className={styles.overlay}>
           <div className={styles.modal}>
             <Heading level={2}>
-              {formStage === "primary" ? heading : "Additional Information"}
+              {formStage === "primary" ? heading : heading + " cont."}
             </Heading>
             <form onSubmit={handleSubmit}>
               {(formStage === "primary" ? fields : secondaryFields).map(
@@ -188,7 +201,7 @@ const FlexForm = ({
               <div className={styles.buttonGroup}>
                 <button
                   type="button"
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleCancel}
                   className={`${styles.button} ${styles.cancelButton}`}
                 >
                   Cancel
