@@ -10,35 +10,20 @@ import {
 } from "../../api"; // Make sure fetchDataTypes is imported
 import styles from "./Types.module.css";
 import { DataType } from "../../types";
+import {
+  getNewDataTypeFormFields,
+  getUpdateDataTypeFormFields,
+} from "../../formFields";
 
 export default function Types() {
   const { dataTypes } = useData();
 
-  // Define fields for the form, including the generic select field
-  const formFields = [
-    { name: "Name", id: "name", required: true },
-    { name: "Note", id: "note" },
-    { name: "Input Type", id: "inputType" },
-    { name: "Is Complex", id: "isComplex", type: "checkbox" },
-  ];
+  console.log(dataTypes);
 
   const handleFormData = (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
     console.log(createDataType(formData)); // Handle form data submission
   };
-
-  const getUpdateTypeFormField = (dataType: DataType) => [
-    { name: "Name", id: "name", required: true, default: dataType.name ?? "" },
-    { name: "Note", id: "note", default: dataType.note ?? "" },
-    {
-      name: "Is Complex",
-      id: "isComplex",
-      type: "checkbox",
-      default: dataType.isComplex ?? "",
-    },
-    { name: "Input Type", id: "inputType", default: dataType.inputType ?? "" },
-    { name: "Id", id: "id", default: dataType.id ?? "", hidden: true },
-  ];
 
   const handleUpdateTypeFormData = (formData: Record<string, any>) => {
     updateDataType(formData);
@@ -51,7 +36,7 @@ export default function Types() {
       <div>
         <FlexForm
           heading="New Type"
-          fields={formFields}
+          fields={getNewDataTypeFormFields()}
           handleFormData={handleFormData}
         >
           <Button className={styles.horizontalMargin}>Add New</Button>
@@ -72,7 +57,7 @@ export default function Types() {
               <td>
                 <FlexForm
                   heading="Update Type"
-                  fields={getUpdateTypeFormField(item)}
+                  fields={getUpdateDataTypeFormFields(item)}
                   handleFormData={handleUpdateTypeFormData}
                 >
                   {item.name} <small>{item.isComplex && "(Complex)"}</small>

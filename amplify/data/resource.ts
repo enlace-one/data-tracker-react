@@ -25,6 +25,7 @@ const schema = a
         name: a.string().required(),
         note: a.string(),
         inputType: a.string().required(),
+        pattern: a.string().default("*"),
         isComplex: a.boolean().required(),
         dataCategories: a.hasMany("DataCategory", "dataTypeId"),
       })

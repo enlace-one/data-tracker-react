@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Flex, Divider } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
@@ -16,9 +16,9 @@ export default function App() {
     "profile" | "categories" | "entries" | "types" | "graph" | "day"
   >("day");
 
-  const { signOut } = useAuthenticator((context) => [context.user]);
+  const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
 
-  const { setSelectedCategory, actionMessage } = useData();
+  const { setSelectedCategory, actionMessage, setActionMessage } = useData();
 
   // Define setActiveTab as a function expression
   const setActiveTab = (
@@ -27,6 +27,17 @@ export default function App() {
     _setActiveTab(state);
     setSelectedCategory(null);
   };
+
+  useEffect(() => {
+    const handleAuthCheck = async () => {
+      if (authStatus === "unauthenticated") {
+        await setActionMessage({ message: "timeout", type: "error" });
+        signOut();
+      }
+    };
+
+    handleAuthCheck();
+  }, [authStatus]);
 
   return (
     <Flex

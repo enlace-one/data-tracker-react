@@ -207,3 +207,25 @@ export const getSelectDataTypeFormFields = (dataTypes: DataType[]) => {
     },
   ];
 };
+
+export const getUpdateDataTypeFormFields = (dataType: DataType) => [
+  { name: "Name", id: "name", required: true, default: dataType?.name ?? "" },
+  { name: "Note", id: "note", default: dataType?.note ?? "" },
+  {
+    name: "Is Complex",
+    id: "isComplex",
+    type: "checkbox",
+    default: dataType.isComplex ?? "",
+  },
+  { name: "Regex Pattern", id: "pattern", default: dataType?.pattern ?? "*" },
+  { name: "Input Type", id: "inputType", default: dataType?.inputType ?? "" },
+  { name: "Id", id: "id", default: dataType.id ?? "", hidden: true },
+];
+
+export const getNewDataTypeFormFields = () => [
+  { name: "Name", id: "name", required: true },
+  { name: "Note", id: "note" },
+  { name: "Regex Pattern", id: "pattern", default: "*" },
+  { name: "Input Type", id: "inputType" },
+  { name: "Is Complex", id: "isComplex", type: "checkbox" },
+];

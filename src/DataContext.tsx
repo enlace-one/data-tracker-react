@@ -29,7 +29,7 @@ interface DataContextType {
   dataCategories: EnrichedDataCategory[];
   // dataEntries: DataEntry[];
   dataTypes: DataType[];
-  SETTINGS: { debug: boolean };
+  SETTINGS: { debug: boolean; version: string };
   selectedCategory: EnrichedDataCategory | null;
   setSelectedCategory: React.Dispatch<
     React.SetStateAction<EnrichedDataCategory | null>
@@ -75,7 +75,7 @@ const DEFAULT_DATA_TYPES = [
 const urlParams = new URLSearchParams(window.location.search);
 const isDebugMode = urlParams.get("debug") === "true";
 
-const SETTINGS = { debug: isDebugMode };
+const SETTINGS = { debug: isDebugMode, version: "1.0.0" };
 
 async function initializeDataTypes() {
   await Promise.all(

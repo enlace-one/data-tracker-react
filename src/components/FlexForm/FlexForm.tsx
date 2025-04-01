@@ -19,6 +19,7 @@ export interface Field {
   getType?: (formData: Record<string, any>) => string; // Function to determine the field type
   getNote?: (formData: Record<string, any>) => string;
   note?: string | null;
+  pattern?: string | null;
 }
 interface Props {
   heading: string;
@@ -184,6 +185,7 @@ const FlexForm = ({
                         id={field.id}
                         name={field.id}
                         onChange={handleChange}
+                        pattern={field.pattern ?? "*"}
                         {...(field.type === "checkbox"
                           ? { checked: !!formData[field.id] } // Ensuring boolean type
                           : {

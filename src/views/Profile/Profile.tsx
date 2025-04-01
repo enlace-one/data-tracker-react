@@ -16,7 +16,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ signOut }: ProfileProps) {
-  const { userProfiles } = useData();
+  const { userProfiles, SETTINGS } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -70,6 +70,7 @@ export default function Profile({ signOut }: ProfileProps) {
           </Flex>
         ))}
       </Grid>
+      <small>Version: {SETTINGS.version}</small>
     </>
   );
 }
