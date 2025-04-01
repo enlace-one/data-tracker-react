@@ -21,65 +21,69 @@ export interface Field {
   note?: string | null;
   pattern?: string | null;
 }
+
 interface Props {
   heading: string;
   fields: Field[];
   handleFormData: (data: Record<string, string | boolean>) => void;
+  getSecondaryFields?: (data: Record<string, string | boolean>) => Field[];
   buttonStyle?: string;
-  children: ReactNode; // Accepts a child component to be used as the button
+  children: ReactNode;
 }
 
 const FlexForm = ({
   heading,
   fields,
   handleFormData,
+  getSecondaryFields,
   buttonStyle = "",
   children,
 }: Props) => {
-  // console.log("Fields:", fields);
-
-  const [dynamicFields, setDynamicFields] = useState<Field[]>(() =>
-    fields.map((field) => ({
-      ...field,
-      type: field.getType ? field.getType(fields) : field.type,
-      note: field.getNote ? field.getNote(fields) : field.note,
-    }))
+  const [isOpen, setIsOpen] = useState(false);
+  const [formStage, setFormStage] = useState<"primary" | "secondary">(
+    "primary"
+  );
+  const [primaryData, setPrimaryData] = useState<
+    Record<string, string | boolean>
+  >({});
+  const [secondaryFields, setSecondaryFields] = useState<Field[]>([]);
+  const [formData, setFormData] = useState<Record<string, string | boolean>>(
+    {}
   );
 
-  const setDynamicFieldType = (fieldId: string, inputType: string) => {
-    // console.log(`Setting field ${fieldId} type to ${inputType}`);
-    setDynamicFields((prevFields) =>
-      prevFields.map((field) =>
-        field.id === fieldId ? { ...field, type: inputType } : field
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchSecondaryFields = async () => {
+      if (formStage === "secondary" && getSecondaryFields) {
+        console.log("Fetching secondary fields with primaryData:", primaryData); // Debugging
+        try {
+          const generatedFields = await getSecondaryFields(primaryData);
+          setSecondaryFields(generatedFields);
+          setFormData(
+            generatedFields.reduce((acc, field) => {
+              acc[field.id] =
+                field.default ?? (field.type === "checkbox" ? false : "");
+              return acc;
+            }, {} as Record<string, string | boolean>)
+          );
+        } catch (error) {
+          console.error("Error fetching secondary fields:", error);
+        }
+      }
+    };
 
-  const setDynamicFieldNote = (fieldId: string, note: string) => {
-    // console.log(`Setting field ${fieldId} note to ${note}`);
-    setDynamicFields((prevFields) =>
-      prevFields.map((field) =>
-        field.id === fieldId ? { ...field, note: note } : field
-      )
-    );
-  };
-
-  const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState<Record<string, string | boolean>>(
-    () => {
-      return dynamicFields.reduce((acc, field) => {
-        if (field.type === "date") {
-          acc[field.id] =
-            field.default || new Date().toLocaleDateString("en-CA"); // Default to today
-        } else {
+    if (formStage === "primary") {
+      setFormData(
+        fields.reduce((acc, field) => {
           acc[field.id] =
             field.default ?? (field.type === "checkbox" ? false : "");
-        }
-
-        return acc;
-      }, {} as Record<string, string | boolean>);
+          return acc;
+        }, {} as Record<string, string | boolean>)
+      );
+    } else if (formStage === "secondary") {
+      fetchSecondaryFields();
     }
-  );
+  }, [formStage, fields, getSecondaryFields, primaryData]);
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -93,24 +97,6 @@ const FlexForm = ({
     }));
   };
 
-  // React to changes in formData after it updates
-  useEffect(() => {
-    dynamicFields.forEach((field) => {
-      if (field.getType) {
-        const newType = field.getType(formData);
-        if (newType !== field.type) {
-          setDynamicFieldType(field.id, newType);
-        }
-      }
-      if (field.getNote) {
-        const newNote = field.getNote(formData);
-        if (newNote !== field.note) {
-          setDynamicFieldNote(field.id, newNote);
-        }
-      }
-    });
-  }, [formData]); // This ensures it runs only when formData updates
-
   const handleBooleanChange = (id: string, value: boolean) => {
     setFormData((prev) => ({
       ...prev,
@@ -118,11 +104,23 @@ const FlexForm = ({
     }));
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    handleFormData(formData);
-    setIsOpen(false);
+
+    if (formStage === "primary") {
+      await setPrimaryData(await formData);
+      if (getSecondaryFields) {
+        setFormStage("secondary");
+      } else {
+        handleFormData(formData);
+        setIsOpen(false);
+      }
+    } else if (formStage === "secondary") {
+      const fullFormData = { ...primaryData, ...formData };
+      handleFormData(fullFormData);
+      setIsOpen(false);
+      setFormStage("primary"); // Reset for next time
+    }
   };
 
   return (
@@ -133,75 +131,59 @@ const FlexForm = ({
       {isOpen && (
         <div className={styles.overlay}>
           <div className={styles.modal}>
-            <Heading level={2}>{heading}</Heading>
-            {console.log(
-              "FormData:",
-              formData,
-              "DynamicFields:",
-              dynamicFields
-            ) ??
-              (true && <br />)}
+            <Heading level={2}>
+              {formStage === "primary" ? heading : "Additional Information"}
+            </Heading>
             <form onSubmit={handleSubmit}>
-              {dynamicFields.map((field) =>
-                field.hidden ? null : ( // Check if the field is hidden
-                  <div key={field.id} className={styles.formGroup}>
-                    <small>{field.note}</small>
-                    <label htmlFor={field.id}>{field.name}:</label>
-                    {field.type === "select" && field.options ? (
-                      //
-                      // Handle Select Fields
-                      //
-                      <select
-                        id={field.id}
-                        name={field.id}
-                        value={(formData[field.id] as string) || ""}
-                        onChange={handleChange}
-                        required={field.required ?? false}
-                      >
-                        <option value="">Select an option</option>
-                        {field.options.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    ) : field.type === "boolean" ? (
-                      //
-                      // Handle custom boolean field
-                      //
-                      <BooleanField
-                        default={!!formData[field.id]}
-                        onChange={(value) =>
-                          handleBooleanChange(field.id, value)
-                        }
-                      />
-                    ) : (
-                      //
-                      // Handle Other Field Types
-                      //
-
-                      <input
-                        type={field.type || "text"}
-                        id={field.id}
-                        name={field.id}
-                        onChange={handleChange}
-                        pattern={field.pattern ?? "*"}
-                        {...(field.type === "checkbox"
-                          ? { checked: !!formData[field.id] } // Ensuring boolean type
-                          : {
-                              value:
-                                field.type === "date"
-                                  ? (formData[field.id] as string) ||
-                                    new Date().toLocaleDateString("en-CA") // Default to today’s date
-                                  : String(formData[field.id] ?? ""),
-                            })}
-                        required={
-                          field.type !== "checkbox" && (field.required ?? false)
-                        }
-                      />
-                    )}
-                  </div>
-                )
+              {(formStage === "primary" ? fields : secondaryFields).map(
+                (field) =>
+                  field.hidden ? null : (
+                    <div key={field.id} className={styles.formGroup}>
+                      <small>{field.note}</small>
+                      <label htmlFor={field.id}>{field.name}:</label>
+                      {field.type === "select" && field.options ? (
+                        <select
+                          id={field.id}
+                          name={field.id}
+                          value={(formData[field.id] as string) || ""}
+                          onChange={handleChange}
+                          required={field.required ?? false}
+                        >
+                          <option value="">Select an option</option>
+                          {field.options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
+                      ) : field.type === "boolean" ? (
+                        <BooleanField
+                          default={!!formData[field.id]}
+                          onChange={(value) =>
+                            handleBooleanChange(field.id, value)
+                          }
+                        />
+                      ) : (
+                        <input
+                          type={field.type || "text"}
+                          id={field.id}
+                          name={field.id}
+                          onChange={handleChange}
+                          pattern={field.pattern ?? ".*"}
+                          {...(field.type === "checkbox"
+                            ? { checked: !!formData[field.id] }
+                            : {
+                                value:
+                                  field.type === "date"
+                                    ? (formData[field.id] as string) ||
+                                      new Date().toLocaleDateString("en-CA")
+                                    : String(formData[field.id] ?? ""),
+                              })}
+                          required={field.required ?? false}
+                        />
+                      )}
+                    </div>
+                  )
               )}
               <div className={styles.buttonGroup}>
                 <button
@@ -215,7 +197,9 @@ const FlexForm = ({
                   type="submit"
                   className={`${styles.button} ${styles.submitButton}`}
                 >
-                  Submit
+                  {formStage === "primary" && getSecondaryFields
+                    ? "Next"
+                    : "Submit"}
                 </button>
               </div>
             </form>

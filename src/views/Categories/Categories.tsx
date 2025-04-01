@@ -4,7 +4,7 @@ import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteAllDataCategories } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import { FormDataType } from "../../types";
+import { FlexFormField, FormDataType } from "../../types";
 import styles from "./Categories.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
@@ -67,6 +67,48 @@ export default function Categories() {
     }
   };
 
+  const getAddCategorySecondaryFormFields = async (
+    formData: Record<string, any>
+  ) => {
+    console.log("Received formData:", formData); // Debugging
+    console.log("Available dataTypes:", dataTypes); // Debugging
+
+    const dataTypeId = String(formData["dataTypeId"]); // Ensure string comparison
+    const dataType = dataTypes.find((dt) => String(dt.id) === dataTypeId);
+
+    if (!dataType) {
+      throw new Error(
+        `No DataType Selected. Received: ${JSON.stringify(formData)}`
+      );
+    }
+
+    let fields: FlexFormField[] = [
+      { name: "Name", id: "name", required: true },
+      { name: "Note", id: "note" },
+      { name: "Add Default", id: "addDefault", type: "boolean" },
+      { name: "Default Value", id: "defaultValue", type: dataType.inputType },
+    ];
+
+    if (["time", "number"].includes(dataType.inputType)) {
+      fields.push(
+        {
+          name: "Positive Increment",
+          id: "positiveIncrement",
+          type: "number",
+          default: "1",
+        },
+        {
+          name: "Negative Increment",
+          id: "negativeIncrement",
+          type: "number",
+          default: "1",
+        }
+      );
+    }
+
+    return fields;
+  };
+
   return (
     <>
       <Heading level={1}>Data Categories</Heading>
@@ -75,6 +117,7 @@ export default function Categories() {
         heading="New Category"
         fields={getAddCategoryFormFields(dataTypeOptions, getType)}
         handleFormData={handleFormData}
+        getSecondaryFields={getAddCategorySecondaryFormFields}
       >
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm>

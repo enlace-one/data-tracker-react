@@ -95,28 +95,12 @@ export const getAddCategoryFormFields = (
   }[],
   getType: (formData: Record<string, any>) => string
 ) => [
-  { name: "Name", id: "name", required: true },
   {
     name: "Data Type",
     id: "dataTypeId",
     type: "select",
     options: dataTypeOptions,
     required: true,
-  },
-  { name: "Note", id: "note" },
-  { name: "Add Default", id: "addDefault", type: "boolean" },
-  { name: "Default Value", id: "defaultValue", getType: getType },
-  {
-    name: "Positive Increment",
-    id: "positiveIncrement",
-    type: "number",
-    default: "1",
-  },
-  {
-    name: "Negative Increment",
-    id: "negativeIncrement",
-    type: "number",
-    default: "1",
   },
 ];
 
@@ -217,7 +201,7 @@ export const getUpdateDataTypeFormFields = (dataType: DataType) => [
     type: "checkbox",
     default: dataType.isComplex ?? "",
   },
-  { name: "Regex Pattern", id: "pattern", default: dataType?.pattern ?? "*" },
+  { name: "Regex Pattern", id: "pattern", default: dataType?.pattern ?? ".*" },
   { name: "Input Type", id: "inputType", default: dataType?.inputType ?? "" },
   { name: "Id", id: "id", default: dataType.id ?? "", hidden: true },
 ];
@@ -225,7 +209,7 @@ export const getUpdateDataTypeFormFields = (dataType: DataType) => [
 export const getNewDataTypeFormFields = () => [
   { name: "Name", id: "name", required: true },
   { name: "Note", id: "note" },
-  { name: "Regex Pattern", id: "pattern", default: "*" },
+  { name: "Regex Pattern", id: "pattern", default: ".*" },
   { name: "Input Type", id: "inputType" },
   { name: "Is Complex", id: "isComplex", type: "checkbox" },
 ];
