@@ -14,7 +14,7 @@ export const getAddEntryFormFieldsWithCategory = (
     name: "Value",
     id: "value",
     type: category.dataType?.inputType ?? "text",
-    note: category.note,
+    note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
     default: category.defaultValue ?? "",
   },
   { name: "Date", id: "date", type: "date" },
@@ -30,7 +30,7 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
     id: "value",
     default: entry.value ?? category.defaultValue ?? "",
     type: category.dataType?.inputType ?? "text",
-    note: category.note,
+    note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
   },
   { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
   { name: "Note", id: "note", default: entry.note ?? "" },
@@ -53,6 +53,7 @@ export const getUpdateCategoryFormFields = (
     {
       name: "Default Value",
       id: "defaultValue",
+      note: category.dataType?.note ?? "",
       type: category.dataType?.inputType ?? "text",
       default: String(category.defaultValue ?? ""), // Ensure default values are strings
     },
@@ -124,7 +125,12 @@ export const getAddCategorySecondaryFormFields = async (
     { name: "Name", id: "name", required: true },
     { name: "Note", id: "note" },
     { name: "Add Default", id: "addDefault", type: "boolean" },
-    { name: "Default Value", id: "defaultValue", type: dataType.inputType },
+    {
+      name: "Default Value",
+      id: "defaultValue",
+      type: dataType.inputType,
+      note: dataType.note,
+    },
   ];
 
   if (["time", "number"].includes(dataType.inputType)) {
@@ -199,7 +205,7 @@ export const getAddUpdateDataEntrySecondaryFormFields = async (
       id: "value",
       default: entry?.value ?? dataCategory.defaultValue,
       type: dataCategory.dataType.inputType,
-      note: dataCategory.note,
+      note: `${dataCategory.note}. DataType is ${dataCategory.dataType.name}: ${dataCategory.dataType.note}`,
     },
     { name: "Date", id: "date", type: "date", default: entry?.date },
     { name: "Note", id: "note", default: entry?.note },
