@@ -70,6 +70,14 @@ const DEFAULT_DATA_TYPES = [
     isComplex: false,
     inputType: "time",
   },
+  {
+    name: "Complex Number",
+    note: "Stores multiple related numbers such as 2*10+1 or 4/(2*9). Good for weight*reps or distance/time.",
+    isComplex: true,
+    pattern:
+      "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
+    inputType: "text",
+  },
 ];
 
 const urlParams = new URLSearchParams(window.location.search);

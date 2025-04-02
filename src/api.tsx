@@ -51,6 +51,7 @@ export async function updateDataType(formData: FormData): Promise<void> {
       name: formData.name || "", // Ensure a default empty string if missing
       note: formData.note || "", // Default empty string
       inputType: formData.inputType || "",
+      pattern: formData.pattern || ".*",
     });
     console.log("Errors:", errors);
   } catch (error) {

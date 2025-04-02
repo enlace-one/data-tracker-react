@@ -16,6 +16,7 @@ export const getAddEntryFormFieldsWithCategory = (
     type: category.dataType?.inputType ?? "text",
     note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
     default: category.defaultValue ?? "",
+    pattern: category.dataType?.pattern ?? ".*",
   },
   { name: "Date", id: "date", type: "date" },
   { name: "Note", id: "note" },
@@ -30,6 +31,7 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
     id: "value",
     default: entry.value ?? category.defaultValue ?? "",
     type: category.dataType?.inputType ?? "text",
+    pattern: category.dataType?.pattern ?? ".*",
     note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
   },
   { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
@@ -55,6 +57,7 @@ export const getUpdateCategoryFormFields = (
       id: "defaultValue",
       note: category.dataType?.note ?? "",
       type: category.dataType?.inputType ?? "text",
+      pattern: category.dataType?.pattern ?? ".*",
       default: String(category.defaultValue ?? ""), // Ensure default values are strings
     },
     {
@@ -128,6 +131,7 @@ export const getAddCategorySecondaryFormFields = async (
     {
       name: "Default Value",
       id: "defaultValue",
+      pattern: dataType?.pattern ?? ".*",
       type: dataType.inputType,
       note: dataType.note,
     },
@@ -205,6 +209,7 @@ export const getAddUpdateDataEntrySecondaryFormFields = async (
       id: "value",
       default: entry?.value ?? dataCategory.defaultValue,
       type: dataCategory.dataType.inputType,
+      pattern: dataCategory.dataType?.pattern ?? ".*",
       note: `${dataCategory.note}. DataType is ${dataCategory.dataType.name}: ${dataCategory.dataType.note}`,
     },
     { name: "Date", id: "date", type: "date", default: entry?.date },

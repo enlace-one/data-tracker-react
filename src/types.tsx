@@ -51,6 +51,7 @@ export interface FormDataType {
   date?: string;
   value?: string;
   id?: string;
+  pattern?: string;
   negativeIncrement?: string;
   positiveIncrement?: string;
 }
