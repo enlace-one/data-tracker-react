@@ -92,8 +92,7 @@ export const getAddCategoryFormFields = (
   dataTypeOptions: {
     label: string;
     value: string;
-  }[],
-  getType: (formData: Record<string, any>) => string
+  }[]
 ) => [
   {
     name: "Data Type",
@@ -148,7 +147,7 @@ export const getAddCategorySecondaryFormFields = async (
   return fields;
 };
 
-export const getUpdateEntryFormFields = (
+export const getAddUpdateDataEntryFormFields = (
   entry: DataEntry,
   dataCategories: EnrichedDataCategory[]
 ) => {
@@ -156,27 +155,6 @@ export const getUpdateEntryFormFields = (
     label: dt.name,
     value: dt.id,
   }));
-  const getType = (formData: FormDataType) => {
-    const category = dataCategories.find(
-      (dc) => dc.id === formData.dataCategoryId
-    );
-    if (category) {
-      return category.dataType?.inputType;
-    } else {
-      return "text";
-    }
-  };
-
-  const getNote = (formData: FormDataType) => {
-    const category = dataCategories.find(
-      (dc) => dc.id === formData.dataCategoryId
-    );
-    if (category) {
-      return category.note || "";
-    } else {
-      return "";
-    }
-  };
 
   return [
     {
@@ -187,20 +165,49 @@ export const getUpdateEntryFormFields = (
       required: true,
       default: entry.dataCategoryId,
     },
+  ];
+};
+
+// getAddDataEntrySecondaryFormFields
+
+export const getAddUpdateDataEntrySecondaryFormFields = async (
+  formData: Record<string, any>,
+  params: unknown
+) => {
+  const assertedParams = params as {
+    dataCategories: EnrichedDataCategory[];
+    entry: DataEntry;
+  };
+
+  const dataCategories = assertedParams["dataCategories"];
+  const entry = assertedParams["entry"];
+
+  const dataCategoryId = String(formData["dataCategoryId"]); // Ensure string comparison
+  const dataCategory = dataCategories.find(
+    (dt) => String(dt.id) === dataCategoryId
+  );
+
+  if (!dataCategory) {
+    throw new Error(
+      `No dataCategory Selected. Received: ${JSON.stringify(formData)}`
+    );
+  }
+
+  let fields: FlexFormField[] = [
     {
       name: "Value",
       id: "value",
       default: entry.value ?? "",
-      getType: getType,
-      getNote: getNote,
+      type: dataCategory.dataType.inputType,
+      note: dataCategory.note,
     },
     { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
     { name: "Note", id: "note", default: entry.note ?? "" },
     { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
   ];
-};
 
-// getAddDataEntrySecondaryFormFields
+  return fields;
+};
 
 export const getSelectCategoryFormFields = (
   dataCategories: EnrichedDataCategory[]

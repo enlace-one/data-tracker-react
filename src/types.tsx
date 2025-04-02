@@ -110,7 +110,6 @@ export type FlexFormField = {
   type?: string; // e.g. "text", "checkbox", "select", etc.
   options?: FlexFormOption[]; // Only needed for select fields
   default?: string | boolean; // Default value for the field
-  getType?: (formData: Record<string, any>) => string; // Function to determine the field type
   getNote?: (formData: Record<string, any>) => string;
   note?: string | null;
   pattern?: string | null;

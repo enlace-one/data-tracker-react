@@ -13,7 +13,7 @@ import styles from "./Day.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { parseNumberToTime, parseTimeToNumber } from "../../util";
-import { getUpdateEntryFormFields } from "../../formFields";
+import { getAddUpdateDataEntryFormFields } from "../../formFields";
 export default function Day() {
   const { dataCategories, setActionMessage } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
@@ -237,7 +237,10 @@ export default function Day() {
                 <td className={styles.minWidth}>
                   <FlexForm
                     heading="Update Entry"
-                    fields={getUpdateEntryFormFields(entry, dataCategories)}
+                    fields={getAddUpdateDataEntryFormFields(
+                      entry,
+                      dataCategories
+                    )}
                     handleFormData={handleUpdateEntryFormData}
                   >
                     <small>{entry.dataCategory?.name}</small>

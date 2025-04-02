@@ -61,22 +61,13 @@ export default function Categories() {
     );
   }
 
-  const getType = (formData: FormDataType) => {
-    const dataType = dataTypes.find((dt) => dt.id === formData.dataTypeId);
-    if (dataType) {
-      return dataType.inputType;
-    } else {
-      return "text";
-    }
-  };
-
   return (
     <>
       <Heading level={1}>Data Categories</Heading>
       <Divider />
       <FlexForm
         heading="New Category"
-        fields={getAddCategoryFormFields(dataTypeOptions, getType)}
+        fields={getAddCategoryFormFields(dataTypeOptions)}
         handleFormData={handleFormData}
         getSecondaryFields={getAddCategorySecondaryFormFields}
         getSecondaryFieldsParams={{ dataTypes: dataTypes }}

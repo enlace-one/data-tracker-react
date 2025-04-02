@@ -14,7 +14,10 @@ import { DataEntry } from "../../types";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { getUpdateEntryFormFields } from "../../formFields";
+import {
+  getAddUpdateDataEntrySecondaryFormFields,
+  getAddUpdateDataEntryFormFields,
+} from "../../formFields";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
@@ -96,51 +99,45 @@ export default function Entries() {
     setSelectedEntry((prev) => (prev === id ? null : id));
   };
 
-  const handleFormData = async (formData: Record<string, any>) => {
-    try {
-      setLoading(true);
-      await createDataEntry(formData);
-      await fetchInitialData();
-      setLoading(false);
-      // setActionMessage("Category created successfully.");
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-      setLoading(false);
-    }
+  function standardWrapper<T extends (...args: any[]) => Promise<any>>(
+    fn: T
+  ): T {
+    return async function (...args: Parameters<T>) {
+      try {
+        setLoading(true);
+        const result = await fn(...args); // Await the result of the function
+        setLoading(false);
+        return result;
+      } catch (e) {
+        const errorMessage =
+          e instanceof Error ? e.message : "An error occurred.";
+        setActionMessage({ message: errorMessage, type: "error" });
+        console.log(e instanceof Error ? e.stack : "No stack available"); // Log the error
+        setLoading(false); // Ensure loading is stopped even if there's an error
+      }
+    } as T;
+  }
+
+  const _handleFormData = async (formData: Record<string, any>) => {
+    console.log("Add Entry Form Data:", formData);
+    await createDataEntry(formData);
+    await fetchInitialData();
+  };
+  const handleFormData = standardWrapper(_handleFormData);
+
+  const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+    await updateDataEntry(formData);
+    await fetchInitialData();
   };
 
-  const handleUpdateEntryFormData = async (formData: Record<string, any>) => {
-    try {
-      setLoading(true);
-      await updateDataEntry(formData);
-      await fetchInitialData();
-      setLoading(false);
-      // setActionMessage("Category created successfully.");
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
+  const handleUpdateEntryFormData = standardWrapper(_handleUpdateEntryFormData);
+
+  const _handleDeleteDataEntry = async (entryId: string) => {
+    await deleteDataEntry(entryId);
+    await fetchInitialData();
   };
 
-  const handleDeleteDataEntry = async (entryId: string) => {
-    try {
-      setLoading(true);
-      await deleteDataEntry(entryId);
-      await fetchInitialData();
-      setActionMessage({
-        message: "Data entry deleted successfully.",
-        type: "success",
-      });
-      setLoading(false);
-    } catch (e) {
-      const errorMessage =
-        e instanceof Error ? e.message : "An error occurred.";
-      setActionMessage({ message: errorMessage, type: "error" });
-    }
-  };
+  const handleDeleteDataEntry = standardWrapper(_handleDeleteDataEntry);
 
   const addTestEntries = () => {
     let numberDataTypeId = dataTypes.find((dt) => dt.name === "Number")?.id;
@@ -179,12 +176,15 @@ export default function Entries() {
               /> */}
               <FlexForm
                 heading="New Entry"
-                fields={getUpdateEntryFormFields(
+                fields={getAddUpdateDataEntryFormFields(
                   {} as DataEntry,
                   dataCategories
                 )}
-                // getSecondaryFields={getAddDataEntrySecondaryFormFields}
-                // getSecondaryFieldsParams={{ dataTypes: dataTypes }}
+                getSecondaryFields={getAddUpdateDataEntrySecondaryFormFields}
+                getSecondaryFieldsParams={{
+                  dataCategories: dataCategories,
+                  entry: {} as DataEntry,
+                }}
                 handleFormData={handleFormData}
               >
                 <Button className={styles.lightMargin}>Add Entry</Button>
@@ -218,8 +218,18 @@ export default function Entries() {
                 <td className={styles.minWidth}>
                   <FlexForm
                     heading="Update Entry"
-                    fields={getUpdateEntryFormFields(item, dataCategories)}
+                    fields={getAddUpdateDataEntryFormFields(
+                      item,
+                      dataCategories
+                    )}
                     handleFormData={handleUpdateEntryFormData}
+                    getSecondaryFields={
+                      getAddUpdateDataEntrySecondaryFormFields
+                    }
+                    getSecondaryFieldsParams={{
+                      dataCategories: dataCategories,
+                      entry: item,
+                    }}
                   >
                     {item.value}
                     <br />
