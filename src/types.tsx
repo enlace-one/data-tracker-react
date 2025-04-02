@@ -109,8 +109,7 @@ export type FlexFormField = {
   required?: boolean;
   type?: string; // e.g. "text", "checkbox", "select", etc.
   options?: FlexFormOption[]; // Only needed for select fields
-  default?: string | boolean; // Default value for the field
-  getNote?: (formData: Record<string, any>) => string;
+  default?: string | boolean | null; // Default value for the field
   note?: string | null;
   pattern?: string | null;
 };

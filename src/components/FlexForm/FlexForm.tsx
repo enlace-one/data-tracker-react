@@ -51,7 +51,12 @@ const FlexForm = ({
           setFormData(
             generatedFields.reduce((acc, field) => {
               acc[field.id] =
-                field.default ?? (field.type === "checkbox" ? false : "");
+                field.default ??
+                (field.type === "checkbox"
+                  ? false
+                  : field.type === "date"
+                  ? new Date().toLocaleDateString("en-CA")
+                  : "");
               return acc;
             }, {} as Record<string, string | boolean>)
           );
@@ -65,7 +70,12 @@ const FlexForm = ({
       setFormData(
         fields.reduce((acc, field) => {
           acc[field.id] =
-            field.default ?? (field.type === "checkbox" ? false : "");
+            field.default ??
+            (field.type === "checkbox"
+              ? false
+              : field.type === "date"
+              ? new Date().toLocaleDateString("en-CA")
+              : "");
           return acc;
         }, {} as Record<string, string | boolean>)
       );
@@ -81,6 +91,11 @@ const FlexForm = ({
     const isCheckbox =
       e.target instanceof HTMLInputElement && type === "checkbox";
 
+    console.log(
+      "Form Changed - setting",
+      id,
+      isCheckbox ? (e.target as HTMLInputElement).checked : value
+    );
     setFormData((prev) => ({
       ...prev,
       [id]: isCheckbox ? (e.target as HTMLInputElement).checked : value,

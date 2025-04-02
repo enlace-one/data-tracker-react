@@ -197,13 +197,13 @@ export const getAddUpdateDataEntrySecondaryFormFields = async (
     {
       name: "Value",
       id: "value",
-      default: entry.value ?? "",
+      default: entry?.value ?? dataCategory.defaultValue,
       type: dataCategory.dataType.inputType,
       note: dataCategory.note,
     },
-    { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
-    { name: "Note", id: "note", default: entry.note ?? "" },
-    { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
+    { name: "Date", id: "date", type: "date", default: entry?.date },
+    { name: "Note", id: "note", default: entry?.note },
+    { name: "Id", id: "id", default: entry?.id, hidden: true },
   ];
 
   return fields;
