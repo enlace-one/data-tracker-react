@@ -45,12 +45,10 @@ export default function Graph() {
     for (const catId of selectedOptions) {
       const entries = await fetchDataEntriesByCategory(catId);
       let inputType = "";
-      let isComplex = false;
       let typeName = "";
       dataCategories.map((cat) => {
         if (cat.id == catId) {
           inputType = cat.dataType.inputType;
-          isComplex = cat.dataType.isComplex;
           typeName = cat.dataType.name;
         }
       });

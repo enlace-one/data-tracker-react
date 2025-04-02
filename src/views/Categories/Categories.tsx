@@ -4,7 +4,6 @@ import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteAllDataCategories } from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
-import { FlexFormField, FormDataType } from "../../types";
 import styles from "./Categories.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";

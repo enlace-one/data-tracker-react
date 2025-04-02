@@ -1,6 +1,5 @@
 import {
   DataEntry,
-  FormDataType,
   EnrichedDataCategory,
   DataType,
   FlexFormField,

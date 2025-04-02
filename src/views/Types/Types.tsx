@@ -9,7 +9,6 @@ import {
   updateDataType,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import styles from "./Types.module.css";
-import { DataType } from "../../types";
 import {
   getNewDataTypeFormFields,
   getUpdateDataTypeFormFields,
