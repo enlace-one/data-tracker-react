@@ -1,3 +1,5 @@
+import { evaluate } from "mathjs";
+
 export const parseTimeToNumber = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
   const decimalMinutes = (minutes / 60) * 100;
@@ -37,4 +39,8 @@ export function sleep(seconds: number) {
 
 export function getRandomInt(max: number) {
   return Math.floor(Math.random() * max);
+}
+
+export function parseComplexNumberToNumber(complexNumber: string) {
+  return evaluate(complexNumber);
 }
