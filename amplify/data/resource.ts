@@ -41,6 +41,7 @@ const schema = a
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
         dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
         dataType: a.belongsTo("DataType", "dataTypeId"),
+        macros: a.hasMany("Macro", "dataCategoryId"),
         lastEntryDate: a.date(),
         positiveIncrement: a.float().default(1),
         negativeIncrement: a.float().default(1),
@@ -84,6 +85,10 @@ const schema = a
         note: a.string(),
         formula: a.string().required(),
         schedule: a.string().required(),
+        lastRunDate: a.date().required(),
+        priority: a.integer().default(3),
+        dataCategory: a.belongsTo("DataCategory", "dataCategoryId"),
+        dataCategoryId: a.id().required(),
         dummy: a.integer().default(0),
       })
       .secondaryIndexes((index) => [
@@ -91,6 +96,10 @@ const schema = a
           .name("macrosByName")
           .queryField("listByName")
           .sortKeys(["name"]),
+        index("dummy")
+          .name("macrosByPriority")
+          .queryField("listByPriority")
+          .sortKeys(["priority"]),
       ])
       .authorization((allow) => [
         allow.owner(),

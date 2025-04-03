@@ -57,6 +57,8 @@ export interface FormDataType {
   positiveIncrement?: string;
   formula?: string;
   schedule?: string;
+  priority?: number;
+  lastRunDate: string;
 }
 
 export type ResolvedDataType = Omit<

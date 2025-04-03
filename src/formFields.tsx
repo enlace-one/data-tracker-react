@@ -310,6 +310,22 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       required: true,
       default: macro.schedule ?? "",
     },
+    {
+      name: "Priority",
+      id: "priority",
+      type: "number",
+      note: "Priority 0 runs first, 1 second, etc.",
+      required: true,
+      default: macro.priority ?? 3,
+    },
+    {
+      name: "Last Run Date",
+      id: "lastRunDate",
+      type: "date",
+      note: "Will run if today > lastRunDate",
+      required: true,
+      default: macro.lastRunDate ?? "",
+    },
     { name: "Id", id: "id", default: macro.id ?? "", hidden: true },
   ];
 };
