@@ -285,14 +285,14 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       id: "name",
       type: "text",
       required: true,
-      default: macro?.name ?? "",
+      default: macro.name ?? "",
     },
     {
       name: "Note",
       id: "note",
       type: "text",
       required: true,
-      default: macro?.note ?? "",
+      default: macro.note ?? "",
     },
     {
       name: "Formula",
@@ -300,7 +300,7 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       type: "text",
       note: "Example: [Cat Name 1] - [Cat Name 2]",
       required: true,
-      default: macro?.formula ?? "",
+      default: macro.formula ?? "",
     },
     {
       name: "Cron Schedule",
@@ -308,7 +308,8 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       type: "text",
       note: "Example: ***TUES**",
       required: true,
-      default: macro?.schedule ?? "",
+      default: macro.schedule ?? "",
     },
+    { name: "Id", id: "id", default: macro.id ?? "", hidden: true },
   ];
 };

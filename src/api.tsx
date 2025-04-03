@@ -5,6 +5,7 @@ import {
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
+  Macro,
 } from "./types"; // ✅ Import interfaces
 import { getRandomInt, sleep } from "./util";
 
@@ -27,6 +28,48 @@ export async function fetchUserProfiles(): Promise<
   } catch (error) {
     console.error("Error fetching user profiles:", error);
     return [];
+  }
+}
+
+export async function fetchMacros(): Promise<Macro[]> {
+  try {
+    const { data: macros, errors } = await client.models.Macro.list();
+    console.log("Macros: ", macros, " Errors: ", errors);
+    return macros || [];
+  } catch (error) {
+    console.error("Error fetching macros:", error);
+    return [];
+  }
+}
+
+export async function updateMacro(formData: FormData): Promise<void> {
+  console.log("Updating Macro:", formData.name); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.Macro.update({
+    id: formData.id!,
+    name: formData.name || "", // Ensure a default empty string if missing
+    note: formData.note || "", // Default empty string
+    formula: formData.formula || "",
+    schedule: formData.schedule || "",
+  });
+  console.log("Errors:", errors);
+  if (errors) {
+    throw new Error(String(errors));
+  }
+}
+
+export async function createMacro(formData: FormData): Promise<void> {
+  console.log("Creating Macro:", formData.name); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.Macro.create({
+    name: formData.name || "", // Ensure a default empty string if missing
+    note: formData.note || "", // Default empty string
+    formula: formData.formula || "",
+    schedule: formData.schedule || "",
+  });
+  console.log("Errors:", errors);
+  if (errors) {
+    throw new Error(String(errors));
   }
 }
 

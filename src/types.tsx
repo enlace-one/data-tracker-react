@@ -55,6 +55,8 @@ export interface FormDataType {
   pattern?: string;
   negativeIncrement?: string;
   positiveIncrement?: string;
+  formula?: string;
+  schedule?: string;
 }
 
 export type ResolvedDataType = Omit<
