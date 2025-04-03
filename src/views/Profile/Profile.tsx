@@ -16,7 +16,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ signOut }: ProfileProps) {
-  const { userProfiles, SETTINGS } = useData();
+  const { userProfiles, SETTINGS, setActiveTab } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ export default function Profile({ signOut }: ProfileProps) {
       <Heading level={1}>My Profile</Heading>
       <Divider />
       <Grid
-        margin="3rem 0"
+        margin="0 0"
         autoFlow="column"
         justifyContent="center"
         gap="2rem"
@@ -66,10 +66,21 @@ export default function Profile({ signOut }: ProfileProps) {
                   key !== "name" && <span key={key}> {`${key}: ${value}`}</span>
               )} */}
             </View>
-            <Button onClick={signOut}>Sign Out</Button>
           </Flex>
         ))}
       </Grid>
+
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="2rem"
+        alignContent="center"
+      >
+        <Button onClick={signOut}>Sign Out</Button>
+        <Button onClick={() => setActiveTab("macros")}>Macros</Button>
+      </Grid>
+
       <small>Version: {SETTINGS.version}</small>
     </>
   );

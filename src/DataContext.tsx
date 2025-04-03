@@ -13,7 +13,12 @@ import {
   client,
 } from "./api";
 
-import { UserProfile, EnrichedDataCategory, DataType } from "./types"; // ✅ Import interfaces
+import {
+  UserProfile,
+  EnrichedDataCategory,
+  DataType,
+  ActiveTab,
+} from "./types";
 
 interface AlertInfo {
   message: string;
@@ -21,13 +26,11 @@ interface AlertInfo {
 }
 type SetActionMessageFunction = (alertInfo: AlertInfo) => void;
 
-// Define the context value type
 interface DataContextType {
   actionMessage: AlertInfo;
   setActionMessage: SetActionMessageFunction;
   userProfiles: UserProfile[];
   dataCategories: EnrichedDataCategory[];
-  // dataEntries: DataEntry[];
   dataTypes: DataType[];
   SETTINGS: { debug: boolean; version: string };
   selectedCategory: EnrichedDataCategory | null;
@@ -35,12 +38,12 @@ interface DataContextType {
     React.SetStateAction<EnrichedDataCategory | null>
   >;
   screenWidth: number;
+  activeTab: ActiveTab;
+  setActiveTab: (state: ActiveTab) => void;
 }
 
-// Create the context
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Define the DataProvider props type
 interface DataProviderProps {
   children: ReactNode;
 }
@@ -48,7 +51,7 @@ interface DataProviderProps {
 const DEFAULT_DATA_TYPES = [
   {
     name: "Number",
-    note: "Stores numeric values such as '1', '-1' and '2.4",
+    note: "Stores numeric values",
     isComplex: false,
     inputType: "number",
   },
@@ -66,13 +69,13 @@ const DEFAULT_DATA_TYPES = [
   },
   {
     name: "Time",
-    note: "Stores time values such as 10:00 PM",
+    note: "Stores time values",
     isComplex: false,
     inputType: "time",
   },
   {
     name: "Complex Number",
-    note: "Stores multiple related numbers such as 2*10+1 or 4/(2*9). Good for weight*reps or distance/time.",
+    note: "Stores multiple related numbers",
     isComplex: true,
     pattern:
       "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
@@ -82,7 +85,6 @@ const DEFAULT_DATA_TYPES = [
 
 const urlParams = new URLSearchParams(window.location.search);
 const isDebugMode = urlParams.get("debug") === "true";
-
 const SETTINGS = { debug: isDebugMode, version: "1.0.0" };
 
 async function initializeDataTypes() {
@@ -103,36 +105,33 @@ export function DataProvider({ children }: DataProviderProps) {
   const [dataCategories, setDataCategories] = useState<EnrichedDataCategory[]>(
     []
   );
-  // const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
   const [actionMessage, _setActionMessage] = useState<AlertInfo>({
     message: "",
     type: "",
-  }); // Initialize with an empty string
+  });
   const [selectedCategory, setSelectedCategory] =
-    useState<EnrichedDataCategory | null>(null); // Correct as is
+    useState<EnrichedDataCategory | null>(null);
+  const [activeTab, _setActiveTab] = useState<ActiveTab>("day");
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
+  const setActiveTab = (state: ActiveTab) => {
+    _setActiveTab(state);
+    setSelectedCategory(null);
+  };
+
   useEffect(() => {
     const sub = client.models.DataType.observeQuery().subscribe({
-      next: ({ items }) => {
-        console.log("Setting data type to ", items);
-        setDataTypes([...items]);
-      },
+      next: ({ items }) => setDataTypes([...items]),
     });
-
     return () => sub.unsubscribe();
   }, []);
 
   const setActionMessage = (alertInfo: AlertInfo) => {
     _setActionMessage(alertInfo);
-    console.log("Alert", alertInfo.type, ":", alertInfo.message);
-
-    // Clear the message after 10 seconds
-    setTimeout(() => {
-      _setActionMessage({ message: "", type: "" });
-    }, 10000); // 10000 milliseconds = 10 seconds
+    setTimeout(() => _setActionMessage({ message: "", type: "" }), 10000);
   };
 
-  // Fetch DataTypes
   useEffect(() => {
     async function loadAndSetDataTypes() {
       await initializeDataTypes();
@@ -142,7 +141,6 @@ export function DataProvider({ children }: DataProviderProps) {
     loadAndSetDataTypes();
   }, []);
 
-  // Fetch user profiles on mount
   useEffect(() => {
     async function loadProfiles() {
       const profiles = await fetchUserProfiles();
@@ -151,33 +149,17 @@ export function DataProvider({ children }: DataProviderProps) {
     loadProfiles();
   }, []);
 
-  // Reintroduce the subscription to real-time updates
   useEffect(() => {
     const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
-    // const unsubscribeEntries = subscribeToDataEntries(setDataEntries);
-    // const unsubscribeTypes = subscribeToDataTypes(setDataTypes);
-
-    // Cleanup function to unsubscribe when the component is unmounted
-    return () => {
-      console.log("Cleaning up subscriptions");
-      unsubscribeCategories();
-      // unsubscribeEntries();
-      // unsubscribeTypes();
-    };
+    return () => unsubscribeCategories();
   }, []);
 
-  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-
-  const handleResize = () => {
-    setScreenWidth(window.innerWidth);
-  };
-
   useEffect(() => {
-    // Set up event listener for window resize
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup the event listener on component unmount
-    return () => window.removeEventListener("resize", handleResize);
+    window.addEventListener("resize", () => setScreenWidth(window.innerWidth));
+    return () =>
+      window.removeEventListener("resize", () =>
+        setScreenWidth(window.innerWidth)
+      );
   }, []);
 
   return (
@@ -187,12 +169,13 @@ export function DataProvider({ children }: DataProviderProps) {
         dataCategories,
         actionMessage,
         setActionMessage,
-        // dataEntries,
         dataTypes,
         SETTINGS,
         selectedCategory,
         setSelectedCategory,
         screenWidth,
+        activeTab,
+        setActiveTab,
       }}
     >
       {children}
@@ -200,7 +183,6 @@ export function DataProvider({ children }: DataProviderProps) {
   );
 }
 
-// Custom hook to access the context
 export function useData(): DataContextType {
   const context = useContext(DataContext);
   if (!context) {

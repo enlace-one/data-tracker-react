@@ -114,3 +114,12 @@ export type FlexFormField = {
   note?: string | null;
   pattern?: string | null;
 };
+
+export type ActiveTab =
+  | "macros"
+  | "profile"
+  | "categories"
+  | "entries"
+  | "types"
+  | "graph"
+  | "day";

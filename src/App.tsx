@@ -10,23 +10,18 @@ import Types from "./views/Types/Types";
 import Alert from "./components/Alert/Alert";
 import Graph from "./views/Graph/Graph";
 import Day from "./views/Day/Day";
+import Macros from "./views/Macros/Macros";
 
 export default function App() {
-  const [activeTab, _setActiveTab] = useState<
-    "profile" | "categories" | "entries" | "types" | "graph" | "day"
-  >("day");
-
   const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
 
-  const { setSelectedCategory, actionMessage, setActionMessage } = useData();
-
-  // Define setActiveTab as a function expression
-  const setActiveTab = (
-    state: "profile" | "categories" | "entries" | "types" | "graph" | "day"
-  ) => {
-    _setActiveTab(state);
-    setSelectedCategory(null);
-  };
+  const {
+    setSelectedCategory,
+    actionMessage,
+    setActionMessage,
+    activeTab,
+    setActiveTab,
+  } = useData();
 
   useEffect(() => {
     const handleAuthCheck = async () => {
@@ -57,6 +52,7 @@ export default function App() {
       {activeTab === "types" && <Types />}
       {activeTab === "graph" && <Graph />}
       {activeTab === "day" && <Day />}
+      {activeTab === "macros" && <Macros />}
 
       <Divider />
 
