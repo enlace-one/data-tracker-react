@@ -5,9 +5,10 @@ import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataEntry,
   fetchEnrichedDataEntriesByDate,
+  fetchMacros,
   updateDataEntry,
 } from "../../api";
-import { EnrichedDataCategory, EnrichedDataEntry } from "../../types";
+import { EnrichedDataCategory, EnrichedDataEntry, Macro } from "../../types";
 import BooleanField from "../../components/BooleanField/BooleanField";
 import styles from "./Macros.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
@@ -16,12 +17,12 @@ import { parseNumberToTime, parseTimeToNumber } from "../../util";
 import { getAddUpdateDataEntryFormFields } from "../../formFields";
 export default function Macros() {
   const { dataCategories, setActionMessage } = useData();
+  const [macros, setMacros] = useState<Macro[]>([]);
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
 
   const [loading, setLoading] = useState(true);
-  const [dataEntries, setDataEntries] = useState<EnrichedDataEntry[]>([]);
 
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
@@ -41,6 +42,17 @@ export default function Macros() {
     } as T;
   }
 
+  const _fetchAndSetMacros = async () => {
+    const newMacros = await fetchMacros();
+    await setMacros(newMacros);
+  };
+
+  const fetchAndSetMacros = standardWrapper(_fetchAndSetMacros);
+
+  useEffect(() => {
+    fetchAndSetMacros();
+  }, []);
+
   return (
     <>
       <Heading level={1}>Macros</Heading>
@@ -56,7 +68,13 @@ export default function Macros() {
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
         <table className={styles.table}>
-          <tbody></tbody>
+          <tbody>
+            {macros.map((macro) => (
+              <tr key={macro.name}>
+                <td>{macro.name}</td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       )}
     </>
