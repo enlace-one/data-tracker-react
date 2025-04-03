@@ -78,6 +78,25 @@ const schema = a
         allow.groups(["Admins"]).to(["read"]),
         // allow.publicApiKey(), // TODO: Remove. FOR TESTING
       ]),
+    Macro: a
+      .model({
+        name: a.string().required(),
+        note: a.string(),
+        formula: a.string().required(),
+        schedule: a.string().required(),
+        dummy: a.integer().default(0),
+      })
+      .secondaryIndexes((index) => [
+        index("dummy")
+          .name("macrosByName")
+          .queryField("listByName")
+          .sortKeys(["name"]),
+      ])
+      .authorization((allow) => [
+        allow.owner(),
+        allow.groups(["Admins"]).to(["read"]),
+        // allow.publicApiKey(), // TODO: Remove. FOR TESTING
+      ]),
   })
   .authorization((allow) => [allow.resource(postConfirmation)]);
 
