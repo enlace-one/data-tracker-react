@@ -3,6 +3,7 @@ import {
   EnrichedDataCategory,
   DataType,
   FlexFormField,
+  Macro,
 } from "./types";
 
 export const getAddEntryFormFieldsWithCategory = (
@@ -276,3 +277,38 @@ export const getNewDataTypeFormFields = () => [
   { name: "Input Type", id: "inputType" },
   { name: "Is Complex", id: "isComplex", type: "checkbox" },
 ];
+
+export const getAddUpdateMacroFormFields = (macro: Macro) => {
+  return [
+    {
+      name: "Name",
+      id: "name",
+      type: "text",
+      required: true,
+      default: macro?.name ?? "",
+    },
+    {
+      name: "Note",
+      id: "note",
+      type: "text",
+      required: true,
+      default: macro?.note ?? "",
+    },
+    {
+      name: "Formula",
+      id: "formula",
+      type: "text",
+      note: "Example: [Cat Name 1] - [Cat Name 2]",
+      required: true,
+      default: macro?.formula ?? "",
+    },
+    {
+      name: "Cron Schedule",
+      id: "schedule",
+      type: "text",
+      note: "Example: ***TUES**",
+      required: true,
+      default: macro?.schedule ?? "",
+    },
+  ];
+};

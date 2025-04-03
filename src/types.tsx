@@ -9,6 +9,7 @@ export type UserProfile = Schema["UserProfile"]["type"];
 export type DataType = Schema["DataType"]["type"];
 export type DataCategory = Schema["DataCategory"]["type"];
 export type DataEntry = Schema["DataEntry"]["type"];
+export type Macro = Schema["Macro"]["type"];
 
 // export interface DataType {
 //   id: string;
