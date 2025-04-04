@@ -1,13 +1,26 @@
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px; /* Space between spinner and text */
+}
+
 .spinner {
-  display: inline-block;
+  border: 4px solid #f3f3f3; /* Default border color */
   border-radius: 50%;
-  border: 4px solid rgba(0, 0, 0, 0.1);
-  border-top-color: #007bff;
   animation: spin 1s linear infinite;
 }
 
+.loadingText {
+  font-family: Arial, sans-serif;
+  text-align: center;
+}
+
 @keyframes spin {
-  to {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
     transform: rotate(360deg);
   }
 }

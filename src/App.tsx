@@ -11,6 +11,7 @@ import Alert from "./components/Alert/Alert";
 import Graph from "./views/Graph/Graph";
 import Day from "./views/Day/Day";
 import Macros from "./views/Macros/Macros";
+import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
   const { authStatus, signOut } = useAuthenticator((context) => [context.user]);

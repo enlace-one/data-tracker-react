@@ -1,5 +1,5 @@
 // import { useState } from "react";
-import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
@@ -99,16 +99,24 @@ export default function Macros() {
       >
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm> */}
-      <FlexForm
-        heading="New Macro"
-        fields={getAddUpdateMacroFormFields({} as Macro, dataCategories)}
-        handleFormData={handleFormData}
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="2rem"
+        alignContent="center"
       >
-        <Button className={styles.lightMargin}>Add Macro</Button>
-      </FlexForm>
-      <Button className={styles.lightMargin} onClick={runMacrosAndUpdate}>
-        Run Macros
-      </Button>
+        <FlexForm
+          heading="New Macro"
+          fields={getAddUpdateMacroFormFields({} as Macro, dataCategories)}
+          handleFormData={handleFormData}
+        >
+          <Button className={styles.lightMargin}>Add Macro</Button>
+        </FlexForm>
+        <Button className={styles.lightMargin} onClick={runMacrosAndUpdate}>
+          Run Macros
+        </Button>
+      </Grid>
 
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
@@ -122,7 +130,7 @@ export default function Macros() {
                     fields={getAddUpdateMacroFormFields(macro, dataCategories)}
                     handleFormData={handleUpdateMacroFormData}
                   >
-                    {macro.name}
+                    {macro.priority} - {macro.name}
                     <br />
                     <small>Note: {macro.note}</small>
                     <br />
