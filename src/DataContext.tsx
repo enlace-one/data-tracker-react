@@ -120,12 +120,13 @@ export function DataProvider({ children }: DataProviderProps) {
     setSelectedCategory(null);
   };
 
-  useEffect(() => {
-    const sub = client.models.DataType.observeQuery().subscribe({
-      next: ({ items }) => setDataTypes([...items]),
-    });
-    return () => sub.unsubscribe();
-  }, []);
+  // This is a dupe since I manually set data types below
+  // useEffect(() => {
+  //   const sub = client.models.DataType.observeQuery().subscribe({
+  //     next: ({ items }) => setDataTypes([...items]),
+  //   });
+  //   return () => sub.unsubscribe();
+  // }, []);
 
   const setActionMessage = (alertInfo: AlertInfo) => {
     _setActionMessage(alertInfo);
