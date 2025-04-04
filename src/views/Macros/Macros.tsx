@@ -131,7 +131,8 @@ export default function Macros() {
                     <small>Schedule: {macro.schedule}</small>
                     <br />
                     <small>
-                      Last Run: {macro.lastRunDate} - {macro.lastRunOutput}
+                      Last Run:
+                      <br />({macro.lastRunDate}) {macro.lastRunOutput}
                     </small>
                     <br />
                     <small></small>

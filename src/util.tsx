@@ -106,7 +106,7 @@ export async function runMacros(
               } else if (category.dataType.inputType == "math") {
                 value = parseComplexNumberToNumber(entry.value);
               } else {
-                value = value;
+                value = entry.value;
               }
               console.log(
                 `Replacing ${categoryName} with ${value} based on ${entry.value}`
@@ -127,22 +127,30 @@ export async function runMacros(
         }
         console.log("Processed Formula:", formula);
         const output = evaluate(formula);
+        if (output == undefined) {
+          await throwError(
+            `No output (${output}) for formula "${formula}"`,
+            macro
+          );
+        }
         let valueToSet = String(output);
         console.log("output:", output);
         if (macroDataCategory?.dataType.inputType == "boolean-string") {
           valueToSet = String(!!output);
         }
-        await updateMacroRun(
-          macro,
-          date,
-          `${formula} = ${output} (${valueToSet})`
-        );
+
         await createDataEntry({
           date: date,
           dataCategoryId: macroDataCategory?.id,
           value: valueToSet,
           note: `Set by macro ${macro.name}`,
         });
+
+        await updateMacroRun(
+          macro,
+          date,
+          `"${formula}" = ${output} = ${valueToSet}`
+        );
       }
     } catch (e) {
       console.log("Error on macro", e);

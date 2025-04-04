@@ -37,7 +37,7 @@ export async function fetchMacros(): Promise<Macro[]> {
     const { data: macros, errors } = await client.models.Macro.listByPriority(
       { dummy: 0 },
       {
-        sortDirection: "DESC",
+        sortDirection: "ASC",
       }
     );
     console.log("Macros: ", macros, " Errors: ", errors);
