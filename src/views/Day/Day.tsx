@@ -26,11 +26,9 @@ export default function Day() {
     const today = new Date();
     return today.toLocaleDateString("en-CA"); // Format as YYYY-MM-DD
   });
-  const [categoriesToShow, setcategoriesToShow] = useState<
+  const [categoriesToShow, setCategoriesToShow] = useState<
     EnrichedDataCategory[]
-  >(() => {
-    return dataCategories;
-  });
+  >([]);
 
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
@@ -63,7 +61,7 @@ export default function Day() {
       fetchedEntries.map((entry) => entry.dataCategoryId)
     );
 
-    setcategoriesToShow(
+    setCategoriesToShow(
       dataCategories
         .filter((category) => !entryCategoryIds.has(category.id))
         .sort((a, b) => a.name.localeCompare(b.name)) // Use localeCompare for string sorting
