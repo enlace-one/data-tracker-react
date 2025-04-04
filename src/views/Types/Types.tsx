@@ -66,8 +66,12 @@ export default function Types() {
                   </small>
                   <br />
                   <small>
-                    Up: {item.updatedAt} Cr: {item.createdAt}
+                    Up: {item.updatedAt}
+                    <br />
+                    Cr: {item.createdAt}
                   </small>
+                  <br />
+                  <br />
                 </FlexForm>
               </td>
               <td>
