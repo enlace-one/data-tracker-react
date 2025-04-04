@@ -49,7 +49,7 @@ export async function fetchMacros(): Promise<Macro[]> {
 }
 
 export async function updateMacro(formData: FormData): Promise<void> {
-  console.log("Updating Macro:", formData.name); // Fixed incorrect variable reference
+  console.log("Updating Macro:", formData); // Fixed incorrect variable reference
 
   const { errors } = await client.models.Macro.update({
     id: formData.id!,
@@ -57,11 +57,30 @@ export async function updateMacro(formData: FormData): Promise<void> {
     note: formData.note || "", // Default empty string
     formula: formData.formula || "",
     schedule: formData.schedule || "",
+    lastRunOutput: formData.lastRunOutput || "",
+    lastRunDate: formData.lastRunDate,
   });
   console.log("Errors:", errors);
   if (errors) {
     throw new Error(String(errors));
   }
+}
+
+export async function updateMacroRun(
+  macro: Macro,
+  lastRunDate: string,
+  lastRunOutput: string
+): Promise<void> {
+  const formData = {
+    id: macro.id,
+    name: macro.name,
+    lastRunOutput: lastRunOutput,
+    lastRunDate: lastRunDate,
+    schedule: macro.schedule,
+    formula: macro.formula,
+    note: macro.note ?? "",
+  };
+  await updateMacro(formData);
 }
 
 export async function createMacro(formData: FormData): Promise<void> {

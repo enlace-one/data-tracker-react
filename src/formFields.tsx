@@ -339,8 +339,8 @@ export const getAddUpdateMacroFormFields = (
       id: "lastRunDate",
       type: "date",
       note: "Will run if today > lastRunDate",
-      required: true,
-      default: macro.lastRunDate ?? "",
+      hidden: true,
+      default: macro.lastRunDate,
     },
     {
       name: "Data Category to Set",

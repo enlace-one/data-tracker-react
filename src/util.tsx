@@ -6,6 +6,7 @@ import {
   FormDataType,
   Macro,
 } from "./types";
+import { createDataEntry, updateMacroRun } from "./api";
 
 export const parseTimeToNumber = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
@@ -58,7 +59,7 @@ export function parseStringToBoolean(input: string | boolean): boolean {
     console.log("Unexpected value in parseStringToBoolean", input);
     return false;
   }
-  return ["true", "1"].includes(input.toLowerCase().trim());
+  return ["true", "1", "True", "TRUE"].includes(input.toLowerCase().trim());
 }
 
 export async function runMacros(
@@ -71,17 +72,17 @@ export async function runMacros(
 ): Promise<void> {
   const throwError = async (errorMessage: string, macro: Macro) => {
     console.warn(errorMessage);
-    const formData = {
-      id: macro.id,
-      lastRunOutput: errorMessage,
-    };
-    await updateMacro(formData);
+
+    await updateMacroRun(macro, date, errorMessage);
     throw new Error(errorMessage);
   };
   for (const macro of macros) {
     try {
       // evaluate Cron
       const cron = true;
+      const macroDataCategory = dataCategories.find(
+        (cat) => cat.id === macro.dataCategoryId
+      );
       if (cron) {
         // Evaluate Formula
         let formula = macro.formula;
@@ -97,7 +98,20 @@ export async function runMacros(
             const entries = await fetchDataEntriesByCategory(category.id);
             const entry = entries.find((e) => e.date === date);
             if (entry) {
-              formula = formula.replace(`[${categoryName}]`, entry.value);
+              let value;
+              if (category.dataType.inputType == "boolean-string") {
+                value = parseBooleanToNumber(entry.value);
+              } else if (category.dataType.inputType == "time") {
+                value = parseTimeToNumber(entry.value);
+              } else if (category.dataType.inputType == "math") {
+                value = parseComplexNumberToNumber(entry.value);
+              } else {
+                value = value;
+              }
+              console.log(
+                `Replacing ${categoryName} with ${value} based on ${entry.value}`
+              );
+              formula = formula.replace(`[${categoryName}]`, value);
             } else {
               await throwError(
                 `No entry found for ${date} on "${categoryName}"`,
@@ -112,6 +126,23 @@ export async function runMacros(
           }
         }
         console.log("Processed Formula:", formula);
+        const output = evaluate(formula);
+        let valueToSet = String(output);
+        console.log("output:", output);
+        if (macroDataCategory?.dataType.inputType == "boolean-string") {
+          valueToSet = String(!!output);
+        }
+        await updateMacroRun(
+          macro,
+          date,
+          `${formula} = ${output} (${valueToSet})`
+        );
+        await createDataEntry({
+          date: date,
+          dataCategoryId: macroDataCategory?.id,
+          value: valueToSet,
+          note: `Set by macro ${macro.name}`,
+        });
       }
     } catch (e) {
       console.log("Error on macro", e);

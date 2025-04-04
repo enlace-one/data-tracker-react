@@ -188,7 +188,7 @@ export default function Day() {
 
   const handleValueBooleanChange = (
     entry: EnrichedDataEntry,
-    value: boolean
+    value: boolean | string
   ) => {
     updateDataEntryValue(entry, String(value));
   };
@@ -250,15 +250,18 @@ export default function Day() {
 
                   {/* NEED TO ADD SUPPORT FOR BOOLEAN FIELDS */}
                   <div className={styles.flexContainer}>
-                    {entry.dataCategory.dataType?.inputType === "boolean" && (
+                    {entry.dataCategory.dataType?.inputType ===
+                      "boolean-string" && (
                       <BooleanField
                         default={entry.value == "true" ? true : false}
                         onChange={(value) =>
                           handleValueBooleanChange(entry, value)
                         }
+                        asString={true}
                       ></BooleanField>
                     )}
-                    {entry.dataCategory.dataType?.inputType != "boolean" && (
+                    {entry.dataCategory.dataType?.inputType !=
+                      "boolean-string" && (
                       <input
                         type={entry.dataCategory.dataType?.inputType}
                         className={"ValueInput" + entry.id}

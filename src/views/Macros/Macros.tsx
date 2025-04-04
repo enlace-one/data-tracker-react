@@ -67,6 +67,27 @@ export default function Macros() {
   };
   const handleFormData = standardWrapper(_handleFormData);
 
+  const _handleUpdateMacroFormData = async (formData: Record<string, any>) => {
+    console.log("Update Macro Form Data:", formData);
+    await updateMacro(formData);
+    await fetchAndSetMacros();
+  };
+  const handleUpdateMacroFormData = standardWrapper(_handleUpdateMacroFormData);
+
+  const _runMacrosAndUpdate = async () => {
+    await runMacros(
+      macros,
+      new Date().toLocaleDateString("en-CA"),
+      dataCategories,
+      fetchDataEntriesByCategory,
+      updateDataCategory,
+      updateMacro
+    );
+    await fetchAndSetMacros();
+  };
+
+  const runMacrosAndUpdate = standardWrapper(_runMacrosAndUpdate);
+
   return (
     <>
       <Heading level={1}>Macros</Heading>
@@ -85,19 +106,7 @@ export default function Macros() {
       >
         <Button className={styles.lightMargin}>Add Macro</Button>
       </FlexForm>
-      <Button
-        className={styles.lightMargin}
-        onClick={() =>
-          runMacros(
-            macros,
-            new Date().toLocaleDateString("en-CA"),
-            dataCategories,
-            fetchDataEntriesByCategory,
-            updateDataCategory,
-            updateMacro
-          )
-        }
-      >
+      <Button className={styles.lightMargin} onClick={runMacrosAndUpdate}>
         Run Macros
       </Button>
 
@@ -108,20 +117,26 @@ export default function Macros() {
             {macros.map((macro) => (
               <tr key={macro.name}>
                 <td>
-                  {macro.name}
-                  <br />
-                  <small>Note: {macro.note}</small>
-                  <br />
-                  <small>Formula: {macro.formula}</small>
-                  <br />
-                  <small>Schedule: {macro.schedule}</small>
-                  <br />
-                  <small>
-                    Last Run: {macro.lastRunDate} - {macro.lastRunOutput}
-                  </small>
-                  <br />
-                  <small></small>
-                  <br />
+                  <FlexForm
+                    heading="Update Macro"
+                    fields={getAddUpdateMacroFormFields(macro, dataCategories)}
+                    handleFormData={handleUpdateMacroFormData}
+                  >
+                    {macro.name}
+                    <br />
+                    <small>Note: {macro.note}</small>
+                    <br />
+                    <small>Formula: {macro.formula}</small>
+                    <br />
+                    <small>Schedule: {macro.schedule}</small>
+                    <br />
+                    <small>
+                      Last Run: {macro.lastRunDate} - {macro.lastRunOutput}
+                    </small>
+                    <br />
+                    <small></small>
+                    <br />
+                  </FlexForm>
                 </td>
               </tr>
             ))}

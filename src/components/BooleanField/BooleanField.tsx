@@ -15,7 +15,7 @@ const BooleanField = ({ default: defaultValue, asString, onChange }: Props) => {
   const toggleValue = () => {
     setValue((prevValue) => {
       const newValue = !prevValue;
-      const returnValue = asString ? (newValue ? "True" : "False") : newValue;
+      const returnValue = asString ? (newValue ? "true" : "false") : newValue;
       onChange(returnValue);
       return newValue;
     });

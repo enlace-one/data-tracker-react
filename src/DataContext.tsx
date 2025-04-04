@@ -79,7 +79,7 @@ const DEFAULT_DATA_TYPES = [
     isComplex: true,
     pattern:
       "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
-    inputType: "text",
+    inputType: "math",
   },
 ];
 
