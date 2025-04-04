@@ -3,6 +3,7 @@ import styles from "./FlexForm.module.css";
 import { Heading } from "@aws-amplify/ui-react";
 import BooleanField from "../BooleanField/BooleanField";
 import { FlexFormField } from "../../types";
+import { parseStringToBoolean } from "../../util";
 
 interface Props {
   heading: string;
@@ -38,6 +39,24 @@ const FlexForm = ({
     {}
   );
 
+  const addFieldDefaults = (
+    fields: FlexFormField[]
+  ): Record<string, string | boolean> => {
+    return fields.reduce((acc, field) => {
+      acc[field.id] =
+        field.default === "" || field.default == null
+          ? field.type === "checkbox"
+            ? false
+            : field.type === "boolean"
+            ? "false"
+            : field.type === "date"
+            ? new Date().toLocaleDateString("en-CA")
+            : ""
+          : field.default;
+      return acc;
+    }, {} as Record<string, string | boolean>);
+  };
+
   useEffect(() => {
     const fetchSecondaryFields = async () => {
       if (formStage === "secondary" && getSecondaryFields) {
@@ -47,38 +66,20 @@ const FlexForm = ({
             primaryData,
             getSecondaryFieldsParams
           );
+          console.log("Secondary fields:", generatedFields);
           setSecondaryFields(generatedFields);
-          setFormData(
-            generatedFields.reduce((acc, field) => {
-              acc[field.id] =
-                field.default ??
-                (field.type === "checkbox"
-                  ? false
-                  : field.type === "date"
-                  ? new Date().toLocaleDateString("en-CA")
-                  : "");
-              return acc;
-            }, {} as Record<string, string | boolean>)
-          );
+          setFormData(addFieldDefaults(generatedFields));
         } catch (error) {
           console.error("Error fetching secondary fields:", error);
         }
       }
     };
 
+    // Set's default formdata
+
     if (formStage === "primary") {
-      setFormData(
-        fields.reduce((acc, field) => {
-          acc[field.id] =
-            field.default ??
-            (field.type === "checkbox"
-              ? false
-              : field.type === "date"
-              ? new Date().toLocaleDateString("en-CA")
-              : "");
-          return acc;
-        }, {} as Record<string, string | boolean>)
-      );
+      const fieldsWithDefaults = addFieldDefaults(fields);
+      setFormData(fieldsWithDefaults);
     } else if (formStage === "secondary") {
       fetchSecondaryFields();
     }
@@ -102,7 +103,7 @@ const FlexForm = ({
     }));
   };
 
-  const handleBooleanChange = (id: string, value: boolean) => {
+  const handleBooleanChange = (id: string, value: boolean | string) => {
     setFormData((prev) => ({
       ...prev,
       [id]: value,
@@ -167,6 +168,7 @@ const FlexForm = ({
                           ))}
                         </select>
                       ) : field.type === "boolean" ? (
+                        // Expects default value as boolean
                         <BooleanField
                           default={!!formData[field.id]}
                           onChange={(value) =>

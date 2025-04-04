@@ -2,6 +2,7 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../amplify/data/resource";
 
 import {
+  DataCategory,
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
@@ -33,7 +34,12 @@ export async function fetchUserProfiles(): Promise<
 
 export async function fetchMacros(): Promise<Macro[]> {
   try {
-    const { data: macros, errors } = await client.models.Macro.list();
+    const { data: macros, errors } = await client.models.Macro.listByPriority(
+      { dummy: 0 },
+      {
+        sortDirection: "DESC",
+      }
+    );
     console.log("Macros: ", macros, " Errors: ", errors);
     return macros || [];
   } catch (error) {
@@ -66,6 +72,9 @@ export async function createMacro(formData: FormData): Promise<void> {
     note: formData.note || "", // Default empty string
     formula: formData.formula || "",
     schedule: formData.schedule || "",
+    dataCategoryId: formData.dataCategoryId!,
+    lastRunDate: formData.lastRunDate || "",
+    priority: formData.priority || 3,
   });
   console.log("Errors:", errors);
   if (errors) {

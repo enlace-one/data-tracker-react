@@ -58,7 +58,7 @@ export interface FormDataType {
   formula?: string;
   schedule?: string;
   priority?: number;
-  lastRunDate: string;
+  lastRunDate?: string;
 }
 
 export type ResolvedDataType = Omit<

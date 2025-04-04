@@ -14,8 +14,8 @@ export const getAddEntryFormFieldsWithCategory = (
     name: "Value",
     id: "value",
     type: category.dataType?.inputType ?? "text",
-    note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
-    default: category.defaultValue ?? "",
+    note: `${category.note}. DataType is ${category.dataType?.name}: ${category.dataType?.note}`,
+    default: category.defaultValue,
     pattern: category.dataType?.pattern ?? ".*",
   },
   { name: "Date", id: "date", type: "date" },
@@ -32,7 +32,7 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
     default: entry.value ?? category.defaultValue ?? "",
     type: category.dataType?.inputType ?? "text",
     pattern: category.dataType?.pattern ?? ".*",
-    note: `${category.note}. DataType is ${category.dataType.name}: ${category.dataType.note}`,
+    note: `${category.note}. DataType is ${category.dataType?.name}: ${category.dataType?.note}`,
   },
   { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
   { name: "Note", id: "note", default: entry.note ?? "" },
@@ -210,12 +210,21 @@ export const getAddUpdateDataEntrySecondaryFormFields = async (
       default: entry?.value ?? dataCategory.defaultValue,
       type: dataCategory.dataType.inputType,
       pattern: dataCategory.dataType?.pattern ?? ".*",
-      note: `${dataCategory.note}. DataType is ${dataCategory.dataType.name}: ${dataCategory.dataType.note}`,
+      note: `${dataCategory.note}. DataType is ${dataCategory.dataType?.name}: ${dataCategory.dataType?.note}`,
     },
     { name: "Date", id: "date", type: "date", default: entry?.date },
     { name: "Note", id: "note", default: entry?.note },
     { name: "Id", id: "id", default: entry?.id, hidden: true },
   ];
+
+  console.log(
+    "Returning Fields: ",
+    fields,
+    "For Entry:",
+    entry,
+    "and category:",
+    dataCategory
+  );
 
   return fields;
 };
@@ -278,7 +287,14 @@ export const getNewDataTypeFormFields = () => [
   { name: "Is Complex", id: "isComplex", type: "checkbox" },
 ];
 
-export const getAddUpdateMacroFormFields = (macro: Macro) => {
+export const getAddUpdateMacroFormFields = (
+  macro: Macro,
+  dataCategories: EnrichedDataCategory[]
+) => {
+  const dataCategoryOptions = dataCategories.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+  }));
   return [
     {
       name: "Name",
@@ -291,7 +307,6 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       name: "Note",
       id: "note",
       type: "text",
-      required: true,
       default: macro.note ?? "",
     },
     {
@@ -306,9 +321,9 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       name: "Cron Schedule",
       id: "schedule",
       type: "text",
-      note: "Example: ***TUES**",
+      note: "Generally, set * for minute and hour. Example: ****sun",
       required: true,
-      default: macro.schedule ?? "",
+      default: macro.schedule ?? "*****",
     },
     {
       name: "Priority",
@@ -316,7 +331,7 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       type: "number",
       note: "Priority 0 runs first, 1 second, etc.",
       required: true,
-      default: macro.priority ?? 3,
+      default: String(macro.priority) ?? "3",
     },
     {
       name: "Last Run Date",
@@ -325,6 +340,14 @@ export const getAddUpdateMacroFormFields = (macro: Macro) => {
       note: "Will run if today > lastRunDate",
       required: true,
       default: macro.lastRunDate ?? "",
+    },
+    {
+      name: "Data Category to Set",
+      id: "dataCategoryId",
+      type: "select",
+      default: macro.dataCategoryId ?? "",
+      options: dataCategoryOptions,
+      required: true,
     },
     { name: "Id", id: "id", default: macro.id ?? "", hidden: true },
   ];

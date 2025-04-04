@@ -1,20 +1,27 @@
 // import { useState } from "react";
-import { Heading, Divider } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataEntry,
+  createMacro,
+  fetchDataEntriesByCategory,
   fetchEnrichedDataEntriesByDate,
   fetchMacros,
+  updateDataCategory,
   updateDataEntry,
+  updateMacro,
 } from "../../api";
 import { EnrichedDataCategory, EnrichedDataEntry, Macro } from "../../types";
 import BooleanField from "../../components/BooleanField/BooleanField";
 import styles from "./Macros.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseNumberToTime, parseTimeToNumber } from "../../util";
-import { getAddUpdateDataEntryFormFields } from "../../formFields";
+import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
+import {
+  getAddUpdateDataEntryFormFields,
+  getAddUpdateMacroFormFields,
+} from "../../formFields";
 export default function Macros() {
   const { dataCategories, setActionMessage } = useData();
   const [macros, setMacros] = useState<Macro[]>([]);
@@ -53,6 +60,13 @@ export default function Macros() {
     fetchAndSetMacros();
   }, []);
 
+  const _handleFormData = async (formData: Record<string, any>) => {
+    console.log("Add Macro Form Data:", formData);
+    await createMacro(formData);
+    await fetchAndSetMacros();
+  };
+  const handleFormData = standardWrapper(_handleFormData);
+
   return (
     <>
       <Heading level={1}>Macros</Heading>
@@ -64,6 +78,28 @@ export default function Macros() {
       >
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm> */}
+      <FlexForm
+        heading="New Macro"
+        fields={getAddUpdateMacroFormFields({} as Macro, dataCategories)}
+        handleFormData={handleFormData}
+      >
+        <Button className={styles.lightMargin}>Add Macro</Button>
+      </FlexForm>
+      <Button
+        className={styles.lightMargin}
+        onClick={() =>
+          runMacros(
+            macros,
+            new Date().toLocaleDateString("en-CA"),
+            dataCategories,
+            fetchDataEntriesByCategory,
+            updateDataCategory,
+            updateMacro
+          )
+        }
+      >
+        Run Macros
+      </Button>
 
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
@@ -71,7 +107,22 @@ export default function Macros() {
           <tbody>
             {macros.map((macro) => (
               <tr key={macro.name}>
-                <td>{macro.name}</td>
+                <td>
+                  {macro.name}
+                  <br />
+                  <small>Note: {macro.note}</small>
+                  <br />
+                  <small>Formula: {macro.formula}</small>
+                  <br />
+                  <small>Schedule: {macro.schedule}</small>
+                  <br />
+                  <small>
+                    Last Run: {macro.lastRunDate} - {macro.lastRunOutput}
+                  </small>
+                  <br />
+                  <small></small>
+                  <br />
+                </td>
               </tr>
             ))}
           </tbody>

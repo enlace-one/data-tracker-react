@@ -84,6 +84,7 @@ const schema = a
         name: a.string().required(),
         note: a.string(),
         formula: a.string().required(),
+        lastRunOutput: a.string().default(""),
         schedule: a.string().required(),
         lastRunDate: a.date().required(),
         priority: a.integer().default(3),
