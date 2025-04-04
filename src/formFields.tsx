@@ -84,6 +84,7 @@ export const getUpdateCategoryFormFields = (
       name: "Data Type",
       id: "dataTypeId",
       type: "select",
+      default: category.dataTypeId,
       options: dataTypeOptions,
       required: true,
     });
