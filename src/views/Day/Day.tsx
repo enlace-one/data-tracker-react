@@ -84,7 +84,7 @@ export default function Day() {
   // Trigger fetchEntries when `date` updates
   useEffect(() => {
     fetchEntries();
-  }, [date]);
+  }, [date, dataCategories]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -208,7 +208,7 @@ export default function Day() {
           value: category.defaultValue ?? "", // Ensure a valid default value is set
         });
         console.log("Category added successfully");
-        await fetchEntries(); // Refresh entries after adding a new one
+        // await fetchEntries(); // Refresh entries after adding a new one
       } catch (error) {
         console.error("Error adding category:", error);
       }

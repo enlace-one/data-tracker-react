@@ -86,14 +86,6 @@ export function DataProvider({ children }: DataProviderProps) {
   };
 
   useEffect(() => {
-    async function loadAndSetDataTypes() {
-      const types = await fetchDataTypes();
-      setDataTypes(types);
-    }
-    loadAndSetDataTypes();
-  }, []);
-
-  useEffect(() => {
     async function loadProfiles() {
       const profiles = await fetchUserProfiles();
       setUserProfiles(profiles);
@@ -102,8 +94,24 @@ export function DataProvider({ children }: DataProviderProps) {
   }, []);
 
   useEffect(() => {
-    const unsubscribeCategories = subscribeToDataCategories(setDataCategories);
-    return () => unsubscribeCategories();
+    let unsubscribeCategories: (() => void) | null = null;
+
+    async function loadAndSubscribe() {
+      const types = await fetchDataTypes();
+      setDataTypes(types);
+
+      // Now subscribe using the loaded types
+      unsubscribeCategories = subscribeToDataCategories(
+        setDataCategories,
+        types
+      );
+    }
+
+    loadAndSubscribe();
+
+    return () => {
+      if (unsubscribeCategories) unsubscribeCategories();
+    };
   }, []);
 
   useEffect(() => {

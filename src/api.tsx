@@ -3,6 +3,7 @@ import type { Schema } from "../amplify/data/resource";
 
 import {
   DataCategory,
+  DataType,
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
@@ -681,13 +682,9 @@ export async function getDataCategory(
   }
 }
 
-/**
- * Subscribe to real-time updates for data categories, including their data types.
- * @param {Function} callback - Function to update state with new data.
- * @returns {Function} Unsubscribe function.
- */
 export function subscribeToDataCategories(
-  callback: (items: EnrichedDataCategory[]) => void
+  callback: (items: EnrichedDataCategory[]) => void,
+  dataTypes: DataType[]
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {
@@ -698,47 +695,32 @@ export function subscribeToDataCategories(
         return;
       }
 
-      let enrichedItems = await Promise.all(
-        result.items.map(async (item) => {
-          try {
-            let dataType: Schema["DataType"]["type"] | undefined;
-
-            if (item.dataType && typeof item.dataType === "function") {
-              // Resolve LazyLoader
-              const resolved = await item.dataType();
-              dataType = resolved?.data ?? undefined;
-            }
-            // else if (item.dataTypeId) {
-            //   // Fallback if LazyLoader isn't present
-            //   dataType = await getDataType(item.dataTypeId);
-            // }
+      try {
+        // Await all enrichment
+        const enrichedItems = await Promise.all(
+          result.items.map(async (item) => {
+            const dataType = item.dataTypeId
+              ? dataTypes.find((dt) => dt.id === item.dataTypeId)
+              : undefined;
 
             return { ...item, dataType };
-          } catch (error) {
-            console.error(
-              `Failed to fetch DataType for ID ${item.dataTypeId}:`,
-              error
-            );
-            return { ...item };
-          }
-        })
-      );
+          })
+        );
 
-      console.log("Enriched Categories:", enrichedItems);
+        enrichedItems.sort((a, b) => a.name.localeCompare(b.name));
 
-      enrichedItems = enrichedItems.sort((a, b) =>
-        a.name.localeCompare(b.name)
-      );
-
-      // Cheat to appease the TypeScript gods.
-      callback(enrichedItems as unknown as EnrichedDataCategory[]);
+        callback(enrichedItems);
+      } catch (error) {
+        console.error("Error enriching DataCategories:", error);
+        callback([]);
+      }
     },
     error: (error: unknown) => {
       console.error("Subscription error:", error);
     },
   });
 
-  return () => sub.unsubscribe(); // Cleanup function
+  return () => sub.unsubscribe();
 }
 
 export function subscribeToDataEntries(
