@@ -48,7 +48,9 @@ const FlexForm = ({
           ? field.type === "checkbox"
             ? false
             : field.type === "boolean"
-            ? "false"
+            ? false
+            : field.type === "boolean-string"
+            ? "False"
             : field.type === "date"
             ? new Date().toLocaleDateString("en-CA")
             : ""
@@ -57,10 +59,11 @@ const FlexForm = ({
     }, {} as Record<string, string | boolean>);
   };
 
+  // Initialize or reset form data based on stage
   useEffect(() => {
     const fetchSecondaryFields = async () => {
       if (formStage === "secondary" && getSecondaryFields) {
-        console.log("Fetching secondary fields with primaryData:", primaryData); // Debugging
+        console.log("Fetching secondary fields with primaryData:", primaryData);
         try {
           const generatedFields = await getSecondaryFields(
             primaryData,
@@ -75,22 +78,25 @@ const FlexForm = ({
       }
     };
 
-    // Set's default formdata
-
     if (formStage === "primary") {
-      const fieldsWithDefaults = addFieldDefaults(fields);
-      setFormData(fieldsWithDefaults);
+      setFormData(addFieldDefaults(fields));
     } else if (formStage === "secondary") {
       fetchSecondaryFields();
     }
-  }, [formStage, fields, getSecondaryFields, primaryData]);
+  }, [
+    formStage,
+    fields,
+    getSecondaryFields,
+    primaryData,
+    getSecondaryFieldsParams,
+  ]);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { id, type, value } = e.target;
     const isCheckbox =
-      e.target instanceof HTMLInputElement && type === "checkbox";
+      type === "checkbox" && e.target instanceof HTMLInputElement;
 
     console.log(
       "Form Changed - setting",
@@ -110,28 +116,35 @@ const FlexForm = ({
     }));
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (formStage === "primary") {
-      await setPrimaryData(await formData);
+      setPrimaryData(formData); // No await needed, setPrimaryData is synchronous
       if (getSecondaryFields) {
         setFormStage("secondary");
       } else {
         handleFormData(formData);
-        setIsOpen(false);
+        resetForm(); // Reset after final submission
       }
     } else if (formStage === "secondary") {
       const fullFormData = { ...primaryData, ...formData };
       handleFormData(fullFormData);
-      setIsOpen(false);
-      setFormStage("primary"); // Reset for next time
+      resetForm(); // Reset after final submission
     }
   };
 
-  const handleCancel = async () => {
+  const handleCancel = () => {
+    resetForm(); // Reset on cancel
+  };
+
+  // Reset form to initial state
+  const resetForm = () => {
     setIsOpen(false);
-    setFormStage("primary"); // Reset for next time
+    setFormStage("primary");
+    setPrimaryData({});
+    setSecondaryFields([]);
+    setFormData(addFieldDefaults(fields)); // Reset to primary defaults
   };
 
   return (
@@ -168,12 +181,22 @@ const FlexForm = ({
                           ))}
                         </select>
                       ) : field.type === "boolean" ? (
-                        // Expects default value as boolean
                         <BooleanField
-                          default={!!formData[field.id]}
+                          default={formData[field.id] as boolean}
                           onChange={(value) =>
                             handleBooleanChange(field.id, value)
                           }
+                          asString={false}
+                        />
+                      ) : field.type === "boolean-string" ? (
+                        <BooleanField
+                          default={parseStringToBoolean(
+                            formData[field.id] as string
+                          )}
+                          onChange={(value) =>
+                            handleBooleanChange(field.id, value)
+                          }
+                          asString={true}
                         />
                       ) : (
                         <input
@@ -184,13 +207,7 @@ const FlexForm = ({
                           pattern={field.pattern ?? ".*"}
                           {...(field.type === "checkbox"
                             ? { checked: !!formData[field.id] }
-                            : {
-                                value:
-                                  field.type === "date"
-                                    ? (formData[field.id] as string) ||
-                                      new Date().toLocaleDateString("en-CA")
-                                    : String(formData[field.id] ?? ""),
-                              })}
+                            : { value: String(formData[field.id] ?? "") })}
                           required={field.required ?? false}
                         />
                       )}

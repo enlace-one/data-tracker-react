@@ -3,10 +3,11 @@ import { useState } from "react";
 
 interface Props {
   default: boolean | string;
+  asString: boolean;
   onChange: (value: boolean | string) => void;
 }
 
-const BooleanField = ({ default: defaultValue, onChange }: Props) => {
+const BooleanField = ({ default: defaultValue, asString, onChange }: Props) => {
   const [value, setValue] = useState(
     defaultValue === true || defaultValue === "true" || defaultValue === "True"
   );
@@ -14,12 +15,7 @@ const BooleanField = ({ default: defaultValue, onChange }: Props) => {
   const toggleValue = () => {
     setValue((prevValue) => {
       const newValue = !prevValue;
-      const returnValue =
-        typeof defaultValue === "string"
-          ? newValue
-            ? "true"
-            : "false"
-          : newValue;
+      const returnValue = asString ? (newValue ? "True" : "False") : newValue;
       onChange(returnValue);
       return newValue;
     });
