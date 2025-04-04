@@ -59,7 +59,7 @@ const DEFAULT_DATA_TYPES = [
     name: "Boolean",
     note: "Stores true/false values",
     isComplex: false,
-    inputType: "boolean",
+    inputType: "boolean-string",
   },
   {
     name: "Text",

@@ -64,7 +64,7 @@ export default function Graph() {
               ? parseTimeToDisplayValue(entry.value)
               : entry.value,
           value:
-            inputType == "boolean"
+            inputType == "boolean-string"
               ? parseBooleanToNumber(entry.value)
               : inputType == "time"
               ? parseTimeToNumber(entry.value)
@@ -259,7 +259,7 @@ export default function Graph() {
           {dataCategories.map(
             (item) =>
               (item.dataType.inputType === "number" ||
-                item.dataType.inputType === "boolean" ||
+                item.dataType.inputType === "boolean-string" ||
                 item.dataType.inputType === "time" ||
                 item.dataType.isComplex) && (
                 <option
