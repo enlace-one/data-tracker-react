@@ -25,7 +25,7 @@ export const parseNumberToTime = (decimalTime: number): string => {
 };
 
 export const parseBooleanToNumber = (boolean: string) => {
-  return boolean === "true" ? 1 : 0;
+  return boolean === "true" || boolean === "True" ? 1 : 0;
 };
 
 export const parseTimeToDisplayValue = (time: string): string => {
