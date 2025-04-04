@@ -64,6 +64,10 @@ export default function Types() {
                   <small>
                     {item.inputType} - {item.note}
                   </small>
+                  <br />
+                  <small>
+                    Up: {item.updatedAt} Cr: {item.createdAt}
+                  </small>
                 </FlexForm>
               </td>
               <td>
