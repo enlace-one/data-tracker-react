@@ -6,6 +6,8 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import { Amplify } from "aws-amplify";
 import outputs from "../amplify_outputs.json";
 import { DataProvider } from "./DataContext"; // Import provider
+import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol.js";
+import PrepareApp from "./PrepareApp.js";
 
 Amplify.configure(outputs);
 
@@ -17,7 +19,7 @@ ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <Authenticator>
       <DataProvider>
-        <App />
+        <PrepareApp />
       </DataProvider>
     </Authenticator>
   </React.StrictMode>

@@ -32,7 +32,7 @@ interface DataContextType {
   userProfiles: UserProfile[];
   dataCategories: EnrichedDataCategory[];
   dataTypes: DataType[];
-  SETTINGS: { debug: boolean; version: string };
+  SETTINGS: { debug: boolean };
   selectedCategory: EnrichedDataCategory | null;
   setSelectedCategory: React.Dispatch<
     React.SetStateAction<EnrichedDataCategory | null>
@@ -48,57 +48,9 @@ interface DataProviderProps {
   children: ReactNode;
 }
 
-const DEFAULT_DATA_TYPES = [
-  {
-    name: "Number",
-    note: "Stores numeric values",
-    isComplex: false,
-    inputType: "number",
-  },
-  {
-    name: "Boolean",
-    note: "Stores true/false values",
-    isComplex: false,
-    inputType: "boolean-string",
-  },
-  {
-    name: "Text",
-    note: "Stores string values",
-    isComplex: false,
-    inputType: "string",
-  },
-  {
-    name: "Time",
-    note: "Stores time values",
-    isComplex: false,
-    inputType: "time",
-  },
-  {
-    name: "Complex Number",
-    note: "Stores multiple related numbers",
-    isComplex: true,
-    pattern:
-      "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
-    inputType: "math",
-  },
-];
-
 const urlParams = new URLSearchParams(window.location.search);
 const isDebugMode = urlParams.get("debug") === "true";
-const SETTINGS = { debug: isDebugMode, version: "1.0.0" };
-
-async function initializeDataTypes() {
-  await Promise.all(
-    DEFAULT_DATA_TYPES.map((dataType) =>
-      createUniqueDataType(
-        dataType.name,
-        dataType.note,
-        dataType.inputType,
-        dataType.isComplex
-      )
-    )
-  );
-}
+const SETTINGS = { debug: isDebugMode };
 
 export function DataProvider({ children }: DataProviderProps) {
   const [userProfiles, setUserProfiles] = useState<UserProfile[]>([]);
@@ -135,7 +87,6 @@ export function DataProvider({ children }: DataProviderProps) {
 
   useEffect(() => {
     async function loadAndSetDataTypes() {
-      await initializeDataTypes();
       const types = await fetchDataTypes();
       setDataTypes(types);
     }

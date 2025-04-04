@@ -10,6 +10,7 @@ import { useData } from "../../DataContext";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
+import { version } from "../../settings";
 
 interface ProfileProps {
   signOut: () => void;
@@ -81,7 +82,7 @@ export default function Profile({ signOut }: ProfileProps) {
         <Button onClick={() => setActiveTab("macros")}>Macros</Button>
       </Grid>
 
-      <small>Version: {SETTINGS.version}</small>
+      <small>Version: {version}</small>
     </>
   );
 }

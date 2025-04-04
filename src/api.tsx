@@ -10,6 +10,8 @@ import {
 } from "./types"; // ✅ Import interfaces
 import { getRandomInt, sleep } from "./util";
 
+import { DEFAULT_DATA_TYPES } from "./settings";
+
 // import { useData } from "./DataContext";
 
 // Initialize the Amplify client
@@ -148,6 +150,19 @@ export async function getDataType(
   }
 }
 
+export async function initializeDataTypes() {
+  await Promise.all(
+    DEFAULT_DATA_TYPES.map((dataType) =>
+      createUniqueDataType(
+        dataType.name,
+        dataType.note,
+        dataType.inputType,
+        dataType.isComplex
+      )
+    )
+  );
+}
+
 export async function createUniqueDataType(
   name: string,
   note: string,
@@ -155,8 +170,6 @@ export async function createUniqueDataType(
   isComplex: boolean
 ) {
   try {
-    // Reduce conflicts by sleeping between 0 and 10 seconds
-    await sleep(getRandomInt(10));
     const { data: dataTypes } = await client.models.DataType.list({
       filter: { name: { eq: name } },
     });
