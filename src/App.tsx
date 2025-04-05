@@ -101,16 +101,52 @@ export default function App() {
       >
         <Flex
           justifyContent="center"
-          gap="1rem"
+          gap=".5rem"
           // width="70%" // Constrain buttons to match content width
           style={{
             flexWrap: "wrap", // Moved to style prop
           }}
         >
-          <Button onClick={() => setActiveTab("profile")}>Profile</Button>
-          <Button onClick={() => setActiveTab("categories")}>Categories</Button>
-          <Button onClick={() => setActiveTab("entries")}>Entries</Button>
-          <Button onClick={() => setActiveTab("day")}>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("profile")}
+          >
+            <HoverText onHoverText="Profile">
+              <img
+                src="/person.svg"
+                alt="Profile View"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("categories")}
+          >
+            <HoverText onHoverText="Categories">
+              <img
+                src="/inboxes.svg"
+                alt="Categories"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("entries")}
+          >
+            <HoverText onHoverText="Entries">
+              <img
+                src="/list-ul.svg"
+                alt="Entries"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("day")}
+          >
             <HoverText onHoverText="Day View">
               <img
                 src="/list-checkmarks.svg"
@@ -119,12 +155,29 @@ export default function App() {
               />
             </HoverText>
           </Button>
-
-          <Button onClick={() => setActiveTab("graph")}>Graph</Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("graph")}
+          >
+            <HoverText onHoverText="Graph">
+              <img
+                src="/graph-up.svg"
+                alt="Graph View"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
           {SETTINGS.debug && (
             <>
-              <Button onClick={() => setActiveTab("types")}>Types</Button>
-              <Button onClick={signOut}>Sign Out</Button>
+              <Button
+                style={{ border: "none" }}
+                onClick={() => setActiveTab("types")}
+              >
+                Types
+              </Button>
+              <Button style={{ border: "none" }} onClick={signOut}>
+                Sign Out
+              </Button>
             </>
           )}
         </Flex>
