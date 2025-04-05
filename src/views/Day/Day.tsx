@@ -1,21 +1,23 @@
 // import { useState } from "react";
-import { Heading, Divider } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataEntry,
   fetchEnrichedDataEntriesByDate,
+  fetchMacros,
   updateDataEntry,
 } from "../../api";
-import { EnrichedDataCategory, EnrichedDataEntry } from "../../types";
+import { EnrichedDataCategory, EnrichedDataEntry, Macro } from "../../types";
 import BooleanField from "../../components/BooleanField/BooleanField";
 import styles from "./Day.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseNumberToTime, parseTimeToNumber } from "../../util";
+import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
 import { getAddUpdateDataEntryFormFields } from "../../formFields";
 export default function Day() {
   const { dataCategories, setActionMessage } = useData();
+  const [macros, setMacros] = useState<Macro[]>([]);
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -48,6 +50,15 @@ export default function Day() {
     } as T;
   }
 
+  const fetchAndSetMacros = async () => {
+    const newMacros = await fetchMacros();
+    await setMacros(newMacros);
+  };
+
+  useEffect(() => {
+    fetchAndSetMacros();
+  }, []);
+
   const _fetchEntries = async () => {
     const fetchedEntries = await fetchEnrichedDataEntriesByDate(date);
 
@@ -66,6 +77,10 @@ export default function Day() {
         .filter((category) => !entryCategoryIds.has(category.id))
         .sort((a, b) => a.name.localeCompare(b.name)) // Use localeCompare for string sorting
     );
+  };
+
+  const runMacrosAndUpdate = async () => {
+    await runMacros(macros, date, dataCategories);
   };
 
   const fetchEntries = standardWrapper(_fetchEntries);
@@ -218,6 +233,11 @@ export default function Day() {
     <>
       <Heading level={1}>Day</Heading>
       <Divider />
+      {macros.length > 0 && (
+        <Button className={styles.lightMargin} onClick={runMacrosAndUpdate}>
+          Run Macros
+        </Button>
+      )}
       {/* <FlexForm
         heading="Add Data"
         fields={addDataFields}
