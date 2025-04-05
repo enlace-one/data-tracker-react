@@ -59,6 +59,7 @@ export default function App() {
       direction="column"
       width="70%"
       margin="0 auto"
+      paddingBottom="6rem" // Extra space to avoid overlap with fixed footer
       style={{ color: "black" }}
     >
       <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
@@ -73,28 +74,37 @@ export default function App() {
           {activeTab === "graph" && <Graph />}
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
-
-          <Divider />
-
-          <Flex gap="1rem" margin="0.5rem 1rem 0 1rem">
-            <Button onClick={() => setActiveTab("profile")}>Profile</Button>
-            <Button onClick={() => setActiveTab("categories")}>
-              Categories
-            </Button>
-            <Button onClick={() => setActiveTab("entries")}>Entries</Button>
-          </Flex>
-          <Flex gap="1rem" margin="0 rem 1rem">
-            <Button onClick={() => setActiveTab("day")}>Day</Button>
-            <Button onClick={() => setActiveTab("graph")}>Graph</Button>
-            {SETTINGS.debug && (
-              <>
-                <Button onClick={() => setActiveTab("types")}>Types</Button>
-                <Button onClick={signOut}>Sign Out</Button>
-              </>
-            )}
-          </Flex>
         </>
       )}
+
+      {/* Fixed Bottom Menu */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          // width: "100%",
+          backgroundColor: "#fff",
+          padding: "0.5rem 1rem",
+          borderTop: "1px solid #ccc",
+          boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)",
+          zIndex: 1000,
+        }}
+      >
+        <Flex justifyContent="center" gap="1rem" wrap="wrap">
+          <Button onClick={() => setActiveTab("profile")}>Profile</Button>
+          <Button onClick={() => setActiveTab("categories")}>Categories</Button>
+          <Button onClick={() => setActiveTab("entries")}>Entries</Button>
+          <Button onClick={() => setActiveTab("day")}>Day</Button>
+          <Button onClick={() => setActiveTab("graph")}>Graph</Button>
+          {SETTINGS.debug && (
+            <>
+              <Button onClick={() => setActiveTab("types")}>Types</Button>
+              <Button onClick={signOut}>Sign Out</Button>
+            </>
+          )}
+        </Flex>
+      </div>
     </Flex>
   );
 }
