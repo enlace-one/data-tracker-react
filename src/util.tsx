@@ -77,6 +77,11 @@ export async function runMacros(
   };
   for (const macro of macros) {
     try {
+      // Pick date, now unless this is called from day view with another date.
+      let dateToEval = new Date();
+      if (date != dateToEval.toLocaleDateString("en-CA")) {
+        dateToEval = new Date(date);
+      }
       // evaluate Cron
       const cronExpression = macro.schedule; // '*/5 * * * *'; // Every 5 minutes
       const schedule = later.parse.cron(cronExpression, true); // true = use local time
