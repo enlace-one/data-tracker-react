@@ -30,7 +30,7 @@ export default function Profile({ signOut }: ProfileProps) {
 
   return (
     <>
-      <Heading level={1}>My Profile</Heading>
+      <Heading level={1}>Profile</Heading>
       <Divider />
       <Grid
         margin="0 0"

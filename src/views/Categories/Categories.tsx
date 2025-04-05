@@ -63,7 +63,7 @@ export default function Categories() {
 
   return (
     <>
-      <Heading level={1}>Data Categories</Heading>
+      <Heading level={1}>Categories</Heading>
       <Divider />
       <FlexForm
         heading="New Category"
@@ -72,7 +72,7 @@ export default function Categories() {
         getSecondaryFields={getAddCategorySecondaryFormFields}
         getSecondaryFieldsParams={{ dataTypes: dataTypes }}
       >
-        <Button className={styles.lightMargin}>Add Category</Button>
+        <Button className={styles.lightMargin}>Add</Button>
       </FlexForm>
       {SETTINGS.debug && (
         <Button

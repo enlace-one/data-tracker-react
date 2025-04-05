@@ -162,7 +162,7 @@ export default function Entries() {
 
   return (
     <>
-      <Heading level={1}>Data Entries</Heading>
+      <Heading level={1}>Entries</Heading>
       <Divider />
       <table>
         <tbody>
@@ -187,7 +187,7 @@ export default function Entries() {
                 }}
                 handleFormData={handleFormData}
               >
-                <Button className={styles.lightMargin}>Add Entry</Button>
+                <Button className={styles.lightMargin}>Add</Button>
               </FlexForm>
             </td>
             {SETTINGS.debug && (

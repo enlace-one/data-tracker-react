@@ -103,10 +103,10 @@ export default function Macros() {
           fields={getAddUpdateMacroFormFields({} as Macro, dataCategories)}
           handleFormData={handleFormData}
         >
-          <Button className={styles.lightMargin}>Add Macro</Button>
+          <Button className={styles.lightMargin}>Add</Button>
         </FlexForm>
         <Button className={styles.lightMargin} onClick={runMacrosAndUpdate}>
-          Run Macros
+          Run
         </Button>
       </Grid>
 
