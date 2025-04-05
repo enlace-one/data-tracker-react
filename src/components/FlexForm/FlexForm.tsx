@@ -155,15 +155,12 @@ const FlexForm = ({
       {isOpen && (
         <div className={styles.overlay}>
           <div className={styles.modal}>
-            <Heading level={2}>
-              {formStage === "primary" ? heading : heading + " cont."}
-            </Heading>
+            <Heading level={2}>heading</Heading>
             <form onSubmit={handleSubmit}>
               {(formStage === "primary" ? fields : secondaryFields).map(
                 (field) =>
                   field.hidden ? null : (
                     <div key={field.id} className={styles.formGroup}>
-                      <small>{field.note}</small>
                       <label htmlFor={field.id}>{field.name}:</label>
                       {field.type === "select" && field.options ? (
                         <select
@@ -211,6 +208,7 @@ const FlexForm = ({
                           required={field.required ?? false}
                         />
                       )}
+                      <small>{field.note}</small>
                     </div>
                   )
               )}
