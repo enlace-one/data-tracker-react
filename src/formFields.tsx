@@ -322,9 +322,9 @@ export const getAddUpdateMacroFormFields = (
       name: "Cron Schedule",
       id: "schedule",
       type: "text",
-      note: "Generally, set * for minute and hour. Example: ****sun",
+      note: "Every Sunday: * * * * * SUN",
       required: true,
-      default: macro.schedule ?? "*****",
+      default: macro.schedule ?? "* * * * * *",
     },
     {
       name: "Priority",
@@ -341,6 +341,14 @@ export const getAddUpdateMacroFormFields = (
       note: "Will run if today > lastRunDate",
       hidden: true,
       default: macro.lastRunDate,
+    },
+    {
+      name: "Last Run Output",
+      id: "lastRunOutput",
+      type: "text",
+      note: "",
+      hidden: true,
+      default: macro.lastRunOutput,
     },
     {
       name: "Data Category to Set",
