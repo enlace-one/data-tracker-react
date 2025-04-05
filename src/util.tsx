@@ -160,3 +160,19 @@ export async function runMacros(
     }
   }
 }
+
+export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
+  const promises = dataCategories
+    .filter((cat) => cat.addDefault && cat.defaultValue != "")
+    .map((cat) => {
+      console.log("Adding defauult entry for", cat.name);
+      createDataEntry({
+        date: new Date().toLocaleDateString("en-CA"),
+        note: "Added as default",
+        value: cat.defaultValue ?? "",
+        dataCategoryId: cat.id,
+      });
+    });
+
+  await Promise.all(promises);
+}

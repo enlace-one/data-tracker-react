@@ -11,8 +11,7 @@ export default function PrepareApp() {
 
   const loadEverything = async () => {
     await initializeDataTypes();
-    setLoadingText("Adding Defaults...");
-    // TODO
+    setLoadingText("");
     setLoading(false);
   };
 
