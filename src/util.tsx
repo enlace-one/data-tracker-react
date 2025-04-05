@@ -1,4 +1,5 @@
 import { evaluate } from "mathjs";
+import later from "@breejs/later";
 import {
   DataCategory,
   DataEntry,
@@ -6,7 +7,11 @@ import {
   FormDataType,
   Macro,
 } from "./types";
-import { createDataEntry, updateMacroRun } from "./api";
+import {
+  createDataEntry,
+  fetchDataEntriesByCategory,
+  updateMacroRun,
+} from "./api";
 
 export const parseTimeToNumber = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
@@ -65,10 +70,7 @@ export function parseStringToBoolean(input: string | boolean): boolean {
 export async function runMacros(
   macros: Macro[],
   date: string,
-  dataCategories: EnrichedDataCategory[],
-  fetchDataEntriesByCategory: (categoryId: string) => Promise<DataEntry[]>,
-  updateDataCategory: (formData: FormDataType) => Promise<void>,
-  updateMacro: (formData: FormDataType) => Promise<void>
+  dataCategories: EnrichedDataCategory[]
 ): Promise<void> {
   const throwError = async (errorMessage: string, macro: Macro) => {
     console.warn(errorMessage);
@@ -79,11 +81,18 @@ export async function runMacros(
   for (const macro of macros) {
     try {
       // evaluate Cron
-      const cron = true;
-      const macroDataCategory = dataCategories.find(
-        (cat) => cat.id === macro.dataCategoryId
+      const cronExpression = macro.schedule; // '*/5 * * * *'; // Every 5 minutes
+      const schedule = later.parse.cron(cronExpression, true); // true = use local time
+      const cronIsMatch = later.schedule(schedule).isValid(new Date());
+      console.log(
+        `Cron expression ${macro.schedule} evaluates as ${cronIsMatch}`
       );
-      if (cron) {
+
+      if (cronIsMatch) {
+        const macroDataCategory = dataCategories.find(
+          (cat) => cat.id === macro.dataCategoryId
+        );
+
         // Evaluate Formula
         let formula = macro.formula;
         const placeholderRegex = /\[([^\]]+)\]/g;

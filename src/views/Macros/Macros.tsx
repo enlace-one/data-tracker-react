@@ -78,10 +78,7 @@ export default function Macros() {
     await runMacros(
       macros,
       new Date().toLocaleDateString("en-CA"),
-      dataCategories,
-      fetchDataEntriesByCategory,
-      updateDataCategory,
-      updateMacro
+      dataCategories
     );
     await fetchAndSetMacros();
   };

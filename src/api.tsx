@@ -709,7 +709,7 @@ export function subscribeToDataCategories(
 
         enrichedItems.sort((a, b) => a.name.localeCompare(b.name));
 
-        callback(enrichedItems);
+        callback(enrichedItems as unknown as EnrichedDataCategory[]);
       } catch (error) {
         console.error("Error enriching DataCategories:", error);
         callback([]);
