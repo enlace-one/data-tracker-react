@@ -251,6 +251,16 @@ export async function deleteAllDataTypes() {
   }
 }
 
+export async function deleteMacro(id: string) {
+  try {
+    await client.models.Macro.delete({ id: id });
+
+    console.log(`Data macro deleted with id ${id}.`);
+  } catch (error) {
+    console.error("Error deleting Macro:", error);
+  }
+}
+
 export async function deleteDataType(id: string) {
   try {
     await client.models.DataType.delete({ id: id });

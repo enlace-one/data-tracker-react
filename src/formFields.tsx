@@ -311,6 +311,14 @@ export const getAddUpdateMacroFormFields = (
       default: macro.note ?? "",
     },
     {
+      name: "Data Category to Set",
+      id: "dataCategoryId",
+      type: "select",
+      default: macro.dataCategoryId ?? "",
+      options: dataCategoryOptions,
+      required: true,
+    },
+    {
       name: "Formula",
       id: "formula",
       type: "text",
@@ -349,14 +357,6 @@ export const getAddUpdateMacroFormFields = (
       note: "",
       hidden: true,
       default: macro.lastRunOutput,
-    },
-    {
-      name: "Data Category to Set",
-      id: "dataCategoryId",
-      type: "select",
-      default: macro.dataCategoryId ?? "",
-      options: dataCategoryOptions,
-      required: true,
     },
     { name: "Id", id: "id", default: macro.id ?? "", hidden: true },
   ];

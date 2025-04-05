@@ -2,13 +2,14 @@
 import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import { createMacro, fetchMacros, updateMacro } from "../../api";
+import { createMacro, deleteMacro, fetchMacros, updateMacro } from "../../api";
 import { Macro } from "../../types";
 import styles from "./Macros.module.css";
 import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { runMacros } from "../../util";
 import { getAddUpdateMacroFormFields } from "../../formFields";
+import TextButton from "../../components/TextButton/TextButton";
 export default function Macros() {
   const { dataCategories, setActionMessage } = useData();
   const [macros, setMacros] = useState<Macro[]>([]);
@@ -72,6 +73,13 @@ export default function Macros() {
 
   const runMacrosAndUpdate = standardWrapper(_runMacrosAndUpdate);
 
+  const _handleDeleteMacro = async (id: string) => {
+    await deleteMacro(id);
+    await fetchAndSetMacros();
+  };
+
+  const handleDeleteMacro = standardWrapper(_handleDeleteMacro);
+
   return (
     <>
       <Heading level={1}>Macros</Heading>
@@ -130,6 +138,11 @@ export default function Macros() {
                     <small></small>
                     <br />
                   </FlexForm>
+                </td>
+                <td>
+                  <TextButton onClick={() => handleDeleteMacro(macro.id)}>
+                    <span className={styles.small}>❌</span>
+                  </TextButton>
                 </td>
               </tr>
             ))}
