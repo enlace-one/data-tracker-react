@@ -120,7 +120,11 @@ export async function fetchTopics(): Promise<Schema["Topic"]["type"][]> {
   try {
     const { data: topics, errors } = await client.models.Topic.list();
     console.log("Data topics:", topics, " Errors: ", errors);
-    return topics || [];
+    // Sort topics by name alphabetically
+    const sortedTopics = (topics || []).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+    return sortedTopics;
   } catch (error) {
     console.error("Error fetching topics:", error);
     return [];

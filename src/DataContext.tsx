@@ -31,6 +31,9 @@ interface DataContextType {
   setActionMessage: SetActionMessageFunction;
   userProfiles: UserProfile[];
   dataCategories: EnrichedDataCategory[];
+  setDataCategories: React.Dispatch<
+    React.SetStateAction<EnrichedDataCategory[]>
+  >;
   dataTypes: DataType[];
   topics: Topic[];
   SETTINGS: { debug: boolean };
@@ -133,6 +136,7 @@ export function DataProvider({ children }: DataProviderProps) {
       value={{
         userProfiles,
         dataCategories,
+        setDataCategories,
         actionMessage,
         setActionMessage,
         dataTypes,
