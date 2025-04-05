@@ -100,8 +100,8 @@ export async function runMacros(
           if (category) {
             const entries = await fetchDataEntriesByCategory(category.id);
             const entry = entries.find((e) => e.date === date);
+            let value;
             if (entry) {
-              let value;
               if (category.dataType.inputType == "boolean-string") {
                 value = parseBooleanToNumber(entry.value);
               } else if (category.dataType.inputType == "time") {
@@ -114,13 +114,13 @@ export async function runMacros(
               console.log(
                 `Replacing ${categoryName} with ${value} based on ${entry.value}`
               );
-              formula = formula.replace(`[${categoryName}]`, value);
             } else {
-              await throwError(
-                `No entry found for ${date} on "${categoryName}"`,
-                macro
+              value = 0;
+              console.log(
+                `Replacing ${categoryName} with ${value} as no entry was found`
               );
             }
+            formula = formula.replace(`[${categoryName}]`, value);
           } else {
             await throwError(
               `No category found matching "${categoryName}"`,
