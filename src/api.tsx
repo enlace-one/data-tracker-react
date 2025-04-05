@@ -581,6 +581,31 @@ export async function updateDataCategoryEntryCount(
   }
 }
 
+export async function updateDataCategoryLastEntryDate(
+  categoryId: string,
+  date: string
+): Promise<void> {
+  console.log(
+    "Updating category last entry for category:",
+    categoryId,
+    "with date:",
+    date
+  );
+
+  // Update the category with the new entry count
+  const { errors: updateErrors } = await client.models.DataCategory.update({
+    id: categoryId,
+    lastEntryDate: date,
+  });
+
+  if (updateErrors) {
+    console.error("Errors updating category entry date:", updateErrors);
+    throw new Error("Error updating category entry count");
+  } else {
+    console.log("Successfully updated category entry date:", date);
+  }
+}
+
 /**
  * Create a new data entry.
  * @param {string} name - Name of the entry.

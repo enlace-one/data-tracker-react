@@ -3,7 +3,10 @@ import later from "@breejs/later";
 import { EnrichedDataCategory, Macro } from "./types";
 import {
   createDataEntry,
+  fetchDataEntries,
   fetchDataEntriesByCategory,
+  fetchDataEntriesByDate,
+  updateDataCategoryLastEntryDate,
   updateMacroRun,
 } from "./api";
 
@@ -175,4 +178,23 @@ export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
     });
 
   await Promise.all(promises);
+}
+
+export async function setLastEntryDates(
+  dataCategories: EnrichedDataCategory[]
+) {
+  const dataEntries = await fetchDataEntries(50);
+  const catsDone: string[] = [];
+
+  for (const cat of dataCategories) {
+    if (!catsDone.includes(cat.id)) {
+      const entry = dataEntries.find(
+        (entry) => entry.dataCategoryId === cat.id
+      );
+      if (entry && entry.date !== cat.lastEntryDate) {
+        await updateDataCategoryLastEntryDate(cat.id, entry.date);
+      }
+      catsDone.push(cat.id);
+    }
+  }
 }

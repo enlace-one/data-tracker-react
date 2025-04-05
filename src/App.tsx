@@ -11,7 +11,7 @@ import Alert from "./components/Alert/Alert";
 import Graph from "./views/Graph/Graph";
 import Day from "./views/Day/Day";
 import Macros from "./views/Macros/Macros";
-import { addDefaults } from "./util";
+import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
@@ -25,7 +25,8 @@ export default function App() {
   const loadEverything = async () => {
     console.log("Adding defaults with", dataCategories);
     await addDefaults(dataCategories);
-    setLoadingText("");
+    setLoadingText("Setting last entry dates");
+    await setLastEntryDates(dataCategories);
     setLoading(false);
   };
 

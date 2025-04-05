@@ -1,5 +1,6 @@
 // import { useState } from "react";
 import { Heading, Divider, Button } from "@aws-amplify/ui-react";
+import moment from "moment";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteAllDataCategories } from "../../api";
@@ -100,10 +101,13 @@ export default function Categories() {
                   </span>
                   <br />
                   <small>
-                    {/* {dataTypes.find((dt) => dt.id === item.dataTypeId)?.name ||
-                    "Unknown"}{" "} */}
-                    {item.dataType?.name} - {item.note}{" "}
+                    {item.dataType?.name}{" "}
+                    {item.lastEntryDate && (
+                      <>- {moment(item.lastEntryDate).fromNow()} </>
+                    )}
                   </small>
+                  <br />
+                  <small>{item.note}</small>
                 </td>
                 {/* <td>
                 <small>
