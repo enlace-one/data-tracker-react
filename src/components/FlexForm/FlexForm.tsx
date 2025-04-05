@@ -155,7 +155,7 @@ const FlexForm = ({
       {isOpen && (
         <div className={styles.overlay}>
           <div className={styles.modal}>
-            <Heading level={2}>heading</Heading>
+            <Heading level={2}>{heading}</Heading>
             <form onSubmit={handleSubmit}>
               {(formStage === "primary" ? fields : secondaryFields).map(
                 (field) =>
@@ -174,6 +174,7 @@ const FlexForm = ({
                           {field.options.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
+                              {option.child}
                             </option>
                           ))}
                         </select>

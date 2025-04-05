@@ -4,6 +4,7 @@ import {
   DataType,
   FlexFormField,
   Macro,
+  Topic,
 } from "./types";
 
 export const getAddEntryFormFieldsWithCategory = (
@@ -41,8 +42,14 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
 export const getUpdateCategoryFormFields = (
   category: EnrichedDataCategory,
   showDataType: boolean = false,
-  dataTypes: DataType[]
+  dataTypes: DataType[],
+  topics: Topic[]
 ): FlexFormField[] => {
+  const topicOptions = topics.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+  }));
+
   let formData: FlexFormField[] = [
     { name: "Name", id: "name", required: true, default: category.name ?? "" },
     { name: "Note", id: "note", default: category.note ?? "" },
@@ -71,6 +78,14 @@ export const getUpdateCategoryFormFields = (
       id: "negativeIncrement",
       type: "number",
       default: String(category.negativeIncrement ?? 1), // Ensure numeric default
+    },
+    {
+      name: "Topic",
+      id: "topicId",
+      type: "select",
+      default: category.topicId,
+      options: topicOptions,
+      required: true,
     },
   ];
 
@@ -112,12 +127,32 @@ export const getAddCategorySecondaryFormFields = async (
   formData: Record<string, any>,
   params: unknown
 ) => {
-  const assertedParams = params as { dataTypes: DataType[] };
+  const assertedParams = params as { dataTypes: DataType[]; topics: Topic[] };
 
   const dataTypes = assertedParams["dataTypes"];
+  const topics = assertedParams["topics"];
 
   const dataTypeId = String(formData["dataTypeId"]); // Ensure string comparison
   const dataType = dataTypes.find((dt) => String(dt.id) === dataTypeId);
+
+  const topicOptions = topics.map((dt) => ({
+    label: dt.name,
+    value: dt.id,
+    child: (
+      <img
+        src={"/" + dt.imageLink}
+        alt={dt.name}
+        style={{
+          width: "5rem",
+          margin: "1rem",
+          height: "5rem",
+          padding: "2px",
+          border: "1px solid #007bff",
+          borderRadius: "50%",
+        }}
+      ></img>
+    ),
+  }));
 
   if (!dataType) {
     throw new Error(
@@ -135,6 +170,13 @@ export const getAddCategorySecondaryFormFields = async (
       pattern: dataType?.pattern ?? ".*",
       type: dataType.inputType,
       note: dataType.note,
+    },
+    {
+      name: "Topic",
+      id: "topicId",
+      type: "select",
+      options: topicOptions,
+      required: true,
     },
   ];
 

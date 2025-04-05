@@ -21,6 +21,7 @@ export default function Categories() {
     setSelectedCategory,
     setActionMessage,
     SETTINGS,
+    topics,
   } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
@@ -70,7 +71,7 @@ export default function Categories() {
         fields={getAddCategoryFormFields(dataTypeOptions)}
         handleFormData={handleFormData}
         getSecondaryFields={getAddCategorySecondaryFormFields}
-        getSecondaryFieldsParams={{ dataTypes: dataTypes }}
+        getSecondaryFieldsParams={{ dataTypes: dataTypes, topics: topics }}
       >
         <Button className={styles.lightMargin}>Add</Button>
       </FlexForm>
@@ -89,6 +90,22 @@ export default function Categories() {
           <tbody>
             {dataCategories.map((item) => (
               <tr className={styles.tableRow} key={item.id}>
+                <td>
+                  {item.topic?.imageLink && (
+                    <img
+                      src={"/" + item.topic?.imageLink}
+                      alt={item.topic?.name}
+                      style={{
+                        width: "3rem",
+                        margin: "1rem",
+                        height: "3rem",
+                        padding: "2px",
+                        border: "1px solid #007bff",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  )}
+                </td>
                 <td className={styles.minWidth}>
                   <span
                     onClick={() => setSelectedCategory(item)}

@@ -32,9 +32,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (!initialized.current && dataCategories.length) {
+    // This used to be dataCategories.length but that don't owrk if you got no categories!
+    if (!initialized.current && dataCategories) {
       initialized.current = true;
       loadEverything();
+    } else if (dataCategories) {
+      setLoading(false);
     }
   }, [dataCategories]);
 
@@ -113,7 +116,7 @@ export default function App() {
           >
             <HoverText onHoverText="Profile">
               <img
-                src="/person.svg"
+                src="/profile-view.svg"
                 alt="Profile View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -125,7 +128,7 @@ export default function App() {
           >
             <HoverText onHoverText="Categories">
               <img
-                src="/inboxes.svg"
+                src="/category-view.svg"
                 alt="Categories"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -137,7 +140,7 @@ export default function App() {
           >
             <HoverText onHoverText="Entries">
               <img
-                src="/list-ul.svg"
+                src="/entries-view.svg"
                 alt="Entries"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -149,7 +152,7 @@ export default function App() {
           >
             <HoverText onHoverText="Day View">
               <img
-                src="/list-checkmarks.svg"
+                src="/day-view.svg"
                 alt="Day View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -161,7 +164,7 @@ export default function App() {
           >
             <HoverText onHoverText="Graph">
               <img
-                src="/graph-up.svg"
+                src="/graph-view.svg"
                 alt="Graph View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />

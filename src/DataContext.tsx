@@ -9,6 +9,7 @@ import {
   fetchUserProfiles,
   subscribeToDataCategories,
   fetchDataTypes,
+  fetchTopics,
 } from "./api";
 
 import {
@@ -16,6 +17,7 @@ import {
   EnrichedDataCategory,
   DataType,
   ActiveTab,
+  Topic,
 } from "./types";
 
 interface AlertInfo {
@@ -30,6 +32,7 @@ interface DataContextType {
   userProfiles: UserProfile[];
   dataCategories: EnrichedDataCategory[];
   dataTypes: DataType[];
+  topics: Topic[];
   SETTINGS: { debug: boolean };
   selectedCategory: EnrichedDataCategory | null;
   setSelectedCategory: React.Dispatch<
@@ -56,6 +59,7 @@ export function DataProvider({ children }: DataProviderProps) {
     []
   );
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [actionMessage, _setActionMessage] = useState<AlertInfo>({
     message: "",
     type: "",
@@ -98,10 +102,14 @@ export function DataProvider({ children }: DataProviderProps) {
       const types = await fetchDataTypes();
       setDataTypes(types);
 
+      const topics = await fetchTopics();
+      setTopics(topics);
+
       // Now subscribe using the loaded types
       unsubscribeCategories = subscribeToDataCategories(
         setDataCategories,
-        types
+        types,
+        topics
       );
     }
 
@@ -128,6 +136,7 @@ export function DataProvider({ children }: DataProviderProps) {
         actionMessage,
         setActionMessage,
         dataTypes,
+        topics,
         SETTINGS,
         selectedCategory,
         setSelectedCategory,

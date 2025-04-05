@@ -6,10 +6,12 @@ import {
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
+  FormDataType,
   Macro,
+  Topic,
 } from "./types"; // ✅ Import interfaces
 
-import { DEFAULT_DATA_TYPES } from "./settings";
+import { DEFAULT_DATA_TYPES, DEFAULT_TOPICS } from "./settings";
 
 // import { useData } from "./DataContext";
 
@@ -114,6 +116,17 @@ export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
   }
 }
 
+export async function fetchTopics(): Promise<Schema["Topic"]["type"][]> {
+  try {
+    const { data: topics, errors } = await client.models.Topic.list();
+    console.log("Data topics:", topics, " Errors: ", errors);
+    return topics || [];
+  } catch (error) {
+    console.error("Error fetching topics:", error);
+    return [];
+  }
+}
+
 export async function updateDataType(formData: FormData): Promise<void> {
   try {
     console.log("Updating Type:", formData.name); // Fixed incorrect variable reference
@@ -162,6 +175,33 @@ export async function initializeDataTypes() {
   );
 }
 
+export async function initializeTopics() {
+  await createUniqueTopics(DEFAULT_TOPICS);
+}
+
+export async function createUniqueTopics(forms: FormDataType[]) {
+  try {
+    const { data: topics } = await client.models.Topic.list();
+    for (const form of forms) {
+      const filtered_topics = topics.filter((t) => t.name == form.name);
+      if (filtered_topics.length == 1) {
+        console.log(`Skipping topic ${form.name} as it exists.`);
+      } else if (filtered_topics.length == 0) {
+        console.log(`Creating topic ${form.name}`);
+        await createTopic({
+          name: form.name,
+          imageLink: form.imageLink,
+        });
+      } else {
+        console.log(`Deleting one of the topics named ${form.name}. Dupes.`);
+        await deleteTopic(filtered_topics[0].id);
+      }
+    }
+  } catch (error) {
+    console.error("Error creating topic:", error);
+  }
+}
+
 export async function createUniqueDataType(
   name: string,
   note: string,
@@ -189,6 +229,21 @@ export async function createUniqueDataType(
     }
   } catch (error) {
     console.error("Error creating DataType:", error);
+  }
+}
+
+export async function createTopic(formData: FormData): Promise<void> {
+  try {
+    console.log("Adding topic:", formData.name ?? "Unnamed"); // Avoid undefined
+
+    const { errors } = await client.models.Topic.create({
+      name: formData.name ?? "", // Ensure a default empty string
+      imageLink: formData.imageLink ?? "", // Default to empty string
+    });
+    console.log("Errors:", errors);
+  } catch (error) {
+    console.error("Error creating topic:", error);
+    throw error; // Ensure the function consistently returns a Promise<DataType>
   }
 }
 
@@ -258,6 +313,16 @@ export async function deleteMacro(id: string) {
     console.log(`Data macro deleted with id ${id}.`);
   } catch (error) {
     console.error("Error deleting Macro:", error);
+  }
+}
+
+export async function deleteTopic(id: string) {
+  try {
+    await client.models.Topic.delete({ id: id });
+
+    console.log(`Topic deleted with id ${id}.`);
+  } catch (error) {
+    console.error("Error deleting Topic:", error);
   }
 }
 
@@ -507,6 +572,7 @@ export async function createDataCategory(formData: FormData): Promise<void> {
     dataTypeId: formData.dataTypeId!,
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
+    topicId: formData.topicId!,
   });
   console.log("Errors:", errors);
 }
@@ -531,6 +597,7 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
     dataTypeId: formData.dataTypeId!,
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
+    topicId: formData.topicId!,
   });
   console.log("Errors:", errors);
 }
@@ -717,7 +784,8 @@ export async function getDataCategory(
 
 export function subscribeToDataCategories(
   callback: (items: EnrichedDataCategory[]) => void,
-  dataTypes: DataType[]
+  dataTypes: DataType[],
+  topics: Topic[]
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {
@@ -736,7 +804,11 @@ export function subscribeToDataCategories(
               ? dataTypes.find((dt) => dt.id === item.dataTypeId)
               : undefined;
 
-            return { ...item, dataType };
+            const topic = item.topicId
+              ? topics.find((t) => t.id === item.topicId)
+              : undefined;
+
+            return { ...item, dataType, topic };
           })
         );
 

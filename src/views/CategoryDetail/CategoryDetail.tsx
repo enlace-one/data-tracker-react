@@ -28,7 +28,7 @@ interface Props {
 }
 
 export default function CategoryDetail({ category }: Props) {
-  const { setActionMessage, SETTINGS, setSelectedCategory, dataTypes } =
+  const { setActionMessage, topics, SETTINGS, setSelectedCategory, dataTypes } =
     useData();
   const [dataEntries, setDataEntries] = useState<DataEntry[]>([]);
   const [fileUpload, setFileUpload] = useState<Boolean>(false);
@@ -312,6 +312,21 @@ export default function CategoryDetail({ category }: Props) {
         <tbody>
           <tr>
             <td className={styles.minWidth}>
+              {category.topic?.imageLink && (
+                <img
+                  src={"/" + category.topic?.imageLink}
+                  alt={category.topic?.name}
+                  style={{
+                    width: "5rem",
+                    margin: "1rem",
+                    height: "5rem",
+                    padding: "2px",
+                    border: "1px solid #007bff",
+                    borderRadius: "50%",
+                  }}
+                />
+              )}
+              <br />
               Type: {category.dataType?.name}
               <br />
               Note: {category.note}
@@ -349,7 +364,8 @@ export default function CategoryDetail({ category }: Props) {
                 fields={getUpdateCategoryFormFields(
                   category,
                   SETTINGS.debug,
-                  dataTypes
+                  dataTypes,
+                  topics
                 )}
                 handleFormData={handleUpdateCategoryFormData}
               >

@@ -1,3 +1,4 @@
+import { ReactElement, ReactHTMLElement } from "react";
 import type { Schema } from "../amplify/data/resource";
 
 // Change to use these types: useState<Schema["DataType"]["type"]>([]);
@@ -10,6 +11,7 @@ export type DataType = Schema["DataType"]["type"];
 export type DataCategory = Schema["DataCategory"]["type"];
 export type DataEntry = Schema["DataEntry"]["type"];
 export type Macro = Schema["Macro"]["type"];
+export type Topic = Schema["Topic"]["type"];
 
 // export interface DataType {
 //   id: string;
@@ -60,6 +62,8 @@ export interface FormDataType {
   priority?: number;
   lastRunDate?: string;
   lastRunOutput?: string;
+  imageLink?: string;
+  topicId?: string;
 }
 
 export type ResolvedDataType = Omit<
@@ -69,11 +73,17 @@ export type ResolvedDataType = Omit<
   dataCategories?: Schema["DataCategory"]["type"][];
 };
 
+export type ResolvedTopic = Omit<Schema["Topic"]["type"], "dataCategories"> & {
+  dataCategories?: Schema["DataCategory"]["type"][];
+};
+
 export type EnrichedDataCategory = Omit<
   Schema["DataCategory"]["type"],
   "dataType"
 > & {
   dataType: ResolvedDataType;
+} & {
+  topic: ResolvedTopic;
 };
 
 export type ResolvedDataCategory = Omit<
@@ -107,6 +117,7 @@ export type DataPoint = {
 export type FlexFormOption = {
   label: string;
   value: string;
+  child?: ReactElement<any, any>;
 };
 
 export type FlexFormField = {

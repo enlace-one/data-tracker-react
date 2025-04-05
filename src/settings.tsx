@@ -38,3 +38,34 @@ export const DEFAULT_DATA_TYPES = [
     inputType: "math",
   },
 ];
+
+export const DEFAULT_TOPICS = [
+  {
+    name: "Weight Lifting",
+    imageLink: "weight-lifting.svg",
+  },
+  {
+    name: "Time",
+    imageLink: "time.svg",
+  },
+  {
+    name: "Sleep",
+    imageLink: "sleep.svg",
+  },
+  { name: "Blue", imageLink: "blue.svg" },
+  { name: "Blue-Purple", imageLink: "blue-purple.svg" },
+  { name: "Cat", imageLink: "cat.svg" },
+  { name: "Chart", imageLink: "chart.svg" },
+  { name: "Fast Forward", imageLink: "fast-forward.svg" },
+  { name: "Gift", imageLink: "gift.svg" },
+  { name: "Graph View", imageLink: "graph-view.svg" },
+  { name: "Green", imageLink: "green.svg" },
+  { name: "Metrics", imageLink: "metrics.svg" },
+  { name: "Minus", imageLink: "minus.svg" },
+  { name: "Play", imageLink: "play.svg" },
+  { name: "Red", imageLink: "red.svg" },
+  { name: "Social Media", imageLink: "social-media.svg" },
+  { name: "Target", imageLink: "target.svg" },
+  { name: "Videos", imageLink: "videos.svg" },
+  { name: "Yellow", imageLink: "yellow.svg" },
+];
