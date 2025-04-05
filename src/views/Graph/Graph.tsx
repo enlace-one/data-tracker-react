@@ -12,7 +12,6 @@ import {
   parseTimeToDisplayValue,
   parseTimeToNumber,
 } from "../../util";
-// import HoverText from "../../components/HoverText/HoverText";
 
 export default function Graph() {
   const { dataCategories, screenWidth } = useData();

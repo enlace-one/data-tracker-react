@@ -13,6 +13,7 @@ import Day from "./views/Day/Day";
 import Macros from "./views/Macros/Macros";
 import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
+import HoverText from "./components/HoverText/HoverText";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -109,7 +110,16 @@ export default function App() {
           <Button onClick={() => setActiveTab("profile")}>Profile</Button>
           <Button onClick={() => setActiveTab("categories")}>Categories</Button>
           <Button onClick={() => setActiveTab("entries")}>Entries</Button>
-          <Button onClick={() => setActiveTab("day")}>Day</Button>
+          <Button onClick={() => setActiveTab("day")}>
+            <HoverText onHoverText="Day View">
+              <img
+                src="/list-checkmarks.svg"
+                alt="Day View"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+
           <Button onClick={() => setActiveTab("graph")}>Graph</Button>
           {SETTINGS.debug && (
             <>
