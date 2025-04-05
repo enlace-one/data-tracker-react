@@ -10,7 +10,7 @@ import { useData } from "../../DataContext";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
-import { version } from "../../settings";
+import { helpLink, version } from "../../settings";
 
 interface ProfileProps {
   signOut: () => void;
@@ -71,6 +71,11 @@ export default function Profile({ signOut }: ProfileProps) {
         ))}
       </Grid>
 
+      <a href={helpLink} target="_blank">
+        Get Help
+      </a>
+      <small>Version: {version}</small>
+
       <Grid
         margin="0 0"
         autoFlow="column"
@@ -81,8 +86,6 @@ export default function Profile({ signOut }: ProfileProps) {
         <Button onClick={signOut}>Sign Out</Button>
         <Button onClick={() => setActiveTab("macros")}>Macros</Button>
       </Grid>
-
-      <small>Version: {version}</small>
     </>
   );
 }
