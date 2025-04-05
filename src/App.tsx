@@ -50,7 +50,6 @@ export default function App() {
 
     handleAuthCheck();
   }, [authStatus]);
-
   return (
     <Flex
       className="App"
@@ -59,9 +58,12 @@ export default function App() {
       direction="column"
       width="70%"
       margin="0 auto"
-      paddingBottom="6rem" // Extra space to avoid overlap with fixed footer
-      style={{ color: "black" }}
+      style={{
+        color: "black",
+        paddingBottom: "6rem", // Matches HTML's padding-block-end
+      }}
     >
+      {/* Main Content */}
       <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
 
       {loading && <LoadingSymbol text={loadingText} />}
@@ -74,6 +76,7 @@ export default function App() {
           {activeTab === "graph" && <Graph />}
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
+          <Divider />
         </>
       )}
 
@@ -81,17 +84,28 @@ export default function App() {
       <div
         style={{
           position: "fixed",
-          bottom: 0,
-          left: 0,
-          // width: "100%",
-          backgroundColor: "#fff",
+          bottom: "0px",
+          left: "0px",
+          right: "0px", // Added to span full width like HTML
+          margin: "0px",
+          backgroundColor: "rgb(255, 255, 255)",
           padding: "0.5rem 1rem",
-          borderTop: "1px solid #ccc",
-          boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)",
+          borderTop: "1px solid rgb(204, 204, 204)",
+          boxShadow: "rgba(0, 0, 0, 0.1) 0px -2px 4px",
           zIndex: 1000,
+          display: "flex", // Use display flex to match Flex behavior
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <Flex justifyContent="center" gap="1rem" wrap="wrap">
+        <Flex
+          justifyContent="center"
+          gap="1rem"
+          // width="70%" // Constrain buttons to match content width
+          style={{
+            flexWrap: "wrap", // Moved to style prop
+          }}
+        >
           <Button onClick={() => setActiveTab("profile")}>Profile</Button>
           <Button onClick={() => setActiveTab("categories")}>Categories</Button>
           <Button onClick={() => setActiveTab("entries")}>Entries</Button>
