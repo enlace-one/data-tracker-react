@@ -31,6 +31,14 @@ const schema = a
       })
       .secondaryIndexes((index) => [index("name")])
       .authorization((allow) => [allow.owner()]),
+    Topic: a
+      .model({
+        name: a.string().required(),
+        imageLink: a.string(),
+        dataCategories: a.hasMany("DataCategory", "topicId"),
+      })
+      .secondaryIndexes((index) => [index("name")])
+      .authorization((allow) => [allow.owner()]),
     DataCategory: a
       .model({
         name: a.string().required(),
@@ -41,6 +49,8 @@ const schema = a
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
         dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
         dataType: a.belongsTo("DataType", "dataTypeId"),
+        topicId: a.id(), // ✅ Explicitly define the reference field
+        topic: a.belongsTo("Topic", "topicId"),
         macros: a.hasMany("Macro", "dataCategoryId"),
         lastEntryDate: a.date(),
         positiveIncrement: a.float().default(1),
