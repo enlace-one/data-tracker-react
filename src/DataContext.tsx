@@ -8,9 +8,7 @@ import {
 import {
   fetchUserProfiles,
   subscribeToDataCategories,
-  createUniqueDataType,
   fetchDataTypes,
-  client,
 } from "./api";
 
 import {

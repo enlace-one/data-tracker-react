@@ -2,26 +2,13 @@
 import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import {
-  createDataEntry,
-  createMacro,
-  fetchDataEntriesByCategory,
-  fetchEnrichedDataEntriesByDate,
-  fetchMacros,
-  updateDataCategory,
-  updateDataEntry,
-  updateMacro,
-} from "../../api";
-import { EnrichedDataCategory, EnrichedDataEntry, Macro } from "../../types";
-import BooleanField from "../../components/BooleanField/BooleanField";
+import { createMacro, fetchMacros, updateMacro } from "../../api";
+import { Macro } from "../../types";
 import styles from "./Macros.module.css";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
-import {
-  getAddUpdateDataEntryFormFields,
-  getAddUpdateMacroFormFields,
-} from "../../formFields";
+import { runMacros } from "../../util";
+import { getAddUpdateMacroFormFields } from "../../formFields";
 export default function Macros() {
   const { dataCategories, setActionMessage } = useData();
   const [macros, setMacros] = useState<Macro[]>([]);

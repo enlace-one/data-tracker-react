@@ -1,12 +1,6 @@
 import { evaluate } from "mathjs";
 import later from "@breejs/later";
-import {
-  DataCategory,
-  DataEntry,
-  EnrichedDataCategory,
-  FormDataType,
-  Macro,
-} from "./types";
+import { EnrichedDataCategory, Macro } from "./types";
 import {
   createDataEntry,
   fetchDataEntriesByCategory,

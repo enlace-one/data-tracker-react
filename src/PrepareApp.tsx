@@ -1,16 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Flex, Divider } from "@aws-amplify/ui-react";
-import { useAuthenticator } from "@aws-amplify/ui-react";
+import { Flex } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { SETTINGS, useData } from "./DataContext"; // Import provider
-import Profile from "./views/Profile/Profile";
-import Categories from "./views/Categories/Categories";
-import Entries from "./views/Entries/Entries";
-import Types from "./views/Types/Types";
-import Alert from "./components/Alert/Alert";
-import Graph from "./views/Graph/Graph";
-import Day from "./views/Day/Day";
-import Macros from "./views/Macros/Macros";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 import { initializeDataTypes } from "./api";
 import App from "./App";

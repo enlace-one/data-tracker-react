@@ -17,7 +17,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ signOut }: ProfileProps) {
-  const { userProfiles, SETTINGS, setActiveTab } = useData();
+  const { userProfiles, setActiveTab } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

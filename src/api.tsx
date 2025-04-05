@@ -2,14 +2,12 @@ import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../amplify/data/resource";
 
 import {
-  DataCategory,
   DataType,
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
   Macro,
 } from "./types"; // ✅ Import interfaces
-import { getRandomInt, sleep } from "./util";
 
 import { DEFAULT_DATA_TYPES } from "./settings";
 
