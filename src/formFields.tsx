@@ -138,20 +138,20 @@ export const getAddCategorySecondaryFormFields = async (
   const topicOptions = topics.map((dt) => ({
     label: dt.name,
     value: dt.id,
-    child: (
-      <img
-        src={"/" + dt.imageLink}
-        alt={dt.name}
-        style={{
-          width: "5rem",
-          margin: "1rem",
-          height: "5rem",
-          padding: "2px",
-          border: "1px solid #007bff",
-          borderRadius: "50%",
-        }}
-      ></img>
-    ),
+    // child: (
+    //   <img
+    //     src={"/" + dt.imageLink}
+    //     alt={dt.name}
+    //     style={{
+    //       width: "5rem",
+    //       margin: "1rem",
+    //       height: "5rem",
+    //       padding: "2px",
+    //       border: "1px solid #007bff",
+    //       borderRadius: "50%",
+    //     }}
+    //   ></img>
+    // ),
   }));
 
   if (!dataType) {

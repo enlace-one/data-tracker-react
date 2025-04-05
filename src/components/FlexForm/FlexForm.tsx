@@ -163,21 +163,22 @@ const FlexForm = ({
                     <div key={field.id} className={styles.formGroup}>
                       <label htmlFor={field.id}>{field.name}:</label>
                       {field.type === "select" && field.options ? (
-                        <select
-                          id={field.id}
-                          name={field.id}
-                          value={(formData[field.id] as string) || ""}
-                          onChange={handleChange}
-                          required={field.required ?? false}
-                        >
-                          <option value="">Select an option</option>
-                          {field.options.map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                              {option.child}
-                            </option>
-                          ))}
-                        </select>
+                        <>
+                          <select
+                            id={field.id}
+                            name={field.id}
+                            value={(formData[field.id] as string) || ""}
+                            onChange={handleChange}
+                            required={field.required ?? false}
+                          >
+                            <option value="">Select an option</option>
+                            {field.options.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </>
                       ) : field.type === "boolean" ? (
                         <BooleanField
                           default={formData[field.id] as boolean}

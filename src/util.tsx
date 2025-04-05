@@ -5,7 +5,6 @@ import {
   createDataEntry,
   fetchDataEntries,
   fetchDataEntriesByCategory,
-  fetchDataEntriesByDate,
   updateDataCategoryLastEntryDate,
   updateMacroRun,
 } from "./api";
