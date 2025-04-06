@@ -4,6 +4,7 @@ import { Heading } from "@aws-amplify/ui-react";
 import BooleanField from "../BooleanField/BooleanField";
 import { FlexFormField } from "../../types";
 import { parseStringToBoolean } from "../../util";
+import CustomSelectField from "../CustomSelectField/CustomSelectField";
 
 interface Props {
   heading: string;
@@ -116,6 +117,13 @@ const FlexForm = ({
     }));
   };
 
+  const handleCustomSelectChange = (id: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -196,6 +204,14 @@ const FlexForm = ({
                             handleBooleanChange(field.id, value)
                           }
                           asString={true}
+                        />
+                      ) : field.type === "custom-select" ? (
+                        <CustomSelectField
+                          items={field.options!}
+                          onChange={(value) =>
+                            handleCustomSelectChange(field.id, value)
+                          }
+                          defaultValue={String(formData[field.id])}
                         />
                       ) : (
                         <input

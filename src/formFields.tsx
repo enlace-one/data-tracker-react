@@ -48,6 +48,23 @@ export const getUpdateCategoryFormFields = (
   const topicOptions = topics.map((dt) => ({
     label: dt.name,
     value: dt.imageLink,
+    element: (
+      <>
+        <img
+          src={"/" + dt.imageLink}
+          alt={dt.name}
+          style={{
+            width: "2rem",
+            // margin: "1rem",
+            height: "2rem",
+            // padding: "2px",
+            // border: "1px solid #007bff",
+            borderRadius: "50%",
+          }}
+        />
+        <span style={{ paddingLeft: "10px", fontSize: "1rem" }}>{dt.name}</span>
+      </>
+    ),
   }));
 
   let formData: FlexFormField[] = [
@@ -79,10 +96,18 @@ export const getUpdateCategoryFormFields = (
       type: "number",
       default: String(category.negativeIncrement ?? 1), // Ensure numeric default
     },
+    // {
+    //   name: "Topic",
+    //   id: "topicId",
+    //   type: "select",
+    //   default: category.topicId,
+    //   options: topicOptions,
+    //   required: true,
+    // },
     {
       name: "Topic",
       id: "topicId",
-      type: "select",
+      type: "custom-select",
       default: category.topicId,
       options: topicOptions,
       required: true,
@@ -138,20 +163,23 @@ export const getAddCategorySecondaryFormFields = async (
   const topicOptions = topics.map((dt) => ({
     label: dt.name,
     value: dt.imageLink,
-    // child: (
-    //   <img
-    //     src={"/" + dt.imageLink}
-    //     alt={dt.name}
-    //     style={{
-    //       width: "5rem",
-    //       margin: "1rem",
-    //       height: "5rem",
-    //       padding: "2px",
-    //       border: "1px solid #007bff",
-    //       borderRadius: "50%",
-    //     }}
-    //   ></img>
-    // ),
+    element: (
+      <>
+        <img
+          src={"/" + dt.imageLink}
+          alt={dt.name}
+          style={{
+            width: "2rem",
+            // margin: "1rem",
+            height: "2rem",
+            // padding: "2px",
+            // border: "1px solid #007bff",
+            borderRadius: "50%",
+          }}
+        />
+        <span style={{ paddingLeft: "10px", fontSize: "1rem" }}>{dt.name}</span>
+      </>
+    ),
   }));
 
   if (!dataType) {
@@ -174,7 +202,7 @@ export const getAddCategorySecondaryFormFields = async (
     {
       name: "Topic",
       id: "topicId",
-      type: "select",
+      type: "custom-select",
       options: topicOptions,
       required: true,
     },

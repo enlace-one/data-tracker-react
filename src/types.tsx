@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import type { Schema } from "../amplify/data/resource";
 
 // Change to use these types: useState<Schema["DataType"]["type"]>([]);
@@ -113,6 +114,7 @@ export type DataPoint = {
 export type FlexFormOption = {
   label: string;
   value: string;
+  element?: ReactElement;
 };
 
 export type FlexFormField = {

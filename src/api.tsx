@@ -103,63 +103,6 @@ export async function createMacro(formData: FormData): Promise<void> {
   }
 }
 
-// export async function fetchTopics(): Promise<Schema["Topic"]["type"][]> {
-//   try {
-//     const { data: topics, errors } = await client.models.Topic.list();
-//     console.log("Data topics:", topics, " Errors: ", errors);
-//     // Sort topics by name alphabetically
-//     const sortedTopics = (topics || []).sort((a, b) =>
-//       a.name.localeCompare(b.name)
-//     );
-//     return sortedTopics;
-//   } catch (error) {
-//     console.error("Error fetching topics:", error);
-//     return [];
-//   }
-// }
-
-// export async function initializeTopics() {
-//   await createUniqueTopics(DEFAULT_TOPICS);
-// }
-
-// export async function createUniqueTopics(forms: FormDataType[]) {
-//   try {
-//     const { data: topics } = await client.models.Topic.list();
-//     for (const form of forms) {
-//       const filtered_topics = topics.filter((t) => t.name == form.name);
-//       if (filtered_topics.length == 1) {
-//         console.log(`Skipping topic ${form.name} as it exists.`);
-//       } else if (filtered_topics.length == 0) {
-//         console.log(`Creating topic ${form.name}`);
-//         await createTopic({
-//           name: form.name,
-//           imageLink: form.imageLink,
-//         });
-//       } else {
-//         console.log(`Deleting one of the topics named ${form.name}. Dupes.`);
-//         await deleteTopic(filtered_topics[0].id);
-//       }
-//     }
-//   } catch (error) {
-//     console.error("Error creating topic:", error);
-//   }
-// }
-
-// export async function createTopic(formData: FormData): Promise<void> {
-//   try {
-//     console.log("Adding topic:", formData.name ?? "Unnamed"); // Avoid undefined
-
-//     const { errors } = await client.models.Topic.create({
-//       name: formData.name ?? "", // Ensure a default empty string
-//       imageLink: formData.imageLink ?? "", // Default to empty string
-//     });
-//     console.log("Errors:", errors);
-//   } catch (error) {
-//     console.error("Error creating topic:", error);
-//     throw error; // Ensure the function consistently returns a Promise<DataType>
-//   }
-// }
-
 export async function deleteMacro(id: string) {
   try {
     await client.models.Macro.delete({ id: id });
@@ -169,16 +112,6 @@ export async function deleteMacro(id: string) {
     console.error("Error deleting Macro:", error);
   }
 }
-
-// export async function deleteTopic(id: string) {
-//   try {
-//     await client.models.Topic.delete({ id: id });
-
-//     console.log(`Topic deleted with id ${id}.`);
-//   } catch (error) {
-//     console.error("Error deleting Topic:", error);
-//   }
-// }
 
 export async function deleteAllDataCategories(
   dataCategories: EnrichedDataCategory[]
