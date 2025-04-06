@@ -20,17 +20,6 @@ const schema = a
         allow.ownerDefinedIn("profileOwner"),
         allow.groups(["Admins"]).to(["read"]),
       ]),
-    DataType: a
-      .model({
-        name: a.string().required(),
-        note: a.string(),
-        inputType: a.string().required(),
-        pattern: a.string().default(".*"),
-        isComplex: a.boolean().required(),
-        dataCategories: a.hasMany("DataCategory", "dataTypeId"),
-      })
-      .secondaryIndexes((index) => [index("name")])
-      .authorization((allow) => [allow.owner()]),
     DataCategory: a
       .model({
         name: a.string().required(),
@@ -39,8 +28,7 @@ const schema = a
         defaultValue: a.string(),
         options: a.string().array(), // For future use with options of values
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
-        dataTypeId: a.id().required(), // ✅ Explicitly define the reference field
-        dataType: a.belongsTo("DataType", "dataTypeId"),
+        dataTypeId: a.string(), // ✅ Explicitly define the reference field
         topicId: a.string(), //
         macros: a.hasMany("Macro", "dataCategoryId"),
         lastEntryDate: a.date(),

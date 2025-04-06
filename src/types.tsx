@@ -6,7 +6,14 @@ import type { Schema } from "../amplify/data/resource";
 // export interface UserProfile as Schema["UserProfile"]["type"]
 
 export type UserProfile = Schema["UserProfile"]["type"];
-export type DataType = Schema["DataType"]["type"];
+export type DataType = {
+  name: string;
+  note: string;
+  isComplex: boolean;
+  inputType: string;
+  id: string;
+  pattern?: string;
+};
 export type DataCategory = Schema["DataCategory"]["type"];
 export type DataEntry = Schema["DataEntry"]["type"];
 export type Macro = Schema["Macro"]["type"];
@@ -65,19 +72,11 @@ export interface FormDataType {
   topicId?: string;
 }
 
-export type ResolvedDataType = Omit<
-  Schema["DataType"]["type"],
-  "dataCategories"
-> & {
-  dataCategories?: Schema["DataCategory"]["type"][];
-};
+export type ResolvedDataType = DataType;
 
 export type ResolvedTopic = Topic;
 
-export type EnrichedDataCategory = Omit<
-  Schema["DataCategory"]["type"],
-  "dataType"
-> & {
+export type EnrichedDataCategory = Schema["DataCategory"]["type"] & {
   dataType: ResolvedDataType;
 } & {
   topic: ResolvedTopic;

@@ -8,7 +8,6 @@ import {
 import {
   fetchUserProfiles,
   subscribeToDataCategories,
-  fetchDataTypes,
   // fetchTopics,
 } from "./api";
 
@@ -19,7 +18,7 @@ import {
   ActiveTab,
   Topic,
 } from "./types";
-import { DEFAULT_TOPICS } from "./settings";
+import { DEFAULT_DATA_TYPES, DEFAULT_TOPICS } from "./settings";
 
 interface AlertInfo {
   message: string;
@@ -103,7 +102,7 @@ export function DataProvider({ children }: DataProviderProps) {
     let unsubscribeCategories: (() => void) | null = null;
 
     async function loadAndSubscribe() {
-      const types = await fetchDataTypes();
+      const types = DEFAULT_DATA_TYPES;
       setDataTypes(types);
 
       const topics = DEFAULT_TOPICS;

@@ -6,12 +6,11 @@ import {
   EnrichedDataCategory,
   EnrichedDataEntry,
   FormDataType as FormData,
-  FormDataType,
   Macro,
   Topic,
 } from "./types"; // ✅ Import interfaces
 
-import { DEFAULT_DATA_TYPES, DEFAULT_TOPICS } from "./settings";
+import { DEFAULT_DATA_TYPES } from "./settings";
 
 // import { useData } from "./DataContext";
 
@@ -104,18 +103,6 @@ export async function createMacro(formData: FormData): Promise<void> {
   }
 }
 
-// Function to fetch all existing DataTypes
-export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
-  try {
-    const { data: dataTypes, errors } = await client.models.DataType.list();
-    console.log("Data Types:", dataTypes, " Errors: ", errors);
-    return dataTypes || [];
-  } catch (error) {
-    console.error("Error fetching data types:", error);
-    return [];
-  }
-}
-
 // export async function fetchTopics(): Promise<Schema["Topic"]["type"][]> {
 //   try {
 //     const { data: topics, errors } = await client.models.Topic.list();
@@ -130,54 +117,6 @@ export async function fetchDataTypes(): Promise<Schema["DataType"]["type"][]> {
 //     return [];
 //   }
 // }
-
-export async function updateDataType(formData: FormData): Promise<void> {
-  try {
-    console.log("Updating Type:", formData.name); // Fixed incorrect variable reference
-
-    const { errors } = await client.models.DataType.update({
-      id: formData.id!,
-      name: formData.name || "", // Ensure a default empty string if missing
-      note: formData.note || "", // Default empty string
-      inputType: formData.inputType || "",
-      pattern: formData.pattern || ".*",
-    });
-    console.log("Errors:", errors);
-  } catch (error) {
-    console.error("Error creating data type:", error);
-  }
-}
-
-export async function getDataType(
-  id: string
-): Promise<Schema["DataType"]["type"] | {}> {
-  try {
-    const { data, errors } = await client.models.DataType.get({ id: id });
-    console.log("Data Type:", data, "Errors:", errors);
-
-    if (errors && errors.length > 0) {
-      console.error("Errors fetching data type:", errors);
-    }
-
-    return data || {};
-  } catch (error) {
-    console.error("Error fetching data type:", error);
-    return {};
-  }
-}
-
-export async function initializeDataTypes() {
-  await Promise.all(
-    DEFAULT_DATA_TYPES.map((dataType) =>
-      createUniqueDataType(
-        dataType.name,
-        dataType.note,
-        dataType.inputType,
-        dataType.isComplex
-      )
-    )
-  );
-}
 
 // export async function initializeTopics() {
 //   await createUniqueTopics(DEFAULT_TOPICS);
@@ -206,36 +145,6 @@ export async function initializeDataTypes() {
 //   }
 // }
 
-export async function createUniqueDataType(
-  name: string,
-  note: string,
-  inputType: string,
-  isComplex: boolean
-) {
-  try {
-    const { data: dataTypes } = await client.models.DataType.list({
-      filter: { name: { eq: name } },
-    });
-
-    if (dataTypes.length === 0) {
-      await createDataType({
-        name: name,
-        note: note,
-        inputType: inputType,
-        isComplex: isComplex,
-      });
-      console.log(`✅ Created DataType: ${name}.`);
-    } else if (dataTypes.length > 1) {
-      console.log(`ERROR - DataType "${name}" exists more than once. Deleting`);
-      await deleteDataType(dataTypes[0].id);
-    } else {
-      console.log(`DataType "${name}" already exists, skipping.`);
-    }
-  } catch (error) {
-    console.error("Error creating DataType:", error);
-  }
-}
-
 // export async function createTopic(formData: FormData): Promise<void> {
 //   try {
 //     console.log("Adding topic:", formData.name ?? "Unnamed"); // Avoid undefined
@@ -250,65 +159,6 @@ export async function createUniqueDataType(
 //     throw error; // Ensure the function consistently returns a Promise<DataType>
 //   }
 // }
-
-export async function createDataType(formData: FormData): Promise<void> {
-  try {
-    console.log("Adding type:", formData.name ?? "Unnamed Type"); // Avoid undefined
-
-    const { errors } = await client.models.DataType.create({
-      name: formData.name ?? "", // Ensure a default empty string
-      note: formData.note ?? "", // Default to empty string
-      isComplex: formData.isComplex ?? false, // Default to false for boolean
-      inputType: formData.inputType ?? "text",
-    });
-    console.log("Errors:", errors);
-  } catch (error) {
-    console.error("Error creating type:", error);
-    throw error; // Ensure the function consistently returns a Promise<DataType>
-  }
-}
-
-/**
- * Subscribe to real-time updates for data categories.
- * @param {Function} callback - Function to update state with new data.
- * @returns {Function} Unsubscribe function.
- */
-export function subscribeToDataTypes(
-  callback: (items: Schema["DataType"]["type"][]) => void
-): () => void {
-  const sub = client.models.DataType.observeQuery().subscribe({
-    next: (result: { items?: Schema["DataType"]["type"][] }) => {
-      console.log("Updating DataTypes:", result.items);
-      callback(result.items ?? []); // Ensure an empty array if undefined
-    },
-    error: (error: unknown) => {
-      console.error("Subscription error:", error);
-    },
-  });
-
-  return () => sub.unsubscribe(); // Cleanup function
-}
-
-export async function deleteAllDataTypes() {
-  try {
-    const { data: dataTypes } = await client.models.DataType.list();
-
-    if (dataTypes.length === 0) {
-      console.log("No DataTypes to delete.");
-      return;
-    }
-
-    await Promise.all(
-      dataTypes.map((dataType: Schema["DataType"]["type"]) =>
-        deleteDataType(dataType.id)
-      )
-    );
-
-    console.log("✅ All DataTypes have been deleted.");
-  } catch (error) {
-    console.error("Error deleting DataTypes:", error);
-  }
-}
 
 export async function deleteMacro(id: string) {
   try {
@@ -329,16 +179,6 @@ export async function deleteMacro(id: string) {
 //     console.error("Error deleting Topic:", error);
 //   }
 // }
-
-export async function deleteDataType(id: string) {
-  try {
-    await client.models.DataType.delete({ id: id });
-
-    console.log(`Data type deleted with id ${id}.`);
-  } catch (error) {
-    console.error("Error deleting DataTypes:", error);
-  }
-}
 
 export async function deleteAllDataCategories(
   dataCategories: EnrichedDataCategory[]
@@ -748,13 +588,10 @@ export async function getDataCategory(
 
     let enrichedItem = null;
     try {
-      let dataType: Schema["DataType"]["type"] | undefined;
+      const dataType = data.dataTypeId
+        ? DEFAULT_DATA_TYPES.find((dt) => dt.id === data.dataTypeId)
+        : undefined;
 
-      if (data.dataType && typeof data.dataType === "function") {
-        // Resolve LazyLoader
-        const resolved = await data.dataType();
-        dataType = resolved?.data ?? undefined;
-      }
       // else if (item.dataTypeId) {
       //   // Fallback if LazyLoader isn't present
       //   dataType = await getDataType(item.dataTypeId);

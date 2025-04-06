@@ -10,24 +10,28 @@ export const DEFAULT_DATA_TYPES = [
     note: "Stores numeric values",
     isComplex: false,
     inputType: "number",
+    id: "number-001",
   },
   {
     name: "Boolean",
     note: "Stores true/false values",
     isComplex: false,
     inputType: "boolean-string",
+    id: "boolean-001",
   },
   {
     name: "Text",
     note: "Stores string values",
     isComplex: false,
     inputType: "string",
+    id: "text-001",
   },
   {
     name: "Time",
     note: "Stores time values",
     isComplex: false,
     inputType: "time",
+    id: "time-001",
   },
   {
     name: "Complex Number",
@@ -36,6 +40,7 @@ export const DEFAULT_DATA_TYPES = [
     pattern:
       "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
     inputType: "math",
+    id: "complex-number-001",
   },
 ];
 

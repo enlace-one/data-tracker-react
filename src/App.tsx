@@ -6,7 +6,6 @@ import { SETTINGS, useData } from "./DataContext"; // Import provider
 import Profile from "./views/Profile/Profile";
 import Categories from "./views/Categories/Categories";
 import Entries from "./views/Entries/Entries";
-import Types from "./views/Types/Types";
 import Alert from "./components/Alert/Alert";
 import Graph from "./views/Graph/Graph";
 import Day from "./views/Day/Day";
@@ -77,7 +76,6 @@ export default function App() {
           {activeTab === "profile" && <Profile signOut={signOut} />}
           {activeTab === "categories" && <Categories />}
           {activeTab === "entries" && <Entries />}
-          {activeTab === "types" && <Types />}
           {activeTab === "graph" && <Graph />}
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Flex } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
-import { initializeDataTypes } from "./api";
+// import { initializeDataTypes } from "./api";
 import App from "./App";
 
 export default function PrepareApp() {
@@ -10,7 +10,7 @@ export default function PrepareApp() {
   const [loadingText, setLoadingText] = useState("Initilaizing Data Types...");
 
   const loadEverything = async () => {
-    await initializeDataTypes();
+    // await initializeDataTypes();
     setLoadingText("");
     // await initializeTopics();
     setLoading(false);
