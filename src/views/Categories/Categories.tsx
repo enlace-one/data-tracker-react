@@ -166,16 +166,15 @@ export default function Categories() {
                     />
                   )}
                 </td>
-                <td className={styles.minWidth}>
-                  <span
-                    onClick={() => setSelectedCategory(item)}
-                    style={{
-                      padding: "2px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    {item.name}
-                  </span>
+                <td
+                  onClick={() => setSelectedCategory(item)}
+                  style={{
+                    padding: "2px",
+                    cursor: "pointer",
+                  }}
+                  className={styles.minWidth}
+                >
+                  {item.name}
                   <br />
                   <small>
                     {item.dataType?.name}{" "}
