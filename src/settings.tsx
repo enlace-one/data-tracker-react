@@ -68,4 +68,7 @@ export const DEFAULT_TOPICS = [
   { name: "Target", imageLink: "target.svg" },
   { name: "Videos", imageLink: "videos.svg" },
   { name: "Yellow", imageLink: "yellow.svg" },
+  { name: "Book (Blue)", imageLink: "book-blue.svg" },
+  { name: "Book (Purple)", imageLink: "book-purple.svg" },
+  { name: "Book (Green)", imageLink: "book-green.svg" },
 ];
