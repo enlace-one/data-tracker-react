@@ -33,7 +33,8 @@ export default function App() {
 
   useEffect(() => {
     // This used to be dataCategories.length but that don't owrk if you got no categories!
-    if (!initialized.current && dataCategories) {
+    // So I added the second condition.
+    if (!initialized.current && dataCategories.length) {
       initialized.current = true;
       loadEverything();
     } else if (dataCategories) {
