@@ -157,7 +157,7 @@ export default function Categories() {
                       alt={item.topic?.name}
                       style={{
                         width: "3rem",
-                        margin: "1rem",
+                        margin: "1rem 1rem 1rem 0rem",
                         height: "3rem",
                         padding: "2px",
                         border: "1px solid #007bff",
