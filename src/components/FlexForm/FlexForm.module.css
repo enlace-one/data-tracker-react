@@ -15,7 +15,7 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   width: 90%; /* Adjust width for responsiveness */
   max-width: 400px;
-  max-height: 90vh; /* Limit max height */
+  max-height: 80vh; /* Limit max height */
   overflow-y: auto; /* Enable scrolling within the modal */
   display: flex;
   flex-direction: column;
