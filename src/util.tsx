@@ -8,6 +8,7 @@ import {
   updateDataCategoryLastEntryDate,
   updateMacroRun,
 } from "./api";
+import moment from "moment";
 
 export const parseTimeToNumber = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
@@ -200,5 +201,14 @@ export async function setLastEntryDates(
       }
       catsDone.push(cat.id);
     }
+  }
+}
+
+export function getPrettyNameForDate(date: string) {
+  const today = new Date().toLocaleDateString("en-CA");
+  if (date == today) {
+    return "Today";
+  } else {
+    return moment(date).fromNow();
   }
 }

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
-import moment from "moment";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import { createDataCategory, deleteAllDataCategories } from "../../api";
@@ -12,6 +11,7 @@ import {
   getAddCategoryFormFields,
   getAddCategorySecondaryFormFields,
 } from "../../formFields";
+import { getPrettyNameForDate } from "../../util";
 
 export default function Categories() {
   const {
@@ -180,7 +180,7 @@ export default function Categories() {
                   <small>
                     {item.dataType?.name}{" "}
                     {item.lastEntryDate && (
-                      <>- {moment(item.lastEntryDate).fromNow()} </>
+                      <>- {getPrettyNameForDate(item.lastEntryDate)} </>
                     )}
                   </small>
                   <br />
