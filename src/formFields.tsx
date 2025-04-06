@@ -47,7 +47,7 @@ export const getUpdateCategoryFormFields = (
 ): FlexFormField[] => {
   const topicOptions = topics.map((dt) => ({
     label: dt.name,
-    value: dt.id,
+    value: dt.imageLink,
   }));
 
   let formData: FlexFormField[] = [
@@ -137,7 +137,7 @@ export const getAddCategorySecondaryFormFields = async (
 
   const topicOptions = topics.map((dt) => ({
     label: dt.name,
-    value: dt.id,
+    value: dt.imageLink,
     // child: (
     //   <img
     //     src={"/" + dt.imageLink}

@@ -9,7 +9,7 @@ import {
   fetchUserProfiles,
   subscribeToDataCategories,
   fetchDataTypes,
-  fetchTopics,
+  // fetchTopics,
 } from "./api";
 
 import {
@@ -19,6 +19,7 @@ import {
   ActiveTab,
   Topic,
 } from "./types";
+import { DEFAULT_TOPICS } from "./settings";
 
 interface AlertInfo {
   message: string;
@@ -105,7 +106,7 @@ export function DataProvider({ children }: DataProviderProps) {
       const types = await fetchDataTypes();
       setDataTypes(types);
 
-      const topics = await fetchTopics();
+      const topics = DEFAULT_TOPICS;
       setTopics(topics);
 
       // Now subscribe using the loaded types

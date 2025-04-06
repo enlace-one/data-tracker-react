@@ -39,6 +39,7 @@ export const DEFAULT_DATA_TYPES = [
   },
 ];
 
+// imageLink = topicId
 export const DEFAULT_TOPICS = [
   { name: "Bike (Blue)", imageLink: "bike-blue.svg" },
   { name: "Bike (Cyan)", imageLink: "bike-cyan.svg" },

@@ -132,7 +132,7 @@ export default function Day() {
   ) => {
     let value = null;
     // const { data: dt } = await entry.dataCategory.dataType();
-    const inputType = entry.dataCategory.dataType?.inputType;
+    const inputType = entry.dataCategory?.dataType?.inputType;
 
     // Parse Value
     if (inputType === "number") {
@@ -268,7 +268,7 @@ export default function Day() {
 
                   {/* NEED TO ADD SUPPORT FOR BOOLEAN FIELDS */}
                   <div className={styles.flexContainer}>
-                    {entry.dataCategory.dataType?.inputType ===
+                    {entry.dataCategory?.dataType?.inputType ===
                       "boolean-string" && (
                       <BooleanField
                         default={entry.value == "true" ? true : false}
@@ -278,10 +278,10 @@ export default function Day() {
                         asString={true}
                       ></BooleanField>
                     )}
-                    {entry.dataCategory.dataType?.inputType !=
+                    {entry.dataCategory?.dataType?.inputType !=
                       "boolean-string" && (
                       <input
-                        type={entry.dataCategory.dataType?.inputType}
+                        type={entry.dataCategory?.dataType?.inputType}
                         className={"ValueInput" + entry.id}
                         defaultValue={entry.value}
                         style={{ maxWidth: "9rem" }}
@@ -292,8 +292,8 @@ export default function Day() {
                     )}
                     {/* className={styles.ButtonHolder} */}
 
-                    {(entry.dataCategory.dataType?.inputType === "number" ||
-                      entry.dataCategory.dataType?.inputType === "time") && (
+                    {(entry.dataCategory?.dataType?.inputType === "number" ||
+                      entry.dataCategory?.dataType?.inputType === "time") && (
                       <>
                         <button
                           onClick={() => modifyCurrentValue("+", entry)}

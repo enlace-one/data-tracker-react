@@ -10,7 +10,7 @@ export type DataType = Schema["DataType"]["type"];
 export type DataCategory = Schema["DataCategory"]["type"];
 export type DataEntry = Schema["DataEntry"]["type"];
 export type Macro = Schema["Macro"]["type"];
-export type Topic = Schema["Topic"]["type"];
+export type Topic = { name: string; imageLink: string };
 
 // export interface DataType {
 //   id: string;
@@ -72,9 +72,7 @@ export type ResolvedDataType = Omit<
   dataCategories?: Schema["DataCategory"]["type"][];
 };
 
-export type ResolvedTopic = Omit<Schema["Topic"]["type"], "dataCategories"> & {
-  dataCategories?: Schema["DataCategory"]["type"][];
-};
+export type ResolvedTopic = Topic;
 
 export type EnrichedDataCategory = Omit<
   Schema["DataCategory"]["type"],
