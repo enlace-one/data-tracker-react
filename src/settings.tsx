@@ -40,35 +40,52 @@ export const DEFAULT_DATA_TYPES = [
 ];
 
 export const DEFAULT_TOPICS = [
-  {
-    name: "Weight Lifting",
-    imageLink: "weight-lifting.svg",
-  },
-  {
-    name: "Time",
-    imageLink: "time.svg",
-  },
-  {
-    name: "Sleep",
-    imageLink: "sleep.svg",
-  },
-  { name: "Blue", imageLink: "blue.svg" },
-  { name: "Blue-Purple", imageLink: "blue-purple.svg" },
-  { name: "Cat", imageLink: "cat.svg" },
-  { name: "Chart", imageLink: "chart.svg" },
-  { name: "Fast Forward", imageLink: "fast-forward.svg" },
-  { name: "Gift", imageLink: "gift.svg" },
-  { name: "Graph View", imageLink: "graph-view.svg" },
-  { name: "Green", imageLink: "green.svg" },
-  { name: "Metrics", imageLink: "metrics.svg" },
-  { name: "Minus", imageLink: "minus.svg" },
-  { name: "Play", imageLink: "play.svg" },
-  { name: "Red", imageLink: "red.svg" },
-  { name: "Social Media", imageLink: "social-media.svg" },
-  { name: "Target", imageLink: "target.svg" },
-  { name: "Videos", imageLink: "videos.svg" },
-  { name: "Yellow", imageLink: "yellow.svg" },
+  { name: "Bike (Blue)", imageLink: "bike-blue.svg" },
+  { name: "Bike (Cyan)", imageLink: "bike-cyan.svg" },
+  { name: "Bike (Green)", imageLink: "bike-green.svg" },
+  { name: "Bike (Purple)", imageLink: "bike-purple.svg" },
+  { name: "Bike (Red)", imageLink: "bike-red.svg" },
+  { name: "Book (Black)", imageLink: "book-black.svg" },
   { name: "Book (Blue)", imageLink: "book-blue.svg" },
-  { name: "Book (Purple)", imageLink: "book-purple.svg" },
+  { name: "Book (Cyan)", imageLink: "book-cyan.svg" },
   { name: "Book (Green)", imageLink: "book-green.svg" },
+  { name: "Book (Purple)", imageLink: "book-purple.svg" },
+  { name: "Book (Red)", imageLink: "book-red.svg" },
+  { name: "Car (Black)", imageLink: "car-black.svg" },
+  { name: "Coffee (Black)", imageLink: "coffee-black.svg" },
+  { name: "Color (Black)", imageLink: "color-black.svg" },
+  { name: "Data Tracker", imageLink: "dataTracker.svg" },
+  { name: "Gift (Black)", imageLink: "gift-black.svg" },
+  { name: "Guitar (Black)", imageLink: "guitar-black.svg" },
+  { name: "Profile", imageLink: "profile-view.svg" }, // Not a "view" per your rule?
+  { name: "Shirt (Black)", imageLink: "shirt-black.svg" },
+  { name: "Shirt (Blue)", imageLink: "shirt-blue.svg" },
+  { name: "Shirt (Cyan)", imageLink: "shirt-cyan.svg" },
+  { name: "Shirt (Green)", imageLink: "shirt-green.svg" },
+  { name: "Shirt (Purple)", imageLink: "shirt-purple.svg" },
+  { name: "Shirt (Red)", imageLink: "shirt-red.svg" },
 ];
+
+// Black
+// #2b2b2b (black)
+// #444444 (grey)
+
+// Cyan
+// #00bfbf (cyan)
+// #9acee6(blue)
+
+// Blue
+// #9acee6 (blue)
+// #BF7E96 (purple)
+
+// Green
+// #619E73 (green)
+// #B1FFFF (blue)
+
+// Purple
+// #AF84A3 (purple)
+// #9acee6 (blue)
+
+// Red
+// #d10c0c (red)
+// #BF7E96 (purple)

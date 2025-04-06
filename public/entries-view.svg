@@ -1,3 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
-  <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/>
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <line id="svg_66" y2="130.83332" x2="505.27805" y1="130.83332" x1="165.69473" stroke-width="20" stroke="#000" fill="none"/>
+  <ellipse ry="25" rx="23.95833" id="svg_67" cy="128.74998" cx="64.65307" stroke-width="20" stroke="#000000" fill="#000000"/>
+  <line id="svg_68" y2="293.3333" x2="505.27805" y1="293.3333" x1="165.69473" stroke-width="20" stroke="#000" fill="none"/>
+  <ellipse ry="25" rx="23.95833" id="svg_69" cy="291.24997" cx="64.65307" stroke-width="20" stroke="#000000" fill="#000000"/>
+  <line id="svg_70" y2="459.99996" x2="505.27805" y1="459.99996" x1="165.69473" stroke-width="20" stroke="#000" fill="none"/>
+  <ellipse ry="25" rx="23.95833" id="svg_71" cy="457.91662" cx="64.65307" stroke-width="20" stroke="#000000" fill="#000000"/>
+ </g>
+
 </svg>
