@@ -1,22 +1,6 @@
-# Utility file to perform things in dev.
-import os
-import re
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
 
-#############
-# Functions #
-#############
-
-
-def getAlternateStylesForSVG(svg_name=None):
-    styles = [
-        {"name": "black", "color1": "2b2b2b", "color2": "444444"},
-        {"name": "cyan", "color1": "00bfbf", "color2": "9acee6"},
-        {"name": "blue", "color1": "9acee6", "color2": "BF7E96"},
-        {"name": "green", "color1": "619E73", "color2": "B1FFFF"},
-        {"name": "purple", "color1": "AF84A3", "color2": "9acee6"},
-        {"name": "red", "color1": "d10c0c", "color2": "BF7E96"},
-    ]
-    svg_background = """<g>
+ <g>
   <title>Layer 1</title>
   <ellipse stroke="#000" ry="299.49997" rx="299.33331" id="svg_1" cy="299.49998" cx="299.99994" fill="#fff"/>
   <path transform="rotate(-40 353.915 360.512)" stroke="#ffffff" id="svg_49" d="m456.25611,173.71695l-204.68185,38.10877l108.43949,41.93513l-63.78794,125.80542l121.19708,167.74053l38.83322,-373.58985z" opacity="NaN" stroke-width="2" fill="#ffd4aa"/>
@@ -35,102 +19,10 @@ def getAlternateStylesForSVG(svg_name=None):
   <path stroke-width="2" stroke="#ffffff" id="svg_37" d="m90.51084,405.34203l179.90784,-267.31582l87.3227,229.57419l-170.42011,38.02763l-96.81043,-0.286z" opacity="NaN" fill="#5656ff"/>
   <ellipse ry="34.50655" rx="55.63301" id="svg_52" cy="10.93452" cx="591.20791" stroke-width="99" stroke="#ffffff" fill="none"/>
   <ellipse stroke="#ffffff" stroke-width="99" ry="338.02331" rx="335.91067" id="svg_51" cy="298.11351" cx="299.66277" fill="none"/>
- </g>"""
-
-    if svg_name is None:
-        print("Path should be ../public")
-        svg_name = input("Enter the SVG name:")
-    svg_style = svg_name.split("-")[1].split(".")[0]
-    svg_base_name = svg_name.split("-")[0]
-    print(f"Using {svg_style} as base style to set others from")
-    chosen_style = [style for style in styles if style["name"] == svg_style][0]
-    styles = [style for style in styles if style["name"] != svg_style]
-    with open(f"./public/{svg_name}", "r") as svg:
-        svg_format = svg.read()
-    for style in styles:
-        with open(f"./public/{svg_base_name}-{style['name']}.svg", "w+") as new_svg:
-            contents = svg_format.replace(
-                chosen_style["color1"], style["color1"]
-            ).replace(chosen_style["color2"], style["color2"])
-            new_svg.write(contents)
-        print(
-            f"""{{ name: "{svg_base_name.title()} ({style['name'].title()})", imageLink: "{svg_base_name}-{style['name']}.svg" }},"""
-        )
-    ellipse_pattern = r'<ellipse[^>]+id="svg_1"[^>]+>'
-    svg_with_bg = re.sub(ellipse_pattern, "", svg_format)
-    # svg_with_bg = svg_with_bg.replace(chosen_style["color1"], "FFFFFF")
-    g_layer1_regex = r"<g>[\s\S]*<title>Layer 1</title>"
-    svg_with_bg = re.sub(
-        g_layer1_regex, svg_background + "<g><title>Layer 2</title>", svg_with_bg
-    )
-    with open(f"./public/{svg_base_name}-colorful.svg", "w+") as new_svg:
-        new_svg.write(svg_with_bg)
-    print(
-        f"""{{ name: "{svg_base_name.title()} (Colorful)", imageLink: "{svg_base_name}-colorful.svg" }},"""
-    )
-
-
-def getAlternateStylesForAllSVG():
-    svg_dir = "./public/"
-    for root, dirs, files in os.walk(svg_dir):
-        for file in files:
-            if file.endswith(".svg") and "-black" in file:
-                getAlternateStylesForSVG(file)
-
-
-def getDefaultTopics():
-    svg_dir = "./public/"
-    print("export const DEFAULT_TOPICS = [")
-    for root, dirs, files in os.walk(svg_dir):
-        for file in files:
-            if file.endswith(
-                (
-                    "-black.svg",
-                    "-cyan.svg",
-                    "-red.svg",
-                    "-blue.svg",
-                    "-colorful.svg",
-                    "-green.svg",
-                    "-purple.svg",
-                )
-            ):
-                color = file.split("-")[1].split(".")[0].title()
-                name = file.split("-")[0].title()
-                print(f"""{{ name: "{name} ({color})", imageLink: "{file}" }},""")
-    print("];")
-
-
-###########
-# Options #
-###########
-
-options = [
-    {
-        "id": 0,
-        "name": "Get alternative color styles for an SVG",
-        "function": getAlternateStylesForSVG,
-    },
-    {
-        "id": 1,
-        "name": "Get alternative color styles for all SVGs in /public based on -black",
-        "function": getAlternateStylesForAllSVG,
-    },
-    {
-        "id": 2,
-        "name": "Get DEFAULT_TOPICS for all SVGs in /public",
-        "function": getDefaultTopics,
-    },
-]
-
-##################
-# User Interface #
-##################
-print("""Welcome to the ultity file for data tracker!""")
-print("-" * 20)
-for option in options:
-    print(option["id"], "-", option["name"])
-print("-" * 20)
-choice = input("Enter the number for a selection:")
-for option in options:
-    if option["id"] == int(choice):
-        option["function"]()
+ </g><g><title>Layer 2</title>
+  
+  <path id="svg_30" d="m280.08809,643.92269l0.56913,0l0.17587,-0.54067l0.17587,0.54067l0.56913,0l-0.46044,0.33415l0.17588,0.54067l-0.46044,-0.33416l-0.46044,0.33416l0.17588,-0.54067l-0.46044,-0.33415z" stroke-width="5" stroke="#000" fill="none"/>
+  <path id="svg_56" d="m159.17349,245.72891c-18.60974,-1.91001 -31.44486,-16.65249 -25.37964,-29.62455c3.74905,-12.57583 22.93734,-16.01601 35.66046,-22.65297c40.42369,-17.31859 81.07764,-34.35466 121.62668,-51.51933c2.13001,-8.37287 -6.46554,-13.5888 -15.64771,-17.5247c-18.37281,-10.5368 -17.37158,-31.53687 -1.81266,-43.2671c18.23494,-15.46658 56.60403,-10.60456 67.98241,7.68954c11.03768,8.1305 -0.20981,28.04523 -15.69171,18.45933c-1.6149,-10.88998 -14.50271,-23.65942 -31.50939,-16.74294c-17.7439,7.36015 -7.25936,24.51614 9.1295,27.97174c11.06254,5.34961 9.58788,15.27118 10.17484,23.63537c48.59441,20.94923 97.80186,41.18118 145.7303,62.91734c19.08121,10.69869 11.2339,36.44969 -12.79566,39.93939c-18.21748,1.89362 -36.90802,0.55984 -55.30811,1.07767c-77.38267,0.04313 -154.78561,0.42352 -232.15933,-0.35879l0.00001,0zm281.55244,-17.69807c13.9321,-10.02486 -12.12403,-15.41656 -20.70688,-20.32717c-39.52692,-16.75892 -78.92737,-33.69471 -118.92029,-49.86569c-46.86152,19.21687 -93.61686,38.6256 -139.60631,58.91342c-9.73794,2.81445 -2.96035,14.06608 6.09351,12.33332c89.05165,-0.1382 178.1119,0.33908 267.15673,-0.34804c1.97159,-0.18209 4.19291,0.06488 5.98324,-0.70586l0,0.00001z" fill="#444444"/>
+  <path id="svg_53" d="m371.12857,160.19609c-11.17643,24.21162 -38.0611,41.31869 -69.55715,41.31869c-31.51564,0 -58.40609,-17.10706 -69.55774,-41.31869l-170.31805,63.56926l47.91758,99.39192l52.62989,-19.65123l0,202.63774l280.50834,0l0,-201.92168l50.74023,18.94648l47.93603,-99.39183l-170.29913,-63.58064l0,-0.00001z" fill="#2b2b2b"/>
+ </g>
+</svg>

@@ -1,22 +1,5 @@
-# Utility file to perform things in dev.
-import os
-import re
-
-#############
-# Functions #
-#############
-
-
-def getAlternateStylesForSVG(svg_name=None):
-    styles = [
-        {"name": "black", "color1": "2b2b2b", "color2": "444444"},
-        {"name": "cyan", "color1": "00bfbf", "color2": "9acee6"},
-        {"name": "blue", "color1": "9acee6", "color2": "BF7E96"},
-        {"name": "green", "color1": "619E73", "color2": "B1FFFF"},
-        {"name": "purple", "color1": "AF84A3", "color2": "9acee6"},
-        {"name": "red", "color1": "d10c0c", "color2": "BF7E96"},
-    ]
-    svg_background = """<g>
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+ <g>
   <title>Layer 1</title>
   <ellipse stroke="#000" ry="299.49997" rx="299.33331" id="svg_1" cy="299.49998" cx="299.99994" fill="#fff"/>
   <path transform="rotate(-40 353.915 360.512)" stroke="#ffffff" id="svg_49" d="m456.25611,173.71695l-204.68185,38.10877l108.43949,41.93513l-63.78794,125.80542l121.19708,167.74053l38.83322,-373.58985z" opacity="NaN" stroke-width="2" fill="#ffd4aa"/>
@@ -35,102 +18,11 @@ def getAlternateStylesForSVG(svg_name=None):
   <path stroke-width="2" stroke="#ffffff" id="svg_37" d="m90.51084,405.34203l179.90784,-267.31582l87.3227,229.57419l-170.42011,38.02763l-96.81043,-0.286z" opacity="NaN" fill="#5656ff"/>
   <ellipse ry="34.50655" rx="55.63301" id="svg_52" cy="10.93452" cx="591.20791" stroke-width="99" stroke="#ffffff" fill="none"/>
   <ellipse stroke="#ffffff" stroke-width="99" ry="338.02331" rx="335.91067" id="svg_51" cy="298.11351" cx="299.66277" fill="none"/>
- </g>"""
+ </g><g><title>Layer 2</title>
+  
+  <path fill="none" stroke="#000" stroke-width="5" d="m280.08809,643.92269l0.56913,0l0.17587,-0.54067l0.17587,0.54067l0.56913,0l-0.46044,0.33415l0.17588,0.54067l-0.46044,-0.33416l-0.46044,0.33416l0.17588,-0.54067l-0.46044,-0.33415z" id="svg_30"/>
+  <path stroke="null" id="svg_4" d="m229.33895,517.07626c-137.37145,-111.56292 -186.48722,-182.13563 -186.88527,-268.52938c-0.363,-78.75849 60.26787,-154.77204 123.1011,-154.33368c31.3761,0.21933 98.67986,29.20678 122.51234,52.76629c12.00821,11.87064 17.69588,10.70008 44.43088,-9.14422c72.76138,-54.00771 143.81361,-55.14131 189.83016,-3.0284c73.54422,83.28738 60.15468,182.74773 -38.49036,285.91496c-52.44538,54.8497 -166.97458,152.15613 -179.08695,152.15613c-3.68563,0 -37.62095,-25.11082 -75.41188,-55.80172l0,0.00002z" fill="#2b2b2b"/>
+  <path id="svg_5" d="m324.38703,225.80747c-14.95435,-7.45825 -20.30113,-12.1762 -20.34446,-17.95183c-0.03952,-5.26519 6.5608,-10.34688 13.40087,-10.31758c3.41563,0.01466 10.74236,1.95254 13.33678,3.52755c1.30722,0.79358 1.92639,0.71533 4.83678,-0.61131c7.92086,-3.61054 15.65565,-3.68633 20.66505,-0.20246c8.00608,5.56796 6.54848,12.21712 -4.19009,19.1141c-5.70924,3.66683 -18.17697,10.172 -19.49553,10.172c-0.40122,0 -4.09544,-1.67872 -8.20939,-3.73048l0,0z" stroke="null" fill="#2b2b2b"/>
+ </g>
 
-    if svg_name is None:
-        print("Path should be ../public")
-        svg_name = input("Enter the SVG name:")
-    svg_style = svg_name.split("-")[1].split(".")[0]
-    svg_base_name = svg_name.split("-")[0]
-    print(f"Using {svg_style} as base style to set others from")
-    chosen_style = [style for style in styles if style["name"] == svg_style][0]
-    styles = [style for style in styles if style["name"] != svg_style]
-    with open(f"./public/{svg_name}", "r") as svg:
-        svg_format = svg.read()
-    for style in styles:
-        with open(f"./public/{svg_base_name}-{style['name']}.svg", "w+") as new_svg:
-            contents = svg_format.replace(
-                chosen_style["color1"], style["color1"]
-            ).replace(chosen_style["color2"], style["color2"])
-            new_svg.write(contents)
-        print(
-            f"""{{ name: "{svg_base_name.title()} ({style['name'].title()})", imageLink: "{svg_base_name}-{style['name']}.svg" }},"""
-        )
-    ellipse_pattern = r'<ellipse[^>]+id="svg_1"[^>]+>'
-    svg_with_bg = re.sub(ellipse_pattern, "", svg_format)
-    # svg_with_bg = svg_with_bg.replace(chosen_style["color1"], "FFFFFF")
-    g_layer1_regex = r"<g>[\s\S]*<title>Layer 1</title>"
-    svg_with_bg = re.sub(
-        g_layer1_regex, svg_background + "<g><title>Layer 2</title>", svg_with_bg
-    )
-    with open(f"./public/{svg_base_name}-colorful.svg", "w+") as new_svg:
-        new_svg.write(svg_with_bg)
-    print(
-        f"""{{ name: "{svg_base_name.title()} (Colorful)", imageLink: "{svg_base_name}-colorful.svg" }},"""
-    )
-
-
-def getAlternateStylesForAllSVG():
-    svg_dir = "./public/"
-    for root, dirs, files in os.walk(svg_dir):
-        for file in files:
-            if file.endswith(".svg") and "-black" in file:
-                getAlternateStylesForSVG(file)
-
-
-def getDefaultTopics():
-    svg_dir = "./public/"
-    print("export const DEFAULT_TOPICS = [")
-    for root, dirs, files in os.walk(svg_dir):
-        for file in files:
-            if file.endswith(
-                (
-                    "-black.svg",
-                    "-cyan.svg",
-                    "-red.svg",
-                    "-blue.svg",
-                    "-colorful.svg",
-                    "-green.svg",
-                    "-purple.svg",
-                )
-            ):
-                color = file.split("-")[1].split(".")[0].title()
-                name = file.split("-")[0].title()
-                print(f"""{{ name: "{name} ({color})", imageLink: "{file}" }},""")
-    print("];")
-
-
-###########
-# Options #
-###########
-
-options = [
-    {
-        "id": 0,
-        "name": "Get alternative color styles for an SVG",
-        "function": getAlternateStylesForSVG,
-    },
-    {
-        "id": 1,
-        "name": "Get alternative color styles for all SVGs in /public based on -black",
-        "function": getAlternateStylesForAllSVG,
-    },
-    {
-        "id": 2,
-        "name": "Get DEFAULT_TOPICS for all SVGs in /public",
-        "function": getDefaultTopics,
-    },
-]
-
-##################
-# User Interface #
-##################
-print("""Welcome to the ultity file for data tracker!""")
-print("-" * 20)
-for option in options:
-    print(option["id"], "-", option["name"])
-print("-" * 20)
-choice = input("Enter the number for a selection:")
-for option in options:
-    if option["id"] == int(choice):
-        option["function"]()
+</svg>

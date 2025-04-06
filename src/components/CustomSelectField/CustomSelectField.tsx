@@ -1,4 +1,4 @@
-import { ReactElement, useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import styles from "./CustomSelectField.module.css"; // Uncommented for styling
 import { FlexFormOption } from "../../types";
 
