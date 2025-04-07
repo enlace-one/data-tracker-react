@@ -56,6 +56,7 @@ const CustomSelectField = ({
         });
       }
     };
+    console.log(typedText);
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);

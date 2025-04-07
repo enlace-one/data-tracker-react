@@ -10,7 +10,7 @@ import {
   Topic,
 } from "./types"; // ✅ Import interfaces
 
-import { DEFAULT_DATA_TYPES } from "./settings";
+import { DEFAULT_DATA_TYPES, EXAMPLE_DATA } from "./settings";
 
 // import { useData } from "./DataContext";
 
@@ -475,6 +475,9 @@ export async function createDataEntry(formData: FormData): Promise<void> {
   });
 
   console.log("Errors:", errors);
+  if (errors?.length) {
+    throw new Error(`${errors}`);
+  }
 
   updateDataCategoryEntryCount(formData.dataCategoryId!, 1);
 }
@@ -620,3 +623,32 @@ export function subscribeToDataEntries(
 
 // Export the client instance if needed elsewhere
 export { client };
+
+export async function addExampleData(skipConfirmation = false) {
+  if (!skipConfirmation) {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to add example data? It will add several categories and entries"
+    );
+    if (!isConfirmed) {
+      console.log("Add examples cancelled by user.");
+      return;
+    }
+  }
+  for (const data of EXAMPLE_DATA) {
+    console.log("Adding example cat:", data.category.name);
+    try {
+      await createDataCategory(data.category);
+    } catch (e) {
+      console.log("Error ", e);
+    }
+  }
+  const { data: categories } = await client.models.DataCategory.list();
+  for (const cat of categories) {
+    const data = EXAMPLE_DATA.find((d) => d.category.name == cat.name);
+    if (data) {
+      for (const entry of data.entries) {
+        await createDataEntry({ ...entry, dataCategoryId: cat.id });
+      }
+    }
+  }
+}
