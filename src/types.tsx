@@ -68,6 +68,7 @@ export interface FormDataType {
   schedule?: string;
   priority?: number;
   lastRunDate?: string;
+  options?: string;
   lastRunOutput?: string;
   imageLink?: string;
   topicId?: string;

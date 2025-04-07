@@ -34,6 +34,13 @@ export const DEFAULT_DATA_TYPES = [
     id: "time-001",
   },
   {
+    name: "Select",
+    note: "Select from options",
+    isComplex: false,
+    inputType: "select",
+    id: "select-001",
+  },
+  {
     name: "Complex Number",
     note: "Stores multiple related numbers",
     isComplex: true,

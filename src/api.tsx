@@ -350,6 +350,7 @@ export async function createDataCategory(formData: FormData): Promise<void> {
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
     topicId: formData.topicId!,
+    options: (formData.options || "").split(",").map((val) => val.trim()),
   });
   console.log("Errors:", errors);
 }
@@ -375,6 +376,7 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
     topicId: formData.topicId!,
+    options: (formData.options || "").split(",").map((val) => val.trim()),
   });
   console.log("Errors:", errors);
 }

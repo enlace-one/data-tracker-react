@@ -193,7 +193,7 @@ export default function Day() {
 
   const handleValueInputChange = (
     entry: EnrichedDataEntry,
-    e: ChangeEvent<HTMLInputElement>
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
     const { value } = e.target;
     updateDataEntryValue(entry, String(value));
@@ -206,7 +206,9 @@ export default function Day() {
     updateDataEntryValue(entry, String(value));
   };
 
-  const handleAddCategory = async (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleAddCategory = async (
+    e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
     console.log("Adding cat");
 
     const value = e.target.value;
@@ -278,18 +280,36 @@ export default function Day() {
                         asString={true}
                       ></BooleanField>
                     )}
-                    {entry.dataCategory?.dataType?.inputType !=
-                      "boolean-string" && (
-                      <input
-                        type={entry.dataCategory?.dataType?.inputType}
-                        className={"ValueInput" + entry.id}
-                        defaultValue={entry.value}
-                        style={{ maxWidth: "9rem" }}
+                    {entry.dataCategory?.dataType?.inputType == "select" && (
+                      <select
+                        id={entry.id}
+                        name={entry.id}
+                        value={entry.value}
                         onChange={(event) =>
                           handleValueInputChange(entry, event)
                         }
-                      ></input>
+                      >
+                        <option value="">Select an option</option>
+                        {entry.dataCategory?.options?.map((option) => (
+                          <option key={option} value={option ?? ""}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
                     )}
+                    {entry.dataCategory?.dataType?.inputType !=
+                      "boolean-string" &&
+                      entry.dataCategory?.dataType?.inputType != "select" && (
+                        <input
+                          type={entry.dataCategory?.dataType?.inputType}
+                          className={"ValueInput" + entry.id}
+                          defaultValue={entry.value}
+                          style={{ maxWidth: "9rem" }}
+                          onChange={(event) =>
+                            handleValueInputChange(entry, event)
+                          }
+                        ></input>
+                      )}
                     {/* className={styles.ButtonHolder} */}
 
                     {(entry.dataCategory?.dataType?.inputType === "number" ||
