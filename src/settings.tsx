@@ -34,11 +34,18 @@ export const DEFAULT_DATA_TYPES = [
     id: "time-001",
   },
   {
-    name: "Select",
+    name: "Select (Text)",
     note: "Select from options",
     isComplex: false,
     inputType: "select",
-    id: "select-001",
+    id: "select-text-001",
+  },
+  {
+    name: "Select (Numeric)",
+    note: "Select from options with numeric values. Enter 'optionA (2), optionB (5)' in the options field.",
+    isComplex: false,
+    inputType: "select",
+    id: "select-numeric-001",
   },
   {
     name: "Complex Number",

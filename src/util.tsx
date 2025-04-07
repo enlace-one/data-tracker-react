@@ -169,6 +169,10 @@ export async function runMacros(
   }
 }
 
+export function parseNumericSelectToNumber(value: string) {
+  return Number(value.split("(")[1].split(")")[0]);
+}
+
 export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
   const promises = dataCategories
     .filter((cat) => cat.addDefault && cat.defaultValue != "")

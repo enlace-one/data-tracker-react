@@ -9,6 +9,7 @@ import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import {
   parseBooleanToNumber,
   parseComplexNumberToNumber,
+  parseNumericSelectToNumber,
   parseTimeToDisplayValue,
   parseTimeToNumber,
 } from "../../util";
@@ -45,10 +46,12 @@ export default function Graph() {
       const entries = await fetchDataEntriesByCategory(catId);
       let inputType = "";
       let typeName = "";
+      let typeId = "";
       dataCategories.map((cat) => {
         if (cat.id == catId) {
           inputType = cat.dataType.inputType;
           typeName = cat.dataType.name;
+          typeId = cat.dataType.id;
         }
       });
 
@@ -65,6 +68,8 @@ export default function Graph() {
           value:
             inputType == "boolean-string"
               ? parseBooleanToNumber(entry.value)
+              : typeId == "select-numeric-001"
+              ? parseNumericSelectToNumber(entry.value)
               : inputType == "time"
               ? parseTimeToNumber(entry.value)
               : typeName == "Complex Number"
@@ -260,6 +265,7 @@ export default function Graph() {
               (item.dataType.inputType === "number" ||
                 item.dataType.inputType === "boolean-string" ||
                 item.dataType.inputType === "time" ||
+                item.dataType.id === "select-numeric-001" ||
                 item.dataType.isComplex) && (
                 <option
                   className={styles.tableRow}
