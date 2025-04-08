@@ -1,22 +1,25 @@
 // import { useState } from "react";
-import { Heading, Divider } from "@aws-amplify/ui-react";
+import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
-import { DataPoint } from "../../types";
+import { DataPoint, EnrichedDataCategory } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import {
   parseBooleanToNumber,
   parseComplexNumberToNumber,
+  parseEntryToDisplayValue,
+  parseEntryToNumber,
   parseNumericSelectToNumber,
   parseTimeDifferenceToNumber,
   parseTimeToDisplayValue,
   parseTimeToNumber,
 } from "../../util";
+import HoverText from "../../components/HoverText/HoverText";
 
 export default function Graph() {
-  const { dataCategories, screenWidth } = useData();
+  const { dataCategories, screenWidth, setActiveTab } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
@@ -45,39 +48,20 @@ export default function Graph() {
 
     for (const catId of selectedOptions) {
       const entries = await fetchDataEntriesByCategory(catId);
-      let inputType = "";
-      let typeName = "";
-      let typeId = "";
+      let category: EnrichedDataCategory;
       dataCategories.map((cat) => {
         if (cat.id == catId) {
-          inputType = cat.dataType.inputType;
-          typeName = cat.dataType.name;
-          typeId = cat.dataType.id;
+          category = cat;
         }
       });
-
       // Reverse the entries and take the last 30
       const reversedEntries = entries.slice(0, entryCountMax).reverse();
 
       reversedEntries.forEach((entry) => {
         newData.push({
           name: entry.date, // Assuming `entry.date` is accessible
-          displayValue:
-            inputType == "time"
-              ? parseTimeToDisplayValue(entry.value)
-              : entry.value,
-          value:
-            inputType == "boolean-string"
-              ? parseBooleanToNumber(entry.value)
-              : typeId == "select-numeric-001"
-              ? parseNumericSelectToNumber(entry.value)
-              : inputType == "time"
-              ? parseTimeToNumber(entry.value)
-              : inputType == "time-difference"
-              ? parseTimeDifferenceToNumber(entry.value)
-              : typeName == "Complex Number"
-              ? parseComplexNumberToNumber(entry.value)
-              : Number(entry.value),
+          displayValue: parseEntryToDisplayValue(entry, category),
+          value: parseEntryToNumber(entry, category),
           note: entry.note || "",
         });
       });
@@ -140,7 +124,6 @@ export default function Graph() {
     const value = event.target.value;
     setEntryCountMax(Number(value));
   };
-
   return (
     <>
       <Heading level={1}>Graph</Heading>
@@ -259,38 +242,64 @@ export default function Graph() {
         </div>
       )}
 
-      <div className={styles.formGroup}>
-        {/* <label>Category</label> */}
-        <select onChange={handleCategoryChange} className={styles.multiSelect}>
-          <option className={styles.tableRow}>Choose a Category</option>
-          {dataCategories.map(
-            (item) =>
-              (item.dataType.inputType === "number" ||
-                item.dataType.inputType === "boolean-string" ||
-                item.dataType.inputType === "time" ||
-                item.dataType.id === "select-numeric-001" ||
-                item.dataType.isComplex) && (
-                <option
-                  className={styles.tableRow}
-                  key={item.id}
-                  value={item.id}
-                >
-                  {item.name}
-                </option>
-              )
-          )}
-        </select>
-      </div>
-      <div className={styles.formGroup}>
-        <label>Entry Count to Graph:</label>
-        <input
-          type="number"
-          min={2}
-          max={100}
-          onChange={handleCountChange}
-          defaultValue={entryCountMax}
-        ></input>
-      </div>
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="1rem"
+        alignContent="center"
+      >
+        <div className={styles.formGroup}>
+          {/* <label>Category</label> */}
+          <select
+            onChange={handleCategoryChange}
+            className={styles.multiSelect}
+          >
+            <option className={styles.tableRow}>Choose a Category</option>
+            {dataCategories.map(
+              (item) =>
+                (item.dataType.inputType === "number" ||
+                  item.dataType.inputType === "boolean-string" ||
+                  item.dataType.inputType === "time" ||
+                  item.dataType.id === "select-numeric-001" ||
+                  item.dataType.isComplex) && (
+                  <option
+                    className={styles.tableRow}
+                    key={item.id}
+                    value={item.id}
+                  >
+                    {item.name}
+                  </option>
+                )
+            )}
+          </select>
+        </div>
+
+        <div className={styles.formGroup}>
+          <input
+            type="number"
+            min={2}
+            max={100}
+            onChange={handleCountChange}
+            defaultValue={entryCountMax}
+          ></input>
+        </div>
+      </Grid>
+      <Divider />
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="1rem"
+        alignContent="center"
+      >
+        <Button
+          // style={{ border: "none" }}
+          onClick={() => setActiveTab("date-graph")}
+        >
+          Date View
+        </Button>
+      </Grid>
     </>
   );
 }

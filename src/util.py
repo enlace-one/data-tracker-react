@@ -45,10 +45,12 @@ def getAlternateStylesForSVG(svg_name=None):
     print(f"Using {svg_style} as base style to set others from")
     chosen_style = [style for style in styles if style["name"] == svg_style][0]
     styles = [style for style in styles if style["name"] != svg_style]
-    with open(f"./public/{svg_name}", "r") as svg:
+    with open(f"./public/topics/{svg_name}", "r") as svg:
         svg_format = svg.read()
     for style in styles:
-        with open(f"./public/{svg_base_name}-{style['name']}.svg", "w+") as new_svg:
+        with open(
+            f"./public/topics/{svg_base_name}-{style['name']}.svg", "w+"
+        ) as new_svg:
             contents = svg_format.replace(
                 chosen_style["color1"], style["color1"]
             ).replace(chosen_style["color2"], style["color2"])
@@ -63,7 +65,7 @@ def getAlternateStylesForSVG(svg_name=None):
     svg_with_bg = re.sub(
         g_layer1_regex, svg_background + "<g><title>Layer 2</title>", svg_with_bg
     )
-    with open(f"./public/{svg_base_name}-colorful.svg", "w+") as new_svg:
+    with open(f"./public/topics/{svg_base_name}-colorful.svg", "w+") as new_svg:
         new_svg.write(svg_with_bg)
     print(
         f"""{{ name: "{svg_base_name.title()} (Colorful)", imageLink: "{svg_base_name}-colorful.svg" }},"""
@@ -71,7 +73,7 @@ def getAlternateStylesForSVG(svg_name=None):
 
 
 def getAlternateStylesForAllSVG():
-    svg_dir = "./public/"
+    svg_dir = "./public/topics/"
     for root, dirs, files in os.walk(svg_dir):
         for file in files:
             if file.endswith(".svg") and "-black" in file:
@@ -79,7 +81,7 @@ def getAlternateStylesForAllSVG():
 
 
 def getDefaultTopics():
-    svg_dir = "./public/"
+    svg_dir = "./public/topics/"
     print("export const DEFAULT_TOPICS = [")
     for root, dirs, files in os.walk(svg_dir):
         for file in files:

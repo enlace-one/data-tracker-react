@@ -137,4 +137,5 @@ export type ActiveTab =
   | "entries"
   | "types"
   | "graph"
+  | "date-graph"
   | "day";

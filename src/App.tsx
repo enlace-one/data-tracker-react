@@ -13,6 +13,7 @@ import Macros from "./views/Macros/Macros";
 import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 import HoverText from "./components/HoverText/HoverText";
+import DateGraph from "./views/DateGraph/DateGraph";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -79,6 +80,7 @@ export default function App() {
           {activeTab === "graph" && <Graph />}
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
+          {activeTab === "date-graph" && <DateGraph />}
           <Divider />
         </>
       )}

@@ -153,7 +153,7 @@ export default function Categories() {
                 <td>
                   {item.topic?.imageLink && (
                     <img
-                      src={"/" + item.topic.imageLink}
+                      src={"/topics/" + item.topic.imageLink}
                       alt={item.topic?.name}
                       style={{
                         width: "3rem",

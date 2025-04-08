@@ -51,7 +51,7 @@ export const getUpdateCategoryFormFields = (
     element: (
       <>
         <img
-          src={"/" + dt.imageLink}
+          src={"/topics/" + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -166,7 +166,7 @@ export const getAddCategorySecondaryFormFields = async (
     element: (
       <>
         <img
-          src={"/" + dt.imageLink}
+          src={"/topics/" + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",

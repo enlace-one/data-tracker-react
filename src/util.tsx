@@ -1,6 +1,6 @@
 import { evaluate } from "mathjs";
 import later from "@breejs/later";
-import { EnrichedDataCategory, Macro } from "./types";
+import { DataEntry, EnrichedDataCategory, Macro } from "./types";
 import {
   createDataEntry,
   fetchDataEntries,
@@ -51,6 +51,36 @@ export const parseTimeToDisplayValue = (time: string): string => {
   hour = hour % 12 || 12; // Convert 0 to 12 for midnight and 12 to 12 for noon
 
   return `${hour}:${minutes} ${period}`;
+};
+
+export const parseEntryToNumber = (
+  entry: DataEntry,
+  category: EnrichedDataCategory
+) => {
+  const inputType = category.dataType.inputType;
+  const typeId = category.dataType.id;
+  return inputType == "boolean-string"
+    ? parseBooleanToNumber(entry.value)
+    : typeId == "select-numeric-001"
+    ? parseNumericSelectToNumber(entry.value)
+    : inputType == "time"
+    ? parseTimeToNumber(entry.value)
+    : inputType == "time-difference"
+    ? parseTimeDifferenceToNumber(entry.value)
+    : typeId == "omplex-number-001"
+    ? parseComplexNumberToNumber(entry.value)
+    : Number(entry.value);
+};
+
+export const parseEntryToDisplayValue = (
+  entry: DataEntry,
+  category: EnrichedDataCategory
+) => {
+  const inputType = category.dataType.inputType;
+  // const typeId = category.dataType.id;
+  return inputType == "time"
+    ? parseTimeToDisplayValue(entry.value)
+    : entry.value;
 };
 
 export function sleep(seconds: number) {

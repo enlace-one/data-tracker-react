@@ -314,7 +314,7 @@ export default function CategoryDetail({ category }: Props) {
             <td className={styles.minWidth}>
               {category.topic?.imageLink && (
                 <img
-                  src={"/" + category.topic?.imageLink}
+                  src={"/topics/" + category.topic?.imageLink}
                   alt={category.topic?.name}
                   style={{
                     width: "5rem",
