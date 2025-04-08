@@ -33,53 +33,92 @@ export default function DateGraph() {
   const { dataCategories, screenWidth } = useData();
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
   const [chartData, setChartData] = useState<any>({
     labels: [],
     datasets: [],
   });
 
   useEffect(() => {
-    if (dataCategories) {
+    if (dataCategories && !startDate && !endDate) {
+      // Set default date range to last 30 days
+      const today = new Date();
+      const thirtyDaysAgo = new Date(today);
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+
+      setEndDate(today.toISOString().split("T")[0]);
+      setStartDate(thirtyDaysAgo.toISOString().split("T")[0]);
       setLoading(false);
     }
   }, [dataCategories]);
 
-  const handleCategoryChange = async (
+  useEffect(() => {
+    if (startDate && endDate && selectedCategories.length > 0) {
+      updateChartData(selectedCategories);
+    }
+  }, [startDate, endDate, selectedCategories]);
+
+  const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
     categoryIndex: number
   ) => {
     const newSelectedCategories = [...selectedCategories];
     newSelectedCategories[categoryIndex] = event.target.value;
     setSelectedCategories(newSelectedCategories.filter(Boolean));
+  };
 
+  const handleDateChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    type: "start" | "end"
+  ) => {
+    const newDate = event.target.value;
+    if (type === "start") {
+      setStartDate(newDate);
+    } else {
+      setEndDate(newDate);
+    }
+  };
+
+  const updateChartData = async (categories: string[]) => {
+    if (!startDate || !endDate || categories.length === 0) return;
+
+    setLoading(true);
     const datasets: any[] = [];
     const allDates = new Set<string>();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
 
-    for (const [index, catId] of newSelectedCategories.entries()) {
+    for (const [index, catId] of categories.entries()) {
       if (!catId) continue;
 
       const entries = await fetchDataEntriesByCategory(catId);
       const category = dataCategories.find((cat) => cat.id === catId);
       if (!category) continue;
 
-      const dataPoints: DataPoint[] = entries.map((entry) => ({
-        name: entry.date,
-        displayValue: parseEntryToDisplayValue(entry, category),
-        value: parseEntryToNumber(entry, category),
-        note: entry.note || "",
-      }));
+      const dataPoints: DataPoint[] = entries
+        .map((entry) => ({
+          name: entry.date,
+          displayValue: parseEntryToDisplayValue(entry, category),
+          value: parseEntryToNumber(entry, category),
+          note: entry.note || "",
+        }))
+        .filter((point) => {
+          const pointDate = new Date(point.name);
+          return pointDate >= start && pointDate <= end;
+        });
 
       dataPoints.forEach((point) => allDates.add(point.name));
 
       datasets.push({
         label: category.name,
         dataPoints: dataPoints,
-        borderColor: index === 0 ? "#00bfbf" : "#9acee6", // Category 1: #00bfbf, Category 2: #9acee6
+        borderColor: index === 0 ? "#00bfbf" : "#9acee6",
         backgroundColor:
           index === 0 ? "rgba(0, 191, 191, 0.2)" : "rgba(154, 206, 230, 0.2)",
         tension: 0.1,
         fill: false,
-        yAxisID: index === 0 ? "y1" : "y2", // Assign different Y-axis IDs
+        yAxisID: index === 0 ? "y1" : "y2",
       });
     }
 
@@ -87,25 +126,27 @@ export default function DateGraph() {
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
-    const alignedDatasets = datasets.map((dataset) => ({
-      label: dataset.label,
-      data: sortedDates.map((date) => {
-        const point = dataset.dataPoints.find(
-          (p: DataPoint) => p.name === date
-        );
-        return point ? point.value : null;
-      }),
-      borderColor: dataset.borderColor,
-      backgroundColor: dataset.backgroundColor,
-      tension: dataset.tension,
-      fill: dataset.fill,
-      yAxisID: dataset.yAxisID,
-    }));
+    const alignedDatasets = datasets.map((dataset) => {
+      const dataMap = new Map(
+        dataset.dataPoints.map((point: DataPoint) => [point.name, point.value])
+      );
+      return {
+        label: dataset.label,
+        data: sortedDates.map((date) => dataMap.get(date)),
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+        tension: dataset.tension,
+        fill: dataset.fill,
+        yAxisID: dataset.yAxisID,
+        spanGaps: true,
+      };
+    });
 
     setChartData({
       labels: sortedDates,
       datasets: alignedDatasets,
     });
+    setLoading(false);
   };
 
   const options = {
@@ -118,6 +159,15 @@ export default function DateGraph() {
       tooltip: {
         mode: "index" as const,
         intersect: false,
+        callbacks: {
+          label: function (context: any) {
+            const datasetLabel = context.dataset.label || "";
+            const value = context.parsed.y;
+            return value !== null && value !== undefined
+              ? `${datasetLabel}: ${value}`
+              : `${datasetLabel}: No data`;
+          },
+        },
       },
     },
     scales: {
@@ -128,7 +178,6 @@ export default function DateGraph() {
         },
       },
       y1: {
-        // Left Y-axis for Category 1
         type: "linear" as const,
         position: "left" as const,
         title: {
@@ -137,11 +186,10 @@ export default function DateGraph() {
           color: "#00bfbf",
         },
         grid: {
-          drawOnChartArea: false, // Only show grid for right axis
+          drawOnChartArea: false,
         },
       },
       y2: {
-        // Right Y-axis for Category 2
         type: "linear" as const,
         position: "right" as const,
         title: {
@@ -197,6 +245,32 @@ export default function DateGraph() {
                 </select>
               </div>
             ))}
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <label>Start Date</label>
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => handleDateChange(e, "start")}
+                className={styles.dateInput}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label>End Date</label>
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => handleDateChange(e, "end")}
+                className={styles.dateInput}
+              />
+            </div>
           </Grid>
         </div>
       )}
