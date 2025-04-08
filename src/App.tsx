@@ -84,6 +84,8 @@ export default function App() {
           <Divider />
         </>
       )}
+      {/* Div to give space in case bottom menu covers anything */}
+      <div style={{ padding: "50px" }}> </div>
 
       {/* Fixed Bottom Menu */}
       <div
@@ -161,7 +163,7 @@ export default function App() {
           </Button>
           <Button
             style={{ border: "none" }}
-            onClick={() => setActiveTab("graph")}
+            onClick={() => setActiveTab("date-graph")}
           >
             <HoverText onHoverText="Graph">
               <img

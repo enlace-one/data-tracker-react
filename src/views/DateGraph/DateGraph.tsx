@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
+import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./DateGraph.module.css";
@@ -30,7 +30,7 @@ ChartJS.register(
 );
 
 export default function DateGraph() {
-  const { dataCategories, screenWidth } = useData();
+  const { dataCategories, screenWidth, setActiveTab } = useData();
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<string>("");
@@ -271,6 +271,21 @@ export default function DateGraph() {
                 className={styles.dateInput}
               />
             </div>
+          </Grid>
+          <Divider style={{ margin: "10px" }} />
+          <Grid
+            margin="0 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <Button
+              // style={{ border: "none" }}
+              onClick={() => setActiveTab("graph")}
+            >
+              Legacy Graph
+            </Button>
           </Grid>
         </div>
       )}

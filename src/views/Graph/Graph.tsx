@@ -285,7 +285,7 @@ export default function Graph() {
           ></input>
         </div>
       </Grid>
-      <Divider />
+      {/* <Divider />
       <Grid
         margin="0 0"
         autoFlow="column"
@@ -299,7 +299,7 @@ export default function Graph() {
         >
           Date View
         </Button>
-      </Grid>
+      </Grid> */}
     </>
   );
 }
