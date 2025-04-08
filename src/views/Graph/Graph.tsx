@@ -10,6 +10,7 @@ import {
   parseBooleanToNumber,
   parseComplexNumberToNumber,
   parseNumericSelectToNumber,
+  parseTimeDifferenceToNumber,
   parseTimeToDisplayValue,
   parseTimeToNumber,
 } from "../../util";
@@ -72,6 +73,8 @@ export default function Graph() {
               ? parseNumericSelectToNumber(entry.value)
               : inputType == "time"
               ? parseTimeToNumber(entry.value)
+              : inputType == "time-difference"
+              ? parseTimeDifferenceToNumber(entry.value)
               : typeName == "Complex Number"
               ? parseComplexNumberToNumber(entry.value)
               : Number(entry.value),

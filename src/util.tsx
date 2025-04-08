@@ -16,6 +16,16 @@ export const parseTimeToNumber = (time: string) => {
   return hours + Math.round(decimalMinutes) / 100; // Convert HH:mm to HH.MM
 };
 
+export const parseTimeDifferenceToNumber = (complexTime: string) => {
+  const [time1, time2] = complexTime.split("-");
+  let time1Number = parseTimeToNumber(time1);
+  let time2Number = parseTimeToNumber(time2);
+  if (time2Number < time1Number) {
+    time2Number += 24;
+  }
+  return Number((time2Number - time1Number).toFixed(2));
+};
+
 export const parseNumberToTime = (decimalTime: number): string => {
   const hours = Math.floor(decimalTime);
   const decimalMinutes = decimalTime - hours;

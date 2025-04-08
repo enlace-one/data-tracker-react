@@ -56,6 +56,13 @@ export const DEFAULT_DATA_TYPES = [
     inputType: "math",
     id: "complex-number-001",
   },
+  {
+    name: "Time Difference",
+    note: "Computes the difference between two times",
+    isComplex: true,
+    inputType: "time-difference",
+    id: "time-difference-001",
+  },
 ];
 
 // imageLink = topicId

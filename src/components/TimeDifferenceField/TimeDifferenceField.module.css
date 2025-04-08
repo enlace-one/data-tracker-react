@@ -1,0 +1,16 @@
+.booleanField {
+  display: inline-block;
+  border: solid;
+  min-width: 150px; /* Set a minimum width */
+  width: 100%; /* Allow it to take full width of the container */
+  max-width: 300px; /* Set a maximum width */
+  border-width: 1px;
+  border-color: lightgray;
+  padding: 5px;
+  cursor: pointer; /* Change cursor to indicate interactivity */
+  border-radius: 4px; /* Optional: Add rounded corners */
+  background-color: white; /* Optional: Set background color */
+  user-select: none; /* Prevent text selection */
+  font-family: inherit; /* Match font with other input fields */
+  font-size: inherit; /* Match font size with other input fields */
+}

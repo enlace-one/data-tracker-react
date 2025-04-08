@@ -15,6 +15,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
 import { getAddUpdateDataEntryFormFields } from "../../formFields";
+import TimeDifferenceField from "../../components/TimeDifferenceField/TimeDifferenceField";
 export default function Day() {
   const { dataCategories, setActionMessage } = useData();
   const [macros, setMacros] = useState<Macro[]>([]);
@@ -297,8 +298,19 @@ export default function Day() {
                         ))}
                       </select>
                     )}
+                    {entry.dataCategory?.dataType?.inputType ==
+                      "time-difference" && (
+                      <TimeDifferenceField
+                        onChange={(value) =>
+                          handleValueBooleanChange(entry, value)
+                        }
+                        defaultValue={entry.value}
+                      />
+                    )}
                     {entry.dataCategory?.dataType?.inputType !=
                       "boolean-string" &&
+                      entry.dataCategory?.dataType?.inputType !=
+                        "time-difference" &&
                       entry.dataCategory?.dataType?.inputType != "select" && (
                         <input
                           type={entry.dataCategory?.dataType?.inputType}
