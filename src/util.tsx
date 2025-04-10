@@ -72,6 +72,25 @@ export const parseEntryToNumber = (
     : Number(entry.value);
 };
 
+export const parseEntryValueToNumber = (
+  value: string,
+  category: EnrichedDataCategory
+) => {
+  const inputType = category.dataType.inputType;
+  const typeId = category.dataType.id;
+  return inputType == "boolean-string"
+    ? parseBooleanToNumber(value)
+    : typeId == "select-numeric-001"
+    ? parseNumericSelectToNumber(value)
+    : inputType == "time"
+    ? parseTimeToNumber(value)
+    : inputType == "time-difference"
+    ? parseTimeDifferenceToNumber(value)
+    : typeId == "complex-number-001"
+    ? parseComplexNumberToNumber(value)
+    : Number(value);
+};
+
 export const parseEntryToDisplayValue = (
   entry: DataEntry,
   category: EnrichedDataCategory

@@ -5,7 +5,11 @@ import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./DateGraph.module.css";
 import { DataPoint, EnrichedDataCategory } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseEntryToDisplayValue, parseEntryToNumber } from "../../util";
+import {
+  parseEntryToDisplayValue,
+  parseEntryToNumber,
+  parseEntryValueToNumber,
+} from "../../util";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -46,10 +50,10 @@ export default function DateGraph() {
     "min-value"
   );
   const [y1BlankHandling, setY1BlankHandling] = useState<
-    "skip" | "zeroize" | "default"
+    "skip" | "zeroize" | "default" | "previous"
   >("skip");
   const [y2BlankHandling, setY2BlankHandling] = useState<
-    "skip" | "zeroize" | "default"
+    "skip" | "zeroize" | "default" | "previous"
   >("skip");
 
   const cat_1_color = "#00bfbf";
@@ -71,7 +75,15 @@ export default function DateGraph() {
     if (startDate && endDate && selectedCategories.length > 0) {
       updateChartData(selectedCategories);
     }
-  }, [startDate, endDate, selectedCategories]);
+  }, [
+    startDate,
+    endDate,
+    selectedCategories,
+    y2BlankHandling,
+    y1BlankHandling,
+    y2MinSetting,
+    y1MinSetting,
+  ]);
 
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -103,11 +115,15 @@ export default function DateGraph() {
   };
 
   const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setY1BlankHandling(event.target.value as "skip" | "zeroize" | "default");
+    setY1BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
   };
 
   const handleY2BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setY2BlankHandling(event.target.value as "skip" | "zeroize" | "default");
+    setY2BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
   };
 
   const updateChartData = async (categories: string[]) => {
@@ -143,6 +159,7 @@ export default function DateGraph() {
       datasets.push({
         label: category.name,
         dataPoints: dataPoints,
+        category, // Store category with dataset
         borderColor: index === 0 ? cat_1_color : cat_2_color,
         backgroundColor:
           index === 0 ? "rgba(0, 191, 191, 0.2)" : "rgba(154, 206, 230, 0.2)",
@@ -156,25 +173,47 @@ export default function DateGraph() {
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
+    const fillAllDates = (sortedDates) => {
+      const maxDate = sortedDates[sortedDates.length - 1];
+      const minDate = sortedDates[0];
+      const allDatesSorted = [minDate];
+      let currentDate = new Date(minDate);
+
+      while (currentDate < new Date(maxDate)) {
+        currentDate = new Date(currentDate);
+        currentDate.setDate(currentDate.getDate() + 1);
+        allDatesSorted.push(currentDate.toISOString().split("T")[0]);
+      }
+
+      return allDatesSorted;
+    };
+
+    const allDatesSorted = fillAllDates(sortedDates);
+
     const alignedDatasets = datasets.map((dataset, index) => {
       const dataMap = new Map(
         dataset.dataPoints.map((point: DataPoint) => [point.name, point.value])
       );
       const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
 
-      const data = sortedDates.map((date) => {
+      const data = allDatesSorted.map((date) => {
         const value = dataMap.get(date);
         if (value !== undefined) return value;
 
         switch (blankHandling) {
           case "zeroize":
             return 0;
-          case "default":
-            const prevIndex = sortedDates.indexOf(date) - 1;
+          case "previous":
+            const prevIndex = allDatesSorted.indexOf(date) - 1;
             return prevIndex >= 0 &&
-              dataMap.get(sortedDates[prevIndex]) !== undefined
-              ? dataMap.get(sortedDates[prevIndex])
+              dataMap.get(allDatesSorted[prevIndex]) !== undefined
+              ? dataMap.get(allDatesSorted[prevIndex])
               : 0;
+          case "default":
+            return parseEntryValueToNumber(
+              dataset.category.defaultValue ?? "0", // Use dataset-specific category
+              dataset.category
+            );
           case "skip":
           default:
             return undefined;
@@ -194,7 +233,7 @@ export default function DateGraph() {
     });
 
     setChartData({
-      labels: sortedDates,
+      labels: allDatesSorted,
       datasets: alignedDatasets,
     });
     setLoading(false);
@@ -350,7 +389,8 @@ export default function DateGraph() {
               >
                 <option value="skip">Blanks: Skip</option>
                 <option value="zeroize">Blanks: 0</option>
-                <option value="default">Blanks: Previous</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
               </select>
             </div>
             <div className={styles.formGroup}>
@@ -361,7 +401,8 @@ export default function DateGraph() {
               >
                 <option value="skip">Blanks: Skip</option>
                 <option value="zeroize">Blanks: 0</option>
-                <option value="default">Blanks: Previous</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
               </select>
             </div>
           </Grid>
