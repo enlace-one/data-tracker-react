@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
@@ -39,10 +39,15 @@ export default function DateGraph() {
     labels: [],
     datasets: [],
   });
+  const [y1MinSetting, setY1MinSetting] = useState<"min-value" | "zeroize">(
+    "min-value"
+  );
+  const [y2MinSetting, setY2MinSetting] = useState<"min-value" | "zeroize">(
+    "min-value"
+  );
 
   useEffect(() => {
     if (dataCategories && !startDate && !endDate) {
-      // Set default date range to last 30 days
       const today = new Date();
       const thirtyDaysAgo = new Date(today);
       thirtyDaysAgo.setDate(today.getDate() - 30);
@@ -78,6 +83,14 @@ export default function DateGraph() {
     } else {
       setEndDate(newDate);
     }
+  };
+
+  const handleY1MinChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1MinSetting(event.target.value as "min-value" | "zeroize");
+  };
+
+  const handleY2MinChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2MinSetting(event.target.value as "min-value" | "zeroize");
   };
 
   const updateChartData = async (categories: string[]) => {
@@ -149,57 +162,62 @@ export default function DateGraph() {
     setLoading(false);
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "top" as const,
-      },
-      tooltip: {
-        mode: "index" as const,
-        intersect: false,
-        callbacks: {
-          label: function (context: any) {
-            const datasetLabel = context.dataset.label || "";
-            const value = context.parsed.y;
-            return value !== null && value !== undefined
-              ? `${datasetLabel}: ${value}`
-              : `${datasetLabel}: No data`;
+  const options = useMemo(
+    () => ({
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top" as const,
+        },
+        tooltip: {
+          mode: "index" as const,
+          intersect: false,
+          callbacks: {
+            label: function (context: any) {
+              const datasetLabel = context.dataset.label || "";
+              const value = context.parsed.y;
+              return value !== null && value !== undefined
+                ? `${datasetLabel}: ${value}`
+                : `${datasetLabel}: No data`;
+            },
           },
         },
       },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Date",
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: "Date",
+          },
+        },
+        y1: {
+          type: "linear" as const,
+          position: "left" as const,
+          title: {
+            display: true,
+            text: "Category 1 Value",
+            color: "#00bfbf",
+          },
+          grid: {
+            drawOnChartArea: false,
+          },
+          min: y1MinSetting === "zeroize" ? 0 : undefined,
+        },
+        y2: {
+          type: "linear" as const,
+          position: "right" as const,
+          title: {
+            display: true,
+            text: "Category 2 Value",
+            color: "#9acee6",
+          },
+          min: y2MinSetting === "zeroize" ? 0 : undefined,
         },
       },
-      y1: {
-        type: "linear" as const,
-        position: "left" as const,
-        title: {
-          display: true,
-          text: "Category 1 Value",
-          color: "#00bfbf",
-        },
-        grid: {
-          drawOnChartArea: false,
-        },
-      },
-      y2: {
-        type: "linear" as const,
-        position: "right" as const,
-        title: {
-          display: true,
-          text: "Category 2 Value",
-          color: "#9acee6",
-        },
-      },
-    },
-  };
+    }),
+    [y1MinSetting, y2MinSetting]
+  );
 
   return (
     <>
@@ -254,6 +272,64 @@ export default function DateGraph() {
             alignContent="center"
           >
             <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1MinSetting}
+                onChange={handleY1MinChange}
+              >
+                <option value="min-value">Min: Auto</option>
+                <option value="zeroize">Min: 0</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2MinSetting}
+                onChange={handleY2MinChange}
+              >
+                <option value="min-value">Min: Auto</option>
+                <option value="zeroize">Min: 0</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1MinSetting}
+                // onChange={handleY1MinChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2MinSetting}
+                // onChange={handleY2MinChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
               <label>Start Date</label>
               <input
                 type="date"
@@ -280,13 +356,9 @@ export default function DateGraph() {
             gap="1rem"
             alignContent="center"
           >
-            <Button
-              // style={{ border: "none" }}
-              onClick={() => setActiveTab("graph")}
-            >
-              Legacy Graph
-            </Button>
+            <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
           </Grid>
+          <div style={{ padding: "50px" }}> </div>
         </div>
       )}
     </>

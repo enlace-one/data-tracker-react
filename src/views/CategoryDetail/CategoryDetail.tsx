@@ -44,7 +44,7 @@ export default function CategoryDetail({ category }: Props) {
         { dataCategoryId: category.id },
         {
           sortDirection: "DESC",
-          limit: 20,
+          // limit: 20,
           nextToken: token,
         }
       );

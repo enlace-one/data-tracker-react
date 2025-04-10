@@ -29,21 +29,25 @@ export default function Entries() {
   const [loading, setLoading] = useState(true);
 
   const fetchEntries = async (token: string | null) => {
-    const { data: fetchedEntries, nextToken } =
-      await client.models.DataEntry.listByDate(
-        { dummy: 0 },
-        {
-          sortDirection: "DESC",
-          limit: 10,
-          nextToken: token,
-        }
-      );
+    const response = await client.models.DataEntry.listByDate(
+      { dummy: 0 },
+      {
+        sortDirection: "DESC",
+        // limit: 22,
+        nextToken: token,
+      }
+    );
+    console.log("Raw Response:", response);
+    const { data: fetchedEntries, nextToken } = response;
+    console.log("Entries:", fetchedEntries.length, fetchedEntries);
+    console.log("Next Token:", nextToken);
     setDataEntries(fetchedEntries);
     return nextToken;
   };
 
   const handlePageChange = async (action: "next" | "previous" | number) => {
     let targetPageIndex = currentPageIndex;
+    console.debug("Changing page to ", action);
 
     if (action === "next" && hasMorePages) {
       targetPageIndex += 1;
@@ -105,6 +109,7 @@ export default function Entries() {
     return async function (...args: Parameters<T>) {
       try {
         setLoading(true);
+        console.log(`Running ${fn}`);
         const result = await fn(...args); // Await the result of the function
         setLoading(false);
         return result;

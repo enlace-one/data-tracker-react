@@ -67,7 +67,7 @@ export const parseEntryToNumber = (
     ? parseTimeToNumber(entry.value)
     : inputType == "time-difference"
     ? parseTimeDifferenceToNumber(entry.value)
-    : typeId == "omplex-number-001"
+    : typeId == "complex-number-001"
     ? parseComplexNumberToNumber(entry.value)
     : Number(entry.value);
 };

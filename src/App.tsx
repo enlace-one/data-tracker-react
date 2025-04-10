@@ -81,7 +81,7 @@ export default function App() {
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
           {activeTab === "date-graph" && <DateGraph />}
-          <Divider />
+          {/* <Divider /> */}
         </>
       )}
       {/* Div to give space in case bottom menu covers anything */}
