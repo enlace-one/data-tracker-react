@@ -37,10 +37,10 @@ export default function Entries() {
         nextToken: token,
       }
     );
-    console.log("Raw Response:", response);
+    // console.log("Raw Response:", response);
     const { data: fetchedEntries, nextToken } = response;
-    console.log("Entries:", fetchedEntries.length, fetchedEntries);
-    console.log("Next Token:", nextToken);
+    // console.log("Entries:", fetchedEntries.length, fetchedEntries);
+    // console.log("Next Token:", nextToken);
     setDataEntries(fetchedEntries);
     return nextToken;
   };

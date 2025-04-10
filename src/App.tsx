@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Flex, Divider } from "@aws-amplify/ui-react";
+import { Button, Flex } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { SETTINGS, useData } from "./DataContext"; // Import provider
@@ -20,7 +20,7 @@ export default function App() {
   const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
   const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories } = useData();
+  const { dataCategories, setInitialized, fetchedCats } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -28,6 +28,7 @@ export default function App() {
     await addDefaults(dataCategories);
     setLoadingText("Setting last entry dates");
     await setLastEntryDates(dataCategories);
+    setInitialized(true);
     setLoading(false);
   };
 
@@ -40,7 +41,7 @@ export default function App() {
     } else if (dataCategories) {
       setLoading(false);
     }
-  }, [dataCategories]);
+  }, [fetchedCats]);
 
   const { actionMessage, setActionMessage, activeTab, setActiveTab } =
     useData();

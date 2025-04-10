@@ -457,7 +457,10 @@ export async function updateDataCategoryLastEntryDate(
  * @param {string} name - Name of the entry.
  * @returns {Promise<void>}
  */
-export async function createDataEntry(formData: FormData): Promise<void> {
+export async function createDataEntry(
+  formData: FormData,
+  raiseErrors = true
+): Promise<void> {
   const { data } = await client.models.DataEntry.listCategoryEntries({
     dataCategoryId: formData.dataCategoryId!,
     date: { eq: formData.date! },
@@ -477,7 +480,7 @@ export async function createDataEntry(formData: FormData): Promise<void> {
   });
 
   console.log("Errors:", errors);
-  if (errors?.length) {
+  if (errors?.length && raiseErrors) {
     throw new Error(`${errors}`);
   }
 

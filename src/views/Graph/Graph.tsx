@@ -1,25 +1,15 @@
 // import { useState } from "react";
-import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./Graph.module.css";
 import { useState, useEffect } from "react";
 import { DataPoint, EnrichedDataCategory } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import {
-  parseBooleanToNumber,
-  parseComplexNumberToNumber,
-  parseEntryToDisplayValue,
-  parseEntryToNumber,
-  parseNumericSelectToNumber,
-  parseTimeDifferenceToNumber,
-  parseTimeToDisplayValue,
-  parseTimeToNumber,
-} from "../../util";
-import HoverText from "../../components/HoverText/HoverText";
+import { parseEntryToDisplayValue, parseEntryToNumber } from "../../util";
 
 export default function Graph() {
-  const { dataCategories, screenWidth, setActiveTab } = useData();
+  const { dataCategories, screenWidth } = useData();
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );

@@ -3,13 +3,9 @@ import { Heading, Divider, Grid, Button, Text } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./DateGraph.module.css";
-import { DataPoint, EnrichedDataCategory } from "../../types";
+import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import {
-  parseEntryToDisplayValue,
-  parseEntryToNumber,
-  parseEntryValueToNumber,
-} from "../../util";
+import { parseEntryToDisplayValue, parseEntryValueToNumber } from "../../util";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
