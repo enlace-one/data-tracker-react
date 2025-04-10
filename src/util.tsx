@@ -1,6 +1,6 @@
 import { evaluate } from "mathjs";
 import later from "@breejs/later";
-import { EnrichedDataCategory, Macro } from "./types";
+import { DataEntry, EnrichedDataCategory, Macro } from "./types";
 import {
   createDataEntry,
   fetchDataEntries,
@@ -14,6 +14,16 @@ export const parseTimeToNumber = (time: string) => {
   const [hours, minutes] = time.split(":").map(Number);
   const decimalMinutes = (minutes / 60) * 100;
   return hours + Math.round(decimalMinutes) / 100; // Convert HH:mm to HH.MM
+};
+
+export const parseTimeDifferenceToNumber = (complexTime: string) => {
+  const [time1, time2] = complexTime.split("-");
+  let time1Number = parseTimeToNumber(time1);
+  let time2Number = parseTimeToNumber(time2);
+  if (time2Number < time1Number) {
+    time2Number += 24;
+  }
+  return Number((time2Number - time1Number).toFixed(2));
 };
 
 export const parseNumberToTime = (decimalTime: number): string => {
@@ -41,6 +51,73 @@ export const parseTimeToDisplayValue = (time: string): string => {
   hour = hour % 12 || 12; // Convert 0 to 12 for midnight and 12 to 12 for noon
 
   return `${hour}:${minutes} ${period}`;
+};
+
+export const parseEntryToNumber = (
+  entry: DataEntry,
+  category: EnrichedDataCategory
+) => {
+  const inputType = category.dataType.inputType;
+  const typeId = category.dataType.id;
+  return inputType == "boolean-string"
+    ? parseBooleanToNumber(entry.value)
+    : typeId == "select-numeric-001"
+    ? parseNumericSelectToNumber(entry.value)
+    : inputType == "time"
+    ? parseTimeToNumber(entry.value)
+    : inputType == "time-difference"
+    ? parseTimeDifferenceToNumber(entry.value)
+    : typeId == "complex-number-001"
+    ? parseComplexNumberToNumber(entry.value)
+    : Number(entry.value);
+};
+
+export const parseEntryValueToNumber = (
+  value: string,
+  category: EnrichedDataCategory,
+  type: "output" | "value 1" | "value 2" | "value 3"
+) => {
+  const inputType = category.dataType.inputType;
+  const typeId = category.dataType.id;
+  if (
+    type == "output" ||
+    !(inputType == "time-difference" || typeId == "complex-number-001")
+  ) {
+    return inputType == "boolean-string"
+      ? parseBooleanToNumber(value)
+      : typeId == "select-numeric-001"
+      ? parseNumericSelectToNumber(value)
+      : inputType == "time"
+      ? parseTimeToNumber(value)
+      : inputType == "time-difference"
+      ? parseTimeDifferenceToNumber(value)
+      : typeId == "complex-number-001"
+      ? parseComplexNumberToNumber(value)
+      : Number(value);
+  } else if (type == "value 1") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/);
+    return match ? parseFloat(match[0]) : 0;
+  } else if (type == "value 2") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/g);
+    return match ? parseFloat(match[1]) : 0;
+  } else if (type == "value 3") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/g);
+    return match ? parseFloat(match[2]) : 0;
+  }
+};
+
+export const parseEntryToDisplayValue = (
+  entry: DataEntry,
+  category: EnrichedDataCategory
+) => {
+  const inputType = category.dataType.inputType;
+  // const typeId = category.dataType.id;
+  return inputType == "time"
+    ? parseTimeToDisplayValue(entry.value)
+    : entry.value;
 };
 
 export function sleep(seconds: number) {
@@ -169,17 +246,24 @@ export async function runMacros(
   }
 }
 
+export function parseNumericSelectToNumber(value: string) {
+  return Number(value.split("(")[1].split(")")[0]);
+}
+
 export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
   const promises = dataCategories
     .filter((cat) => cat.addDefault && cat.defaultValue != "")
     .map((cat) => {
       console.log("Adding defauult entry for", cat.name);
-      createDataEntry({
-        date: new Date().toLocaleDateString("en-CA"),
-        note: "Added as default",
-        value: cat.defaultValue ?? "",
-        dataCategoryId: cat.id,
-      });
+      createDataEntry(
+        {
+          date: new Date().toLocaleDateString("en-CA"),
+          note: "Added as default",
+          value: cat.defaultValue ?? "",
+          dataCategoryId: cat.id,
+        },
+        false
+      );
     });
 
   await Promise.all(promises);

@@ -51,7 +51,7 @@ export const getUpdateCategoryFormFields = (
     element: (
       <>
         <img
-          src={"/" + dt.imageLink}
+          src={"/topics/" + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -166,7 +166,7 @@ export const getAddCategorySecondaryFormFields = async (
     element: (
       <>
         <img
-          src={"/" + dt.imageLink}
+          src={"/topics/" + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -207,6 +207,15 @@ export const getAddCategorySecondaryFormFields = async (
       required: true,
     },
   ];
+
+  if (dataType.inputType.includes("select")) {
+    fields.push({
+      name: "Options",
+      id: "options",
+      note: "Comma seperated options",
+      type: "select",
+    });
+  }
 
   if (["time", "number"].includes(dataType.inputType)) {
     fields.push(
@@ -274,12 +283,21 @@ export const getAddUpdateDataEntrySecondaryFormFields = async (
     );
   }
 
+  let options = undefined;
+  if (dataCategory.dataType.inputType === "select") {
+    options = (dataCategory?.options ?? []).map((o) => ({
+      label: o ?? "",
+      value: o ?? "",
+    }));
+  }
+
   let fields: FlexFormField[] = [
     {
       name: "Value",
       id: "value",
       default: entry?.value ?? dataCategory.defaultValue,
       type: dataCategory.dataType.inputType,
+      options: options ?? [],
       pattern: dataCategory.dataType?.pattern ?? ".*",
       note: `${dataCategory.note}. DataType is ${dataCategory.dataType?.name}: ${dataCategory.dataType?.note}`,
     },

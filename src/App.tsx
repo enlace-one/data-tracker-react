@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Flex, Divider } from "@aws-amplify/ui-react";
+import { Button, Flex } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { SETTINGS, useData } from "./DataContext"; // Import provider
@@ -13,13 +13,14 @@ import Macros from "./views/Macros/Macros";
 import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 import HoverText from "./components/HoverText/HoverText";
+import DateGraph from "./views/DateGraph/DateGraph";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
   const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
   const [loading, setLoading] = useState(true);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories } = useData();
+  const { dataCategories, setInitialized, fetchedCats } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -27,6 +28,7 @@ export default function App() {
     await addDefaults(dataCategories);
     setLoadingText("Setting last entry dates");
     await setLastEntryDates(dataCategories);
+    setInitialized(true);
     setLoading(false);
   };
 
@@ -39,7 +41,7 @@ export default function App() {
     } else if (dataCategories) {
       setLoading(false);
     }
-  }, [dataCategories]);
+  }, [fetchedCats]);
 
   const { actionMessage, setActionMessage, activeTab, setActiveTab } =
     useData();
@@ -79,9 +81,12 @@ export default function App() {
           {activeTab === "graph" && <Graph />}
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
-          <Divider />
+          {activeTab === "date-graph" && <DateGraph />}
+          {/* <Divider /> */}
         </>
       )}
+      {/* Div to give space in case bottom menu covers anything */}
+      <div style={{ padding: "50px" }}> </div>
 
       {/* Fixed Bottom Menu */}
       <div
@@ -159,7 +164,7 @@ export default function App() {
           </Button>
           <Button
             style={{ border: "none" }}
-            onClick={() => setActiveTab("graph")}
+            onClick={() => setActiveTab("date-graph")}
           >
             <HoverText onHoverText="Graph">
               <img

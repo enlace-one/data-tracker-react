@@ -44,7 +44,7 @@ export default function CategoryDetail({ category }: Props) {
         { dataCategoryId: category.id },
         {
           sortDirection: "DESC",
-          limit: 20,
+          // limit: 20,
           nextToken: token,
         }
       );
@@ -314,7 +314,7 @@ export default function CategoryDetail({ category }: Props) {
             <td className={styles.minWidth}>
               {category.topic?.imageLink && (
                 <img
-                  src={"/" + category.topic?.imageLink}
+                  src={"/topics/" + category.topic?.imageLink}
                   alt={category.topic?.name}
                   style={{
                     width: "5rem",

@@ -11,6 +11,8 @@ import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
 import { helpLink, version } from "../../settings";
+import { addExampleData } from "../../api";
+import HoverText from "../../components/HoverText/HoverText";
 
 interface ProfileProps {
   signOut: () => void;
@@ -80,10 +82,21 @@ export default function Profile({ signOut }: ProfileProps) {
         margin="0 0"
         autoFlow="column"
         justifyContent="center"
-        gap="2rem"
+        gap="1rem"
         alignContent="center"
       >
         <Button onClick={signOut}>Sign Out</Button>
+        <Button onClick={() => addExampleData()}>
+          <HoverText onHoverText="Add example data">Example</HoverText>
+        </Button>
+      </Grid>
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="1rem"
+        alignContent="center"
+      >
         <Button onClick={() => setActiveTab("macros")}>Macros</Button>
       </Grid>
     </>

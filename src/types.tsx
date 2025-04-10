@@ -68,6 +68,7 @@ export interface FormDataType {
   schedule?: string;
   priority?: number;
   lastRunDate?: string;
+  options?: string;
   lastRunOutput?: string;
   imageLink?: string;
   topicId?: string;
@@ -136,4 +137,5 @@ export type ActiveTab =
   | "entries"
   | "types"
   | "graph"
+  | "date-graph"
   | "day";

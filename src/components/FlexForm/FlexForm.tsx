@@ -5,6 +5,7 @@ import BooleanField from "../BooleanField/BooleanField";
 import { FlexFormField } from "../../types";
 import { parseStringToBoolean } from "../../util";
 import CustomSelectField from "../CustomSelectField/CustomSelectField";
+import TimeDifferenceField from "../TimeDifferenceField/TimeDifferenceField";
 
 interface Props {
   heading: string;
@@ -117,7 +118,7 @@ const FlexForm = ({
     }));
   };
 
-  const handleCustomSelectChange = (id: string, value: string) => {
+  const handleCustomStringFieldChange = (id: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [id]: value,
@@ -195,6 +196,13 @@ const FlexForm = ({
                           }
                           asString={false}
                         />
+                      ) : field.type === "time-difference" ? (
+                        <TimeDifferenceField
+                          onChange={(value) =>
+                            handleCustomStringFieldChange(field.id, value)
+                          }
+                          defaultValue={String(formData[field.id])}
+                        />
                       ) : field.type === "boolean-string" ? (
                         <BooleanField
                           default={parseStringToBoolean(
@@ -209,7 +217,7 @@ const FlexForm = ({
                         <CustomSelectField
                           items={field.options!}
                           onChange={(value) =>
-                            handleCustomSelectChange(field.id, value)
+                            handleCustomStringFieldChange(field.id, value)
                           }
                           defaultValue={String(formData[field.id])}
                         />

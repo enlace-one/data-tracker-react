@@ -10,7 +10,7 @@ import {
   Topic,
 } from "./types"; // ✅ Import interfaces
 
-import { DEFAULT_DATA_TYPES } from "./settings";
+import { DEFAULT_DATA_TYPES, EXAMPLE_DATA } from "./settings";
 
 // import { useData } from "./DataContext";
 
@@ -350,6 +350,7 @@ export async function createDataCategory(formData: FormData): Promise<void> {
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
     topicId: formData.topicId!,
+    options: (formData.options || "").split(",").map((val) => val.trim()),
   });
   console.log("Errors:", errors);
 }
@@ -375,6 +376,7 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
     topicId: formData.topicId!,
+    options: (formData.options || "").split(",").map((val) => val.trim()),
   });
   console.log("Errors:", errors);
 }
@@ -455,7 +457,10 @@ export async function updateDataCategoryLastEntryDate(
  * @param {string} name - Name of the entry.
  * @returns {Promise<void>}
  */
-export async function createDataEntry(formData: FormData): Promise<void> {
+export async function createDataEntry(
+  formData: FormData,
+  raiseErrors = true
+): Promise<void> {
   const { data } = await client.models.DataEntry.listCategoryEntries({
     dataCategoryId: formData.dataCategoryId!,
     date: { eq: formData.date! },
@@ -475,6 +480,9 @@ export async function createDataEntry(formData: FormData): Promise<void> {
   });
 
   console.log("Errors:", errors);
+  if (errors?.length && raiseErrors) {
+    throw new Error(`${errors}`);
+  }
 
   updateDataCategoryEntryCount(formData.dataCategoryId!, 1);
 }
@@ -620,3 +628,32 @@ export function subscribeToDataEntries(
 
 // Export the client instance if needed elsewhere
 export { client };
+
+export async function addExampleData(skipConfirmation = false) {
+  if (!skipConfirmation) {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to add example data? It will add several categories and entries"
+    );
+    if (!isConfirmed) {
+      console.log("Add examples cancelled by user.");
+      return;
+    }
+  }
+  for (const data of EXAMPLE_DATA) {
+    console.log("Adding example cat:", data.category.name);
+    try {
+      await createDataCategory(data.category);
+    } catch (e) {
+      console.log("Error ", e);
+    }
+  }
+  const { data: categories } = await client.models.DataCategory.list();
+  for (const cat of categories) {
+    const data = EXAMPLE_DATA.find((d) => d.category.name == cat.name);
+    if (data) {
+      for (const entry of data.entries) {
+        await createDataEntry({ ...entry, dataCategoryId: cat.id });
+      }
+    }
+  }
+}

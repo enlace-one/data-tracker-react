@@ -34,6 +34,20 @@ export const DEFAULT_DATA_TYPES = [
     id: "time-001",
   },
   {
+    name: "Select (Text)",
+    note: "Select from options",
+    isComplex: false,
+    inputType: "select",
+    id: "select-text-001",
+  },
+  {
+    name: "Select (Numeric)",
+    note: "Select from options with numeric values. Enter 'optionA (2), optionB (5)' in the options field.",
+    isComplex: false,
+    inputType: "select",
+    id: "select-numeric-001",
+  },
+  {
     name: "Complex Number",
     note: "Stores multiple related numbers",
     isComplex: true,
@@ -41,6 +55,13 @@ export const DEFAULT_DATA_TYPES = [
       "(\\(?\\d+(\\.\\d+)?\\)?)[*/+-](\\(?\\d+(\\.\\d+)?\\)?)([*/+-](\\(?\\d+(\\.\\d+)?\\)?))*",
     inputType: "math",
     id: "complex-number-001",
+  },
+  {
+    name: "Time Difference",
+    note: "Computes the difference between two times",
+    isComplex: true,
+    inputType: "time-difference",
+    id: "time-difference-001",
   },
 ];
 
@@ -249,6 +270,7 @@ export const DEFAULT_TOPICS = [
 // Cyan
 // #00bfbf (cyan)
 // #9acee6(blue)
+//rgb(123, 182, 209) (darker blue if needed)
 
 // Blue
 // #9acee6 (blue)
@@ -276,3 +298,98 @@ export const DEFAULT_TOPICS = [
 // #ffd4aa
 // #ffaad4
 // #bfbf91
+
+//////////////////
+// Example Data //
+//////////////////
+
+export const EXAMPLE_DATA = [
+  {
+    category: {
+      name: "Push Ups",
+      dataTypeId: "number-001",
+      note: "Example category",
+      topicId: "treadmil-colorful.svg",
+    },
+    entries: [
+      {
+        date: "2025-01-01",
+        value: "35",
+      },
+      {
+        date: "2025-01-14",
+        value: "54",
+      },
+      {
+        date: "2025-01-15",
+        value: "32",
+      },
+    ],
+  },
+  {
+    category: {
+      name: "Read Bible",
+      dataTypeId: "boolean-001",
+      note: "Example category",
+      topicId: "book-blue.svg",
+    },
+    entries: [
+      {
+        date: "2025-01-01",
+        value: "true",
+      },
+      {
+        date: "2025-01-14",
+        value: "false",
+      },
+      {
+        date: "2025-01-15",
+        value: "true",
+      },
+    ],
+  },
+  {
+    category: {
+      name: "Dumbell Lifts",
+      dataTypeId: "complex-number-001",
+      note: "Example category, weight*reps",
+      topicId: "treadmil-black.svg",
+    },
+    entries: [
+      {
+        date: "2025-01-20",
+        value: "20*22",
+      },
+      {
+        date: "2025-01-21",
+        value: "20*20",
+      },
+      {
+        date: "2025-01-22",
+        value: "20*19",
+      },
+    ],
+  },
+  {
+    category: {
+      name: "Wake up Time",
+      dataTypeId: "time-001",
+      note: "Example category",
+      topicId: "clock-cyan.svg",
+    },
+    entries: [
+      {
+        date: "2025-02-01",
+        value: "05:00",
+      },
+      {
+        date: "2025-02-04",
+        value: "08:00",
+      },
+      {
+        date: "2025-02-25",
+        value: "03:00",
+      },
+    ],
+  },
+];
