@@ -74,21 +74,39 @@ export const parseEntryToNumber = (
 
 export const parseEntryValueToNumber = (
   value: string,
-  category: EnrichedDataCategory
+  category: EnrichedDataCategory,
+  type: "output" | "value 1" | "value 2" | "value 3"
 ) => {
   const inputType = category.dataType.inputType;
   const typeId = category.dataType.id;
-  return inputType == "boolean-string"
-    ? parseBooleanToNumber(value)
-    : typeId == "select-numeric-001"
-    ? parseNumericSelectToNumber(value)
-    : inputType == "time"
-    ? parseTimeToNumber(value)
-    : inputType == "time-difference"
-    ? parseTimeDifferenceToNumber(value)
-    : typeId == "complex-number-001"
-    ? parseComplexNumberToNumber(value)
-    : Number(value);
+  if (
+    type == "output" ||
+    !(inputType == "time-difference" || typeId == "complex-number-001")
+  ) {
+    return inputType == "boolean-string"
+      ? parseBooleanToNumber(value)
+      : typeId == "select-numeric-001"
+      ? parseNumericSelectToNumber(value)
+      : inputType == "time"
+      ? parseTimeToNumber(value)
+      : inputType == "time-difference"
+      ? parseTimeDifferenceToNumber(value)
+      : typeId == "complex-number-001"
+      ? parseComplexNumberToNumber(value)
+      : Number(value);
+  } else if (type == "value 1") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/);
+    return match ? parseFloat(match[0]) : 0;
+  } else if (type == "value 2") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/g);
+    return match ? parseFloat(match[1]) : 0;
+  } else if (type == "value 3") {
+    value = value.replace(":", ".");
+    const match = String(value).match(/-?\d*\.?\d+/g);
+    return match ? parseFloat(match[2]) : 0;
+  }
 };
 
 export const parseEntryToDisplayValue = (

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Grid, Button, Text } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./DateGraph.module.css";
@@ -43,6 +43,8 @@ export default function DateGraph() {
     labels: [],
     datasets: [],
   });
+  const [datasets, setDatasets] = useState<any[]>([]); // New state for datasets
+  const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]); // N
   const [y1MinSetting, setY1MinSetting] = useState<"min-value" | "zeroize">(
     "min-value"
   );
@@ -55,6 +57,13 @@ export default function DateGraph() {
   const [y2BlankHandling, setY2BlankHandling] = useState<
     "skip" | "zeroize" | "default" | "previous"
   >("skip");
+  const [y1ValueHandling, setY1ValueHandling] = useState<
+    "output" | "value 1" | "value 2" | "value 3"
+  >("output");
+  const [y2ValueHandling, setY2ValueHandling] = useState<
+    "output" | "value 1" | "value 2" | "value 3"
+  >("output");
+  const [correlation, setCorrelation] = useState<number | null>(null); // New state for correlation
 
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
@@ -83,6 +92,8 @@ export default function DateGraph() {
     y1BlankHandling,
     y2MinSetting,
     y1MinSetting,
+    y1ValueHandling,
+    y2ValueHandling,
   ]);
 
   const handleCategoryChange = (
@@ -114,6 +125,18 @@ export default function DateGraph() {
     setY2MinSetting(event.target.value as "min-value" | "zeroize");
   };
 
+  const handleY1ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1ValueHandling(
+      event.target.value as "output" | "value 1" | "value 2" | "value 3"
+    );
+  };
+
+  const handleY2ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2ValueHandling(
+      event.target.value as "output" | "value 1" | "value 2" | "value 3"
+    );
+  };
+
   const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setY1BlankHandling(
       event.target.value as "skip" | "zeroize" | "default" | "previous"
@@ -130,7 +153,7 @@ export default function DateGraph() {
     if (!startDate || !endDate || categories.length === 0) return;
 
     setLoading(true);
-    const datasets: any[] = [];
+    const newDatasets: any[] = [];
     const allDates = new Set<string>();
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -146,9 +169,14 @@ export default function DateGraph() {
         .map((entry) => ({
           name: entry.date,
           displayValue: parseEntryToDisplayValue(entry, category),
-          value: parseEntryToNumber(entry, category),
+          value: parseEntryValueToNumber(
+            entry.value,
+            category,
+            index === 0 ? y1ValueHandling : y2ValueHandling
+          ),
           note: entry.note || "",
         }))
+
         .filter((point) => {
           const pointDate = new Date(point.name);
           return pointDate >= start && pointDate <= end;
@@ -156,10 +184,10 @@ export default function DateGraph() {
 
       dataPoints.forEach((point) => allDates.add(point.name));
 
-      datasets.push({
+      newDatasets.push({
         label: category.name,
         dataPoints: dataPoints,
-        category, // Store category with dataset
+        category,
         borderColor: index === 0 ? cat_1_color : cat_2_color,
         backgroundColor:
           index === 0 ? "rgba(0, 191, 191, 0.2)" : "rgba(154, 206, 230, 0.2)",
@@ -173,7 +201,7 @@ export default function DateGraph() {
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
-    const fillAllDates = (sortedDates) => {
+    const fillAllDates = (sortedDates: string[]) => {
       const maxDate = sortedDates[sortedDates.length - 1];
       const minDate = sortedDates[0];
       const allDatesSorted = [minDate];
@@ -188,15 +216,17 @@ export default function DateGraph() {
       return allDatesSorted;
     };
 
-    const allDatesSorted = fillAllDates(sortedDates);
+    const newAllDatesSorted = fillAllDates(sortedDates);
+    setAllDatesSorted(newAllDatesSorted); // Set state
+    setDatasets(newDatasets); // Set state
 
-    const alignedDatasets = datasets.map((dataset, index) => {
+    const alignedDatasets = newDatasets.map((dataset, index) => {
       const dataMap = new Map(
         dataset.dataPoints.map((point: DataPoint) => [point.name, point.value])
       );
       const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
 
-      const data = allDatesSorted.map((date) => {
+      const data = newAllDatesSorted.map((date) => {
         const value = dataMap.get(date);
         if (value !== undefined) return value;
 
@@ -204,15 +234,16 @@ export default function DateGraph() {
           case "zeroize":
             return 0;
           case "previous":
-            const prevIndex = allDatesSorted.indexOf(date) - 1;
+            const prevIndex = newAllDatesSorted.indexOf(date) - 1;
             return prevIndex >= 0 &&
-              dataMap.get(allDatesSorted[prevIndex]) !== undefined
-              ? dataMap.get(allDatesSorted[prevIndex])
+              dataMap.get(newAllDatesSorted[prevIndex]) !== undefined
+              ? dataMap.get(newAllDatesSorted[prevIndex])
               : 0;
           case "default":
             return parseEntryValueToNumber(
-              dataset.category.defaultValue ?? "0", // Use dataset-specific category
-              dataset.category
+              dataset.category.defaultValue ?? "0",
+              dataset.category,
+              index === 0 ? y1ValueHandling : y2ValueHandling
             );
           case "skip":
           default:
@@ -232,13 +263,45 @@ export default function DateGraph() {
       };
     });
 
+    if (alignedDatasets.length === 2) {
+      const x = alignedDatasets[0].data;
+      const y = alignedDatasets[1].data;
+      let sumX = 0,
+        sumY = 0,
+        sumXY = 0,
+        sumX2 = 0,
+        sumY2 = 0,
+        n = 0;
+
+      for (let i = 0; i < newAllDatesSorted.length; i++) {
+        const xVal = x[i] !== undefined ? x[i] : 0;
+        const yVal = y[i] !== undefined ? y[i] : 0;
+        if (xVal !== null && yVal !== null) {
+          sumX += xVal;
+          sumY += yVal;
+          sumXY += xVal * yVal;
+          sumX2 += xVal * xVal;
+          sumY2 += yVal * yVal;
+          n++;
+        }
+      }
+
+      const numerator = n * sumXY - sumX * sumY;
+      const denominator = Math.sqrt(
+        (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
+      );
+      const correlationValue = denominator === 0 ? 0 : numerator / denominator;
+      setCorrelation(Number(correlationValue.toFixed(3)));
+    } else {
+      setCorrelation(null);
+    }
+
     setChartData({
-      labels: allDatesSorted,
+      labels: newAllDatesSorted,
       datasets: alignedDatasets,
     });
     setLoading(false);
   };
-
   const options = useMemo(
     () => ({
       responsive: true,
@@ -254,8 +317,14 @@ export default function DateGraph() {
             label: function (context: any) {
               const datasetLabel = context.dataset.label || "";
               const value = context.parsed.y;
+              const index = context.dataIndex;
+              const datasetIndex = context.datasetIndex;
+              const dataPoint = datasets[datasetIndex]?.dataPoints.find(
+                (dp: DataPoint) => dp.name === allDatesSorted[index]
+              );
+              const note = dataPoint?.note ? ` - ${dataPoint.note}` : "";
               return value !== null && value !== undefined
-                ? `${datasetLabel}: ${value}`
+                ? `${datasetLabel}: ${value} (${dataPoint.displayValue})${note}`
                 : `${datasetLabel}: No data`;
             },
           },
@@ -293,7 +362,7 @@ export default function DateGraph() {
         },
       },
     }),
-    [y1MinSetting, y2MinSetting]
+    [y1MinSetting, y2MinSetting, datasets, allDatesSorted] // Added dependencies
   );
 
   return (
@@ -306,6 +375,11 @@ export default function DateGraph() {
           style={{ height: "400px", width: Math.max(screenWidth - 600, 400) }}
         >
           <Line data={chartData} options={options} />
+          {correlation !== null && (
+            <Text textAlign="center" margin="1rem 0">
+              Correlation Coefficient: {correlation}
+            </Text>
+          )}
           <Grid
             margin="1rem 0"
             autoFlow="column"
@@ -403,6 +477,38 @@ export default function DateGraph() {
                 <option value="zeroize">Blanks: 0</option>
                 <option value="previous">Blanks: Previous</option>
                 <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1ValueHandling}
+                onChange={handleY1ValueChange}
+              >
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1ValueHandling}
+                onChange={handleY2ValueChange}
+              >
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
               </select>
             </div>
           </Grid>

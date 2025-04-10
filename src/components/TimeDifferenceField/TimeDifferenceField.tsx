@@ -12,7 +12,7 @@ const TimeDifferenceField = ({ defaultValue, onChange }: Props) => {
 
   useEffect(() => {
     onChange(`${value1}-${value2}`);
-  }, [value1, value2, onChange]);
+  }, [value1, value2]);
 
   return (
     <div>
