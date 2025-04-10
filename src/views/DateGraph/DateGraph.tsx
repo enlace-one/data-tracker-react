@@ -45,6 +45,15 @@ export default function DateGraph() {
   const [y2MinSetting, setY2MinSetting] = useState<"min-value" | "zeroize">(
     "min-value"
   );
+  const [y1BlankHandling, setY1BlankHandling] = useState<
+    "skip" | "zeroize" | "default"
+  >("skip");
+  const [y2BlankHandling, setY2BlankHandling] = useState<
+    "skip" | "zeroize" | "default"
+  >("skip");
+
+  const cat_1_color = "#00bfbf";
+  const cat_2_color = "rgb(123, 182, 209)";
 
   useEffect(() => {
     if (dataCategories && !startDate && !endDate) {
@@ -93,6 +102,14 @@ export default function DateGraph() {
     setY2MinSetting(event.target.value as "min-value" | "zeroize");
   };
 
+  const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1BlankHandling(event.target.value as "skip" | "zeroize" | "default");
+  };
+
+  const handleY2BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2BlankHandling(event.target.value as "skip" | "zeroize" | "default");
+  };
+
   const updateChartData = async (categories: string[]) => {
     if (!startDate || !endDate || categories.length === 0) return;
 
@@ -126,7 +143,7 @@ export default function DateGraph() {
       datasets.push({
         label: category.name,
         dataPoints: dataPoints,
-        borderColor: index === 0 ? "#00bfbf" : "#9acee6",
+        borderColor: index === 0 ? cat_1_color : cat_2_color,
         backgroundColor:
           index === 0 ? "rgba(0, 191, 191, 0.2)" : "rgba(154, 206, 230, 0.2)",
         tension: 0.1,
@@ -139,17 +156,38 @@ export default function DateGraph() {
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
-    const alignedDatasets = datasets.map((dataset) => {
+    const alignedDatasets = datasets.map((dataset, index) => {
       const dataMap = new Map(
         dataset.dataPoints.map((point: DataPoint) => [point.name, point.value])
       );
+      const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
+
+      const data = sortedDates.map((date) => {
+        const value = dataMap.get(date);
+        if (value !== undefined) return value;
+
+        switch (blankHandling) {
+          case "zeroize":
+            return 0;
+          case "default":
+            const prevIndex = sortedDates.indexOf(date) - 1;
+            return prevIndex >= 0 &&
+              dataMap.get(sortedDates[prevIndex]) !== undefined
+              ? dataMap.get(sortedDates[prevIndex])
+              : 0;
+          case "skip":
+          default:
+            return undefined;
+        }
+      });
+
       return {
         label: dataset.label,
-        data: sortedDates.map((date) => dataMap.get(date)),
+        data,
         borderColor: dataset.borderColor,
         backgroundColor: dataset.backgroundColor,
-        tension: dataset.tension,
-        fill: dataset.fill,
+        tension: 0.1,
+        fill: false,
         yAxisID: dataset.yAxisID,
         spanGaps: true,
       };
@@ -197,7 +235,7 @@ export default function DateGraph() {
           title: {
             display: true,
             text: "Category 1 Value",
-            color: "#00bfbf",
+            color: cat_1_color,
           },
           grid: {
             drawOnChartArea: false,
@@ -210,7 +248,7 @@ export default function DateGraph() {
           title: {
             display: true,
             text: "Category 2 Value",
-            color: "#9acee6",
+            color: cat_2_color,
           },
           min: y2MinSetting === "zeroize" ? 0 : undefined,
         },
@@ -242,6 +280,11 @@ export default function DateGraph() {
                   onChange={(e) => handleCategoryChange(e, index)}
                   className={styles.multiSelect}
                   value={selectedCategories[index] || ""}
+                  style={
+                    index == 0
+                      ? { color: cat_1_color, fontWeight: "bold" }
+                      : { color: cat_2_color, fontWeight: "bold" }
+                  }
                 >
                   <option value="">Choose Category {index + 1}</option>
                   {dataCategories.map(
@@ -302,23 +345,23 @@ export default function DateGraph() {
             <div className={styles.formGroup}>
               <select
                 className={styles.multiSelect}
-                value={y1MinSetting}
-                // onChange={handleY1MinChange}
+                value={y1BlankHandling}
+                onChange={handleY1BlankChange}
               >
                 <option value="skip">Blanks: Skip</option>
                 <option value="zeroize">Blanks: 0</option>
-                <option value="default">Blanks: Default</option>
+                <option value="default">Blanks: Previous</option>
               </select>
             </div>
             <div className={styles.formGroup}>
               <select
                 className={styles.multiSelect}
-                value={y2MinSetting}
-                // onChange={handleY2MinChange}
+                value={y2BlankHandling}
+                onChange={handleY2BlankChange}
               >
                 <option value="skip">Blanks: Skip</option>
                 <option value="zeroize">Blanks: 0</option>
-                <option value="default">Blanks: Default</option>
+                <option value="default">Blanks: Previous</option>
               </select>
             </div>
           </Grid>

@@ -270,6 +270,7 @@ export const DEFAULT_TOPICS = [
 // Cyan
 // #00bfbf (cyan)
 // #9acee6(blue)
+//rgb(123, 182, 209) (darker blue if needed)
 
 // Blue
 // #9acee6 (blue)
