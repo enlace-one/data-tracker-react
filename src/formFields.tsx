@@ -80,6 +80,7 @@ export const getUpdateCategoryFormFields = (
       name: "Default Value",
       id: "defaultValue",
       note: category.dataType?.note ?? "",
+      required: true,
       type: category.dataType?.inputType ?? "text",
       pattern: category.dataType?.pattern ?? ".*",
       default: String(category.defaultValue ?? ""), // Ensure default values are strings
@@ -207,6 +208,7 @@ export const getAddCategorySecondaryFormFields = async (
       pattern: dataType?.pattern ?? ".*",
       type: dataType.inputType,
       note: dataType.note,
+      required: true,
     },
     {
       name: "Topic",
