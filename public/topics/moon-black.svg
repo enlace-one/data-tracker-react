@@ -1,0 +1,13 @@
+<svg width="600" height="600" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <ellipse fill="#fff" cx="301.33327" cy="300.83331" id="svg_1" rx="299.33331" ry="299.49997" stroke="#000"/>
+  <path fill="none" stroke="#000" stroke-width="5" d="m280.08809,643.92269l0.56913,0l0.17587,-0.54067l0.17587,0.54067l0.56913,0l-0.46044,0.33415l0.17588,0.54067l-0.46044,-0.33416l-0.46044,0.33416l0.17588,-0.54067l-0.46044,-0.33415z" id="svg_30"/>
+  <path stroke="#000" id="svg_2" d="m367.27929,498.01939l0,0c-146.8947,0 -265.99999,-92.66077 -265.99999,-207c0,-114.32458 119.10529,-207 265.99999,-207l0,0c-83.71536,48.86442 -132.99086,125.5593 -132.99086,207s49.2755,158.12093 132.99086,207z" fill="#2b2b2b"/>
+  <text transform="matrix(2.03405 0 0 1.7855 -313.638 -220.171)" stroke="#000" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Quicksand'" font-size="60" stroke-width="0" id="svg_4" y="259.01898" x="379.60017" fill="#444444">Z</text>
+  <text transform="matrix(1.69874 0 0 1.46496 -271.205 -109.565)" stroke="#000" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Quicksand'" font-size="60" stroke-width="0" id="svg_5" y="285.33323" x="380.08813" fill="#444444">Z</text>
+  <text font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Quicksand'" font-size="60" stroke-width="0" id="svg_6" y="357.80021" x="326.13297" stroke="#000" fill="#444444">Z</text>
+  <text transform="matrix(0.701754 0 0 0.669432 151.449 60.9852)" stroke="#000" font-weight="bold" xml:space="preserve" text-anchor="start" font-family="'Quicksand'" font-size="60" stroke-width="0" id="svg_7" y="483.47573" x="172.92422" fill="#444444">Z</text>
+ </g>
+
+</svg>
