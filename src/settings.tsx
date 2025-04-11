@@ -292,12 +292,12 @@ export const DEFAULT_TOPICS = [
 // Background Colors //
 ///////////////////////
 
-// #5656ff
+// #c5c5f9
 // #aaffd4
 // #ffffaa
 // #ffd4aa
-// #ffaad4
-// #bfbf91
+// #f9cae1
+// #c5f7dd
 
 //////////////////
 // Example Data //
