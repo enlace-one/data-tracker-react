@@ -114,6 +114,15 @@ export const getUpdateCategoryFormFields = (
     },
   ];
 
+  if (category.dataType.inputType?.includes("select")) {
+    formData.push({
+      name: "Options",
+      id: "options",
+      note: "Comma seperated options",
+      type: "select",
+    });
+  }
+
   if (showDataType) {
     const dataTypeOptions = dataTypes.map((dt) => ({
       label: dt.name,
