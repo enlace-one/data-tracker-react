@@ -1,3 +1,4 @@
+import { TOPIC_IMAGE_PATH } from "./settings";
 import {
   DataEntry,
   EnrichedDataCategory,
@@ -51,7 +52,7 @@ export const getUpdateCategoryFormFields = (
     element: (
       <>
         <img
-          src={"/topics/" + dt.imageLink}
+          src={TOPIC_IMAGE_PATH + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -176,7 +177,7 @@ export const getAddCategorySecondaryFormFields = async (
     element: (
       <>
         <img
-          src={"/topics/" + dt.imageLink}
+          src={TOPIC_IMAGE_PATH + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",

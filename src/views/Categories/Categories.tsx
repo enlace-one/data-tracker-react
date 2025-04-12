@@ -12,6 +12,7 @@ import {
   getAddCategorySecondaryFormFields,
 } from "../../formFields";
 import { getPrettyNameForDate } from "../../util";
+import { TOPIC_IMAGE_PATH } from "../../settings";
 
 export default function Categories() {
   const {
@@ -153,7 +154,7 @@ export default function Categories() {
                 <td>
                   {item.topic?.imageLink && (
                     <img
-                      src={"/topics/" + item.topic.imageLink}
+                      src={TOPIC_IMAGE_PATH + item.topic.imageLink}
                       alt={item.topic?.name}
                       style={{
                         width: "3rem",

@@ -65,6 +65,9 @@ export const DEFAULT_DATA_TYPES = [
   },
 ];
 
+export const TOPIC_IMAGE_PATH =
+  "https://raw.githubusercontent.com/A-Management/common_static/main/topics/";
+
 // imageLink = topicId
 export const DEFAULT_TOPICS = [
   { name: "Bed (Black)", imageLink: "bed-black.svg" },
@@ -316,6 +319,8 @@ export const DEFAULT_TOPICS = [
 ////////////
 // Styles //
 ////////////
+
+// (!) SEE util.py FOR UPDATED STYLES !
 
 // Black
 // #2b2b2b (black)

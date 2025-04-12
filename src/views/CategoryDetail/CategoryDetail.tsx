@@ -21,6 +21,7 @@ import {
 } from "../../formFields";
 import styles from "./CategoryDetail.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
+import { TOPIC_IMAGE_PATH } from "../../settings";
 
 interface Props {
   category: EnrichedDataCategory;
@@ -314,7 +315,7 @@ export default function CategoryDetail({ category }: Props) {
             <td className={styles.minWidth}>
               {category.topic?.imageLink && (
                 <img
-                  src={"/topics/" + category.topic?.imageLink}
+                  src={TOPIC_IMAGE_PATH + category.topic?.imageLink}
                   alt={category.topic?.name}
                   style={{
                     width: "5rem",
