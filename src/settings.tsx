@@ -332,7 +332,7 @@ export const DEFAULT_TOPICS = [
 
 // Green
 // #619E73 (green)
-// #B1FFFF (blue)
+// #56f8f8 (blue)
 
 // Purple
 // #AF84A3 (purple)

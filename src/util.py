@@ -10,11 +10,11 @@ import re
 def getAlternateStylesForSVG(svg_name=None):
     styles = [
         {"name": "black", "color1": "2b2b2b", "color2": "444444"},
-        {"name": "cyan", "color1": "00bfbf", "color2": "9acee6"},
-        {"name": "blue", "color1": "9acee6", "color2": "BF7E96"},
-        {"name": "green", "color1": "619E73", "color2": "B1FFFF"},
-        {"name": "purple", "color1": "AF84A3", "color2": "9acee6"},
-        {"name": "red", "color1": "d10c0c", "color2": "BF7E96"},
+        {"name": "cyan", "color1": "00bfbf", "color2": "008080"},
+        {"name": "blue", "color1": "9acee6", "color2": "1a3c5e"},
+        {"name": "green", "color1": "619E73", "color2": "333f44"},
+        {"name": "purple", "color1": "AF84A3", "color2": "4a5e7c"},
+        {"name": "red", "color1": "af0707", "color2": "3a3a3a"},
     ]
     svg_background = """<g>
   <title>Layer 1</title>
