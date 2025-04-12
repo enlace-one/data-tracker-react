@@ -1,3 +1,4 @@
+import { TOPIC_IMAGE_PATH } from "./settings";
 import {
   DataEntry,
   EnrichedDataCategory,
@@ -51,7 +52,7 @@ export const getUpdateCategoryFormFields = (
     element: (
       <>
         <img
-          src={"/topics/" + dt.imageLink}
+          src={TOPIC_IMAGE_PATH + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -80,6 +81,7 @@ export const getUpdateCategoryFormFields = (
       name: "Default Value",
       id: "defaultValue",
       note: category.dataType?.note ?? "",
+      required: true,
       type: category.dataType?.inputType ?? "text",
       pattern: category.dataType?.pattern ?? ".*",
       default: String(category.defaultValue ?? ""), // Ensure default values are strings
@@ -113,6 +115,15 @@ export const getUpdateCategoryFormFields = (
       required: true,
     },
   ];
+
+  if (category.dataType.inputType?.includes("select")) {
+    formData.push({
+      name: "Options",
+      id: "options",
+      note: "Comma seperated options",
+      type: "select",
+    });
+  }
 
   if (showDataType) {
     const dataTypeOptions = dataTypes.map((dt) => ({
@@ -166,7 +177,7 @@ export const getAddCategorySecondaryFormFields = async (
     element: (
       <>
         <img
-          src={"/topics/" + dt.imageLink}
+          src={TOPIC_IMAGE_PATH + dt.imageLink}
           alt={dt.name}
           style={{
             width: "2rem",
@@ -198,6 +209,7 @@ export const getAddCategorySecondaryFormFields = async (
       pattern: dataType?.pattern ?? ".*",
       type: dataType.inputType,
       note: dataType.note,
+      required: true,
     },
     {
       name: "Topic",
