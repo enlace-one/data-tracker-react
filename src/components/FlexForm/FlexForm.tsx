@@ -94,7 +94,7 @@ const FlexForm = ({
   ]);
 
   const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { id, type, value } = e.target;
     const isCheckbox =
@@ -221,6 +221,14 @@ const FlexForm = ({
                           }
                           defaultValue={String(formData[field.id])}
                         />
+                      ) : field.type === "textarea" ? (
+                        <textarea
+                          id={field.id}
+                          name={field.id}
+                          onChange={handleChange}
+                          required={field.required ?? false}
+                          style={{ width: "100%" }}
+                        ></textarea>
                       ) : (
                         <input
                           type={field.type || "text"}

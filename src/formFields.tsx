@@ -421,7 +421,7 @@ export const getAddUpdateMacroFormFields = (
     {
       name: "Formula",
       id: "formula",
-      type: "text",
+      type: "textarea",
       note: "Example: [Cat Name 1] - [Cat Name 2]",
       required: true,
       default: macro.formula ?? "",
