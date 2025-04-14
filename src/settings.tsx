@@ -182,6 +182,7 @@ export const DEFAULT_TOPICS = [
   { name: "File (Green)", imageLink: "file-green.svg" },
   { name: "File (Purple)", imageLink: "file-purple.svg" },
   { name: "File (Red)", imageLink: "file-red.svg" },
+  { name: "Fruit", imageLink: "fruit.svg" },
   { name: "Gears (Black)", imageLink: "gears-black.svg" },
   { name: "Gears (Blue)", imageLink: "gears-blue.svg" },
   { name: "Gears (Colorful)", imageLink: "gears-colorful.svg" },
