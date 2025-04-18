@@ -10,7 +10,7 @@ import { useData } from "../../DataContext";
 import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
-import { helpLink, version } from "../../settings";
+import { aboutLink, helpLink, supportLink, version } from "../../settings";
 import { addExampleData } from "../../api";
 import HoverText from "../../components/HoverText/HoverText";
 
@@ -73,9 +73,25 @@ export default function Profile({ signOut }: ProfileProps) {
         ))}
       </Grid>
 
-      <a href={helpLink} target="_blank">
-        Get Help
-      </a>
+      <Grid
+        margin="0 0"
+        autoFlow="column"
+        justifyContent="center"
+        gap="1rem"
+        alignContent="center"
+      >
+        <a href={helpLink} target="_blank">
+          Get Help
+        </a>
+
+        <a href={aboutLink} target="_blank">
+          About
+        </a>
+
+        <a href={supportLink} target="_blank">
+          Support us
+        </a>
+      </Grid>
       <small>Version: {version}</small>
 
       <Grid

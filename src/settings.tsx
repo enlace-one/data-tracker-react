@@ -2,7 +2,9 @@ export const version = "1.0.0";
 
 export const appName = "Data Tracker"; // Also update index.html
 
+export const aboutLink = "https://enlace.one/";
 export const helpLink = "https://enlace-one.freshdesk.com/support/home";
+export const supportLink = "https://www.patreon.com/EnlaceOne";
 
 export const DEFAULT_DATA_TYPES = [
   {
