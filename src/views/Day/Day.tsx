@@ -87,6 +87,7 @@ export default function Day() {
   const fetchEntries = standardWrapper(_fetchEntries);
 
   const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+    console.log("Updating entry form and fetching entries");
     await updateDataEntry(formData);
     await fetchEntries();
   };
@@ -100,7 +101,7 @@ export default function Day() {
   // Trigger fetchEntries when `date` updates
   useEffect(() => {
     fetchEntries();
-  }, [date, dataCategories]);
+  }, [date]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
