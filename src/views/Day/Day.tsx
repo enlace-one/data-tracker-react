@@ -82,6 +82,7 @@ export default function Day() {
 
   const runMacrosAndUpdate = async () => {
     await runMacros(macros, date, dataCategories);
+    fetchEntries();
   };
 
   const fetchEntries = standardWrapper(_fetchEntries);

@@ -651,8 +651,17 @@ export async function addExampleData(skipConfirmation = false) {
   for (const cat of categories) {
     const data = EXAMPLE_DATA.find((d) => d.category.name == cat.name);
     if (data) {
+      let counter = 0;
       for (const entry of data.entries) {
-        await createDataEntry({ ...entry, dataCategoryId: cat.id });
+        const date = new Date();
+        date.setDate(date.getDate() - counter);
+        const date_string = date.toLocaleDateString("en-CA");
+        await createDataEntry({
+          ...entry,
+          dataCategoryId: cat.id,
+          date: date_string,
+        });
+        counter += 1;
       }
     }
   }

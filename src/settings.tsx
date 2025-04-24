@@ -382,15 +382,12 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-01",
         value: "35",
       },
       {
-        date: "2025-01-14",
         value: "54",
       },
       {
-        date: "2025-01-15",
         value: "32",
       },
     ],
@@ -404,15 +401,12 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-01",
         value: "true",
       },
       {
-        date: "2025-01-14",
         value: "false",
       },
       {
-        date: "2025-01-15",
         value: "true",
       },
     ],
@@ -426,15 +420,12 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-20",
         value: "20*22",
       },
       {
-        date: "2025-01-21",
         value: "20*20",
       },
       {
-        date: "2025-01-22",
         value: "20*19",
       },
     ],
@@ -448,15 +439,12 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-02-01",
         value: "05:00",
       },
       {
-        date: "2025-02-04",
         value: "08:00",
       },
       {
-        date: "2025-02-25",
         value: "03:00",
       },
     ],
