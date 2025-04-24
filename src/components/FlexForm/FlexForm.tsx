@@ -198,7 +198,7 @@ const FlexForm = ({
                         />
                       ) : field.type === "time-difference" ? (
                         <TimeDifferenceField
-                          onChange={(value) =>
+                          onBlur={(value) =>
                             handleCustomStringFieldChange(field.id, value)
                           }
                           defaultValue={String(formData[field.id])}

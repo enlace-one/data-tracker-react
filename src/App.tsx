@@ -38,7 +38,7 @@ export default function App() {
     if (!initialized.current && dataCategories.length) {
       initialized.current = true;
       loadEverything();
-    } else if (dataCategories) {
+    } else if (dataCategories && fetchedCats) {
       setLoading(false);
     }
   }, [fetchedCats]);

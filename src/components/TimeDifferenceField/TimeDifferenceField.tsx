@@ -3,16 +3,16 @@ import { useState, useEffect } from "react";
 
 interface Props {
   defaultValue: string;
-  onChange: (value: string) => void;
+  onBlur: (value: string) => void;
 }
 
-const TimeDifferenceField = ({ defaultValue, onChange }: Props) => {
+const TimeDifferenceField = ({ defaultValue, onBlur = console.log }: Props) => {
   const [value1, setValue1] = useState(defaultValue.split("-")[0]);
   const [value2, setValue2] = useState(defaultValue.split("-")[1]);
 
-  useEffect(() => {
-    onChange(`${value1}-${value2}`);
-  }, [value1, value2]);
+  // useEffect(() => {
+  //   onBlur(`${value1}-${value2}`);
+  // }, [value1, value2]);
 
   return (
     <div>
@@ -25,6 +25,7 @@ const TimeDifferenceField = ({ defaultValue, onChange }: Props) => {
         // className={styles.TimeDifferenceField}
         value={value1}
         onChange={(e) => setValue1(e.target.value)}
+        onBlur={() => onBlur(`${value1}-${value2}`)}
       />
       <br />
       <small>
@@ -36,6 +37,7 @@ const TimeDifferenceField = ({ defaultValue, onChange }: Props) => {
         // className={styles.TimeDifferenceField}
         value={value2}
         onChange={(e) => setValue2(e.target.value)}
+        onBlur={() => onBlur(`${value1}-${value2}`)}
       />
     </div>
   );

@@ -196,6 +196,7 @@ export default function Day() {
     entry: EnrichedDataEntry,
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
+    console.log("Value input changed, saving...");
     const { value } = e.target;
     updateDataEntryValue(entry, String(value));
   };
@@ -204,6 +205,7 @@ export default function Day() {
     entry: EnrichedDataEntry,
     value: boolean | string
   ) => {
+    console.log("Boolean value input changed, saving...");
     updateDataEntryValue(entry, String(value));
   };
 
@@ -249,7 +251,7 @@ export default function Day() {
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm> */}
 
-      {loading && <LoadingSymbol size={50} />}
+      {loading && <LoadingSymbol size={50} text="Loading Entries..." />}
       {!loading && (
         <table className={styles.table}>
           <tbody>
@@ -286,9 +288,7 @@ export default function Day() {
                         id={entry.id}
                         name={entry.id}
                         value={entry.value}
-                        onChange={(event) =>
-                          handleValueInputChange(entry, event)
-                        }
+                        onBlur={(event) => handleValueInputChange(entry, event)}
                       >
                         <option value="">Select an option</option>
                         {entry.dataCategory?.options?.map((option) => (
@@ -301,7 +301,7 @@ export default function Day() {
                     {entry.dataCategory?.dataType?.inputType ==
                       "time-difference" && (
                       <TimeDifferenceField
-                        onChange={(value) =>
+                        onBlur={(value) =>
                           handleValueBooleanChange(entry, value)
                         }
                         defaultValue={entry.value}
@@ -317,7 +317,7 @@ export default function Day() {
                           className={"ValueInput" + entry.id}
                           defaultValue={entry.value}
                           style={{ maxWidth: "9rem" }}
-                          onChange={(event) =>
+                          onBlur={(event) =>
                             handleValueInputChange(entry, event)
                           }
                         ></input>
