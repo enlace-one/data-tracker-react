@@ -15,7 +15,22 @@ const root = document.getElementById("root") as HTMLElement;
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <Authenticator>
+    <Authenticator
+      components={{
+        Header() {
+          return (
+            <div style={{ textAlign: "center", padding: "1rem" }}>
+              <img
+                src="https://raw.githubusercontent.com/A-Management/common_static/main/app_icons/dataTracker.svg"
+                alt="Data Tracker Logo"
+                style={{ maxWidth: "60px" }}
+              />
+              <h2 style={{ marginTop: "1rem" }}>Welcome to Data Tracker</h2>
+            </div>
+          );
+        },
+      }}
+    >
       <DataProvider>
         <PrepareApp />
       </DataProvider>
