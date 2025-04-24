@@ -365,7 +365,7 @@ export default function DateGraph() {
 
   return (
     <>
-      <Heading level={1}>Correlation Graph</Heading>
+      <Heading level={1}>Graph</Heading>
       <Divider />
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
