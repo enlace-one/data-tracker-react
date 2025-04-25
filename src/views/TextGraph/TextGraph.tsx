@@ -26,7 +26,7 @@ ChartJS.register(
 );
 
 export default function TextGraph() {
-  const { dataCategories, screenWidth } = useData();
+  const { dataCategories } = useData();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
