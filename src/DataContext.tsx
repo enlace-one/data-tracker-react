@@ -47,6 +47,7 @@ interface DataContextType {
   initialized: boolean;
   setInitialized: (state: boolean) => void;
   fetchedCats: boolean;
+  definatelyFetchedCats: boolean;
   setFetchedCats: (state: boolean) => void;
 }
 
@@ -69,6 +70,8 @@ export function DataProvider({ children }: DataProviderProps) {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [initialized, setInitialized] = useState<boolean>(false);
   const [fetchedCats, setFetchedCats] = useState<boolean>(false);
+  const [definatelyFetchedCats, setDefinatelyFetchedCats] =
+    useState<boolean>(false);
   const [actionMessage, _setActionMessage] = useState<AlertInfo>({
     message: "",
     type: "",
@@ -124,6 +127,10 @@ export function DataProvider({ children }: DataProviderProps) {
       setTimeout(() => {
         setFetchedCats(true);
       }, 1000);
+
+      setTimeout(() => {
+        setDefinatelyFetchedCats(true);
+      }, 3000);
     }
 
     loadAndSubscribe();
@@ -159,6 +166,7 @@ export function DataProvider({ children }: DataProviderProps) {
         setActiveTab,
         fetchedCats,
         initialized,
+        definatelyFetchedCats,
         setInitialized,
         setFetchedCats,
       }}

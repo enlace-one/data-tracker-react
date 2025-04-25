@@ -24,7 +24,8 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, setInitialized, fetchedCats } = useData();
+  const { dataCategories, setInitialized, fetchedCats, definatelyFetchedCats } =
+    useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -64,7 +65,7 @@ export default function App() {
       setLoading(false);
     }
     console.log(fetchedCats, dataCategories.length);
-    if (fetchedCats && dataCategories.length == 0) {
+    if (definatelyFetchedCats && dataCategories.length == 0) {
       console.log("Adding example prompt");
       setAddExamplePrompt(true);
     }
