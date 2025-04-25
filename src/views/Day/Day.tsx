@@ -82,7 +82,7 @@ export default function Day() {
 
   const runMacrosAndUpdate = async () => {
     await runMacros(macros, date, dataCategories);
-    fetchEntries();
+    // fetchEntries();
   };
 
   const fetchEntries = standardWrapper(_fetchEntries);
@@ -101,8 +101,24 @@ export default function Day() {
 
   // Trigger fetchEntries when `date` updates
   useEffect(() => {
+    console.log("Reload due to date change");
     fetchEntries();
   }, [date]);
+
+  const [firstChangeOccured, setFirstChangeOccured] = useState(false);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (firstChangeOccured) {
+        console.log("Reload due to data category timeout");
+        fetchEntries();
+      } else {
+        console.log("First change");
+        setFirstChangeOccured(true);
+      }
+    }, 2000); // wait 2 seconds after last change
+
+    return () => clearTimeout(timeoutId); // clear timeout if dataCategories changes again
+  }, [dataCategories]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
