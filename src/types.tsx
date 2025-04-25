@@ -72,6 +72,8 @@ export interface FormDataType {
   lastRunOutput?: string;
   imageLink?: string;
   topicId?: string;
+  email?: string;
+  isNew?: boolean;
 }
 
 export type ResolvedDataType = DataType;

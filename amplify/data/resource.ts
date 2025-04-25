@@ -12,6 +12,7 @@ const schema = a
     UserProfile: a
       .model({
         email: a.string().required(),
+        isNew: a.boolean().default(true),
         profileOwner: a.string(),
       })
       .secondaryIndexes((index) => [index("email")])

@@ -11,7 +11,7 @@ import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
 import { aboutLink, helpLink, supportLink, version } from "../../settings";
-import { addExampleData } from "../../api";
+import { addExampleData, deleteProfile } from "../../api";
 import HoverText from "../../components/HoverText/HoverText";
 
 interface ProfileProps {
@@ -19,7 +19,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ signOut }: ProfileProps) {
-  const { userProfiles, setActiveTab } = useData();
+  const { userProfiles, setActiveTab, SETTINGS } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -68,6 +68,14 @@ export default function Profile({ signOut }: ProfileProps) {
                   key !== "id" &&
                   key !== "name" && <span key={key}> {`${key}: ${value}`}</span>
               )} */}
+              {SETTINGS.debug && (
+                <>
+                  <small>Is new: {user?.isNew}</small>
+                  <Button onClick={() => deleteProfile({ id: user.id })}>
+                    Delete Account
+                  </Button>
+                </>
+              )}
             </View>
           </Flex>
         ))}

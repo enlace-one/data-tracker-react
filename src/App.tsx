@@ -14,13 +14,17 @@ import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 import HoverText from "./components/HoverText/HoverText";
 import DateGraph from "./views/DateGraph/DateGraph";
+import { addExampleData, updateProfile } from "./api";
+import Popup from "./components/Popup/Popup";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
   const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
   const [loading, setLoading] = useState(true);
+  const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, setInitialized, fetchedCats } = useData();
+  const { dataCategories, setInitialized, fetchedCats, userProfiles } =
+    useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -32,6 +36,20 @@ export default function App() {
     setLoading(false);
   };
 
+  // Replaced with check of data categories length!
+  // useEffect(() => {
+  //   console.log("Is New:", userProfiles[0]?.isNew ?? "Not defined");
+  //   if (userProfiles[0]?.isNew ?? true) {
+  //     setAddExamplePrompt(true);
+  //     updateProfile({ ...userProfiles[0], isNew: false });
+  //   }
+  // }, [userProfiles]);
+
+  const handleAddExampleData = () => {
+    addExampleData(true);
+    setAddExamplePrompt(false);
+  };
+
   useEffect(() => {
     // This used to be dataCategories.length but that don't owrk if you got no categories!
     // So I added the second condition.
@@ -41,6 +59,11 @@ export default function App() {
       loadEverything();
     } else if (dataCategories && fetchedCats) {
       setLoading(false);
+    }
+    console.log(fetchedCats, dataCategories.length);
+    if (fetchedCats && dataCategories.length == 0) {
+      console.log("Adding example prompt");
+      setAddExamplePrompt(true);
     }
   }, [fetchedCats]);
 
@@ -74,6 +97,16 @@ export default function App() {
       <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
 
       {loading && <LoadingSymbol text={loadingText} />}
+      {addExamplePrompt && (
+        <Popup>
+          <h2>Add example data?</h2>
+          <p>
+            Would you like to automatically add a few example data categories
+            and data entries so you can see how the app works?
+          </p>
+          <Button onClick={handleAddExampleData}>Add</Button>
+        </Popup>
+      )}
       {!loading && (
         <>
           {activeTab === "profile" && <Profile signOut={signOut} />}
