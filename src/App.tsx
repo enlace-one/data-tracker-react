@@ -124,7 +124,7 @@ export default function App() {
         </>
       )}
       {/* Div to give space in case bottom menu covers anything */}
-      <div style={{ padding: "50px" }}> </div>
+      {/* <div style={{ padding: "50px" }}> </div> */}
 
       {/* Fixed Bottom Menu */}
       <div

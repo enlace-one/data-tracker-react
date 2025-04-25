@@ -365,7 +365,7 @@ export default function DateGraph() {
 
   return (
     <>
-      <Heading level={1}>Graph</Heading>
+      <Heading level={1}>Line Graph</Heading>
       <Divider />
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
@@ -547,7 +547,7 @@ export default function DateGraph() {
             alignContent="center"
           >
             <Button onClick={() => setActiveTab("text-graph")}>
-              Bar Chart
+              Bar Graph
             </Button>
             <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
           </Grid>
