@@ -119,6 +119,7 @@ export default function TextGraph() {
   // Chart options
   const chartOptions = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: "top" as const,
@@ -158,7 +159,9 @@ export default function TextGraph() {
         <>
           {/* Render Bar Chart */}
           {Object.keys(data).length > 0 && selectedCategory && (
-            <div style={{ maxWidth: "800px", margin: "0 auto" }}>
+            <div
+              style={{ height: "350px", maxWidth: "800px", margin: "0 auto" }}
+            >
               <Bar data={chartData} options={chartOptions} />
             </div>
           )}
