@@ -10,19 +10,29 @@ import {
 
 export const getAddEntryFormFieldsWithCategory = (
   category: EnrichedDataCategory
-) => [
+) => {
+  let options = undefined;
+  if (category.dataType.inputType === "select") {
+    options = (category?.options ?? []).map((o) => ({
+      label: o ?? "",
+      value: o ?? "",
+    }));
+  }
   // Category added in handleFormData
-  {
-    name: "Value",
-    id: "value",
-    type: category.dataType?.inputType ?? "text",
-    note: `${category.note}. DataType is ${category.dataType?.name}: ${category.dataType?.note}`,
-    default: category.defaultValue,
-    pattern: category.dataType?.pattern ?? ".*",
-  },
-  { name: "Date", id: "date", type: "date" },
-  { name: "Note", id: "note" },
-];
+  return [
+    {
+      name: "Value",
+      id: "value",
+      type: category.dataType?.inputType ?? "text",
+      note: `${category.note}. DataType is ${category.dataType?.name}: ${category.dataType?.note}`,
+      default: category.defaultValue,
+      pattern: category.dataType?.pattern ?? ".*",
+      options: options ?? [],
+    },
+    { name: "Date", id: "date", type: "date" },
+    { name: "Note", id: "note" },
+  ];
+};
 
 export const getUpdateEntryFormFieldsWithSetCategory = (
   entry: DataEntry,
@@ -120,6 +130,9 @@ export const getUpdateCategoryFormFields = (
     formData.push({
       name: "Options",
       id: "options",
+      default: Array.isArray(category?.options)
+        ? category?.options.join(",") ?? "" // Convert array to string
+        : category?.options ?? "",
       note: "Comma seperated options",
       type: "select",
     });
