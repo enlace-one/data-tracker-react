@@ -356,10 +356,16 @@ export default function CategoryDetail({ category }: Props) {
               <Button className={styles.lightMargin} onClick={handleImport}>
                 Import
               </Button>
-              <Popup isOpen={fileUpload}>
-                <input type="file" accept=".csv" onChange={handleFileUpload} />
-                <Button onClick={() => setFileUpload(false)}>Cancel</Button>
-              </Popup>
+              {fileUpload && (
+                <Popup>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileUpload}
+                  />
+                  <Button onClick={() => setFileUpload(false)}>Cancel</Button>
+                </Popup>
+              )}
               <FlexForm
                 heading="Update Category"
                 fields={getUpdateCategoryFormFields(

@@ -1,5 +1,5 @@
 import { defineAuth } from "@aws-amplify/backend";
-import { postConfirmation } from './post-confirmation/resource';
+import { postConfirmation } from "./post-confirmation/resource";
 
 export const auth = defineAuth({
   loginWith: {
@@ -7,10 +7,17 @@ export const auth = defineAuth({
       verificationEmailStyle: "CODE",
       verificationEmailSubject: "Welcome to Data Tracker!",
       verificationEmailBody: (createCode) =>
-        `Use this code to confirm your account: ${createCode()}`,
+        `Hello,
+
+      Welcome to Data Tracker! 
+      Please use this code to confirm your account: ${createCode()}
+      
+      Best Regards, 
+      Enlace Team
+      https://enlace.one/`,
     },
   },
   triggers: {
-    postConfirmation
-  }
+    postConfirmation,
+  },
 });
