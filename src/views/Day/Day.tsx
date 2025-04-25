@@ -290,7 +290,9 @@ export default function Day() {
                         id={entry.id}
                         name={entry.id}
                         value={entry.value}
-                        onBlur={(event) => handleValueInputChange(entry, event)}
+                        onChange={(event) =>
+                          handleValueInputChange(entry, event)
+                        }
                       >
                         <option value="">Select an option</option>
                         {entry.dataCategory?.options?.map((option) => (
