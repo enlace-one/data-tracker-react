@@ -14,7 +14,7 @@ import { addDefaults, setLastEntryDates } from "./util";
 import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 import HoverText from "./components/HoverText/HoverText";
 import DateGraph from "./views/DateGraph/DateGraph";
-import { addExampleData, updateProfile } from "./api";
+import { addExampleData } from "./api";
 import Popup from "./components/Popup/Popup";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
@@ -23,8 +23,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, setInitialized, fetchedCats, userProfiles } =
-    useData();
+  const { dataCategories, setInitialized, fetchedCats } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
