@@ -44,9 +44,12 @@ export default function App() {
   //   }
   // }, [userProfiles]);
 
-  const handleAddExampleData = () => {
-    addExampleData(true);
+  const handleAddExampleData = async () => {
     setAddExamplePrompt(false);
+    setLoadingText("Adding Example data...");
+    setLoading(true);
+    await addExampleData(true);
+    setLoading(false);
   };
 
   useEffect(() => {

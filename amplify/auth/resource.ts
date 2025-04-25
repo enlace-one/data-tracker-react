@@ -7,14 +7,7 @@ export const auth = defineAuth({
       verificationEmailStyle: "CODE",
       verificationEmailSubject: "Welcome to Data Tracker!",
       verificationEmailBody: (createCode) =>
-        `Hello,
-
-      Welcome to Data Tracker! 
-      Please use this code to confirm your account: ${createCode()}
-      
-      Best Regards, 
-      Enlace Team
-      https://enlace.one/`,
+        `Please use this code to confirm your account: ${createCode()}`,
     },
   },
   triggers: {

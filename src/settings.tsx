@@ -382,13 +382,13 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        value: "35",
+        value: "79",
       },
       {
-        value: "54",
+        value: "42",
       },
       {
-        value: "32",
+        value: "69",
       },
     ],
   },
@@ -420,13 +420,13 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        value: "20*22",
+        value: "30*31",
       },
       {
-        value: "20*20",
+        value: "25*35",
       },
       {
-        value: "20*19",
+        value: "20*40",
       },
     ],
   },
@@ -446,6 +446,26 @@ export const EXAMPLE_DATA = [
       },
       {
         value: "03:00",
+      },
+    ],
+  },
+  {
+    category: {
+      name: "Worked",
+      dataTypeId: "select-numeric-001",
+      note: "Example category",
+      options: "Off (0), Remote (1), In Office (2)",
+      topicId: "work-black.svg",
+    },
+    entries: [
+      {
+        value: "Remote (1)",
+      },
+      {
+        value: "In Office (2)",
+      },
+      {
+        value: "Off (0)",
       },
     ],
   },
