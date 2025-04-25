@@ -16,6 +16,7 @@ import HoverText from "./components/HoverText/HoverText";
 import DateGraph from "./views/DateGraph/DateGraph";
 import { addExampleData } from "./api";
 import Popup from "./components/Popup/Popup";
+import TextGraph from "./views/TextGraph/TextGraph";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -118,6 +119,7 @@ export default function App() {
           {activeTab === "day" && <Day />}
           {activeTab === "macros" && <Macros />}
           {activeTab === "date-graph" && <DateGraph />}
+          {activeTab === "text-graph" && <TextGraph />}
           {/* <Divider /> */}
         </>
       )}

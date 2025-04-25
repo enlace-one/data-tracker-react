@@ -546,6 +546,9 @@ export default function DateGraph() {
             gap="1rem"
             alignContent="center"
           >
+            <Button onClick={() => setActiveTab("text-graph")}>
+              Bar Chart
+            </Button>
             <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
           </Grid>
           <div style={{ padding: "50px" }}> </div>
