@@ -34,6 +34,32 @@ export async function fetchUserProfiles(): Promise<
   }
 }
 
+export async function updateProfile(formData: FormData): Promise<void> {
+  console.log("Updating Profile:", formData); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.UserProfile.update({
+    id: formData.id!,
+    email: formData.email, // Ensure a default empty string if missing
+    isNew: formData.isNew, // Default empty string
+  });
+  console.log("Errors:", errors);
+  if (errors) {
+    throw new Error(String(errors));
+  }
+}
+
+export async function deleteProfile(formData: FormData): Promise<void> {
+  console.log("Deleting Profile:", formData); // Fixed incorrect variable reference
+
+  const { errors } = await client.models.UserProfile.delete({
+    id: formData.id!,
+  });
+  console.log("Errors:", errors);
+  if (errors) {
+    throw new Error(String(errors));
+  }
+}
+
 export async function fetchMacros(): Promise<Macro[]> {
   try {
     const { data: macros, errors } = await client.models.Macro.listByPriority(
@@ -651,8 +677,17 @@ export async function addExampleData(skipConfirmation = false) {
   for (const cat of categories) {
     const data = EXAMPLE_DATA.find((d) => d.category.name == cat.name);
     if (data) {
+      let counter = 0;
       for (const entry of data.entries) {
-        await createDataEntry({ ...entry, dataCategoryId: cat.id });
+        const date = new Date();
+        date.setDate(date.getDate() - counter);
+        const date_string = date.toLocaleDateString("en-CA");
+        await createDataEntry({
+          ...entry,
+          dataCategoryId: cat.id,
+          date: date_string,
+        });
+        counter += 1;
       }
     }
   }

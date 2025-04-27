@@ -72,6 +72,8 @@ export interface FormDataType {
   lastRunOutput?: string;
   imageLink?: string;
   topicId?: string;
+  email?: string;
+  isNew?: boolean;
 }
 
 export type ResolvedDataType = DataType;
@@ -138,4 +140,5 @@ export type ActiveTab =
   | "types"
   | "graph"
   | "date-graph"
+  | "text-graph"
   | "day";

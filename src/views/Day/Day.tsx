@@ -82,11 +82,13 @@ export default function Day() {
 
   const runMacrosAndUpdate = async () => {
     await runMacros(macros, date, dataCategories);
+    // fetchEntries();
   };
 
   const fetchEntries = standardWrapper(_fetchEntries);
 
   const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
+    console.log("Updating entry form and fetching entries");
     await updateDataEntry(formData);
     await fetchEntries();
   };
@@ -99,8 +101,24 @@ export default function Day() {
 
   // Trigger fetchEntries when `date` updates
   useEffect(() => {
+    console.log("Reload due to date change");
     fetchEntries();
-  }, [date, dataCategories]);
+  }, [date]);
+
+  const [firstChangeOccured, setFirstChangeOccured] = useState(false);
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (firstChangeOccured) {
+        console.log("Reload due to data category timeout");
+        fetchEntries();
+      } else {
+        console.log("First change");
+        setFirstChangeOccured(true);
+      }
+    }, 200); // wait after last change
+
+    return () => clearTimeout(timeoutId); // clear timeout if dataCategories changes again
+  }, [dataCategories]);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -196,6 +214,7 @@ export default function Day() {
     entry: EnrichedDataEntry,
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
   ) => {
+    console.log("Value input changed, saving...");
     const { value } = e.target;
     updateDataEntryValue(entry, String(value));
   };
@@ -204,6 +223,7 @@ export default function Day() {
     entry: EnrichedDataEntry,
     value: boolean | string
   ) => {
+    console.log("Boolean value input changed, saving...");
     updateDataEntryValue(entry, String(value));
   };
 
@@ -249,7 +269,7 @@ export default function Day() {
         <Button className={styles.lightMargin}>Add Category</Button>
       </FlexForm> */}
 
-      {loading && <LoadingSymbol size={50} />}
+      {loading && <LoadingSymbol size={50} text="Loading Entries..." />}
       {!loading && (
         <table className={styles.table}>
           <tbody>
@@ -301,7 +321,7 @@ export default function Day() {
                     {entry.dataCategory?.dataType?.inputType ==
                       "time-difference" && (
                       <TimeDifferenceField
-                        onChange={(value) =>
+                        onBlur={(value) =>
                           handleValueBooleanChange(entry, value)
                         }
                         defaultValue={entry.value}
@@ -317,7 +337,7 @@ export default function Day() {
                           className={"ValueInput" + entry.id}
                           defaultValue={entry.value}
                           style={{ maxWidth: "9rem" }}
-                          onChange={(event) =>
+                          onBlur={(event) =>
                             handleValueInputChange(entry, event)
                           }
                         ></input>

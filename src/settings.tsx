@@ -1,8 +1,10 @@
-export const version = "1.0.0";
+export const version = "1.0.1";
 
 export const appName = "Data Tracker"; // Also update index.html
 
-export const helpLink = "https://help-enlace.freshdesk.com/support/home";
+export const aboutLink = "https://enlace.one/";
+export const helpLink = "https://enlace.one/#/help";
+export const supportLink = "https://enlace.one/#/support-me";
 
 export const DEFAULT_DATA_TYPES = [
   {
@@ -380,16 +382,13 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-01",
-        value: "35",
+        value: "79",
       },
       {
-        date: "2025-01-14",
-        value: "54",
+        value: "42",
       },
       {
-        date: "2025-01-15",
-        value: "32",
+        value: "69",
       },
     ],
   },
@@ -402,15 +401,12 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-01",
         value: "true",
       },
       {
-        date: "2025-01-14",
         value: "false",
       },
       {
-        date: "2025-01-15",
         value: "true",
       },
     ],
@@ -424,16 +420,13 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-01-20",
-        value: "20*22",
+        value: "30*31",
       },
       {
-        date: "2025-01-21",
-        value: "20*20",
+        value: "25*35",
       },
       {
-        date: "2025-01-22",
-        value: "20*19",
+        value: "20*40",
       },
     ],
   },
@@ -446,16 +439,33 @@ export const EXAMPLE_DATA = [
     },
     entries: [
       {
-        date: "2025-02-01",
         value: "05:00",
       },
       {
-        date: "2025-02-04",
         value: "08:00",
       },
       {
-        date: "2025-02-25",
         value: "03:00",
+      },
+    ],
+  },
+  {
+    category: {
+      name: "Worked",
+      dataTypeId: "select-numeric-001",
+      note: "Example category",
+      options: "Off (0), Remote (1), In Office (2)",
+      topicId: "work-black.svg",
+    },
+    entries: [
+      {
+        value: "Remote (1)",
+      },
+      {
+        value: "In Office (2)",
+      },
+      {
+        value: "Off (0)",
       },
     ],
   },

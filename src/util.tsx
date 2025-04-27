@@ -34,7 +34,9 @@ export const parseNumberToTime = (decimalTime: number): string => {
   // Ensure minutes are always two digits
   const formattedMinutes = minutes.toString().padStart(2, "0");
 
-  return `${hours}:${formattedMinutes}`;
+  const formattedHours = hours.toString().padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes}`;
 };
 
 export const parseBooleanToNumber = (boolean: string) => {

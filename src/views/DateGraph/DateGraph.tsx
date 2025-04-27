@@ -77,12 +77,8 @@ export default function DateGraph() {
   }, [dataCategories]);
 
   useEffect(() => {
-    if (startDate && endDate && selectedCategories.length > 0) {
-      updateChartData(selectedCategories);
-    }
+    updateChartData(selectedCategories);
   }, [
-    startDate,
-    endDate,
     selectedCategories,
     y2BlankHandling,
     y1BlankHandling,
@@ -146,6 +142,12 @@ export default function DateGraph() {
   };
 
   const updateChartData = async (categories: string[]) => {
+    if (startDate && endDate && categories.length > 0) {
+      console.log("Updating chart...");
+    } else {
+      console.log("Missing date or selected cats");
+      return;
+    }
     if (!startDate || !endDate || categories.length === 0) return;
 
     setLoading(true);
@@ -363,7 +365,7 @@ export default function DateGraph() {
 
   return (
     <>
-      <Heading level={1}>Date Graph</Heading>
+      <Heading level={1}>Line Graph</Heading>
       <Divider />
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
@@ -520,6 +522,7 @@ export default function DateGraph() {
               <input
                 type="date"
                 value={startDate}
+                onBlur={() => updateChartData(selectedCategories)}
                 onChange={(e) => handleDateChange(e, "start")}
                 className={styles.dateInput}
               />
@@ -529,6 +532,7 @@ export default function DateGraph() {
               <input
                 type="date"
                 value={endDate}
+                onBlur={() => updateChartData(selectedCategories)}
                 onChange={(e) => handleDateChange(e, "end")}
                 className={styles.dateInput}
               />
@@ -542,6 +546,9 @@ export default function DateGraph() {
             gap="1rem"
             alignContent="center"
           >
+            <Button onClick={() => setActiveTab("text-graph")}>
+              Bar Graph
+            </Button>
             <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
           </Grid>
           <div style={{ padding: "50px" }}> </div>
