@@ -115,7 +115,7 @@ export default function Day() {
         console.log("First change");
         setFirstChangeOccured(true);
       }
-    }, 2000); // wait 2 seconds after last change
+    }, 200); // wait after last change
 
     return () => clearTimeout(timeoutId); // clear timeout if dataCategories changes again
   }, [dataCategories]);
