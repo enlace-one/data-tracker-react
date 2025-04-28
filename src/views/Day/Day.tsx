@@ -14,7 +14,10 @@ import styles from "./Day.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
-import { getAddUpdateDataEntryFormFields } from "../../formFields";
+import {
+  getAddUpdateDataEntryFormFields,
+  getUpdateEntryFormFieldsWithSetCategory,
+} from "../../formFields";
 import TimeDifferenceField from "../../components/TimeDifferenceField/TimeDifferenceField";
 export default function Day() {
   const { dataCategories, setActionMessage } = useData();
@@ -278,9 +281,9 @@ export default function Day() {
                 <td className={styles.minWidth}>
                   <FlexForm
                     heading="Update Entry"
-                    fields={getAddUpdateDataEntryFormFields(
+                    fields={getUpdateEntryFormFieldsWithSetCategory(
                       entry,
-                      dataCategories
+                      entry.dataCategory
                     )}
                     handleFormData={handleUpdateEntryFormData}
                   >

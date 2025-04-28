@@ -146,7 +146,6 @@ export default function CategoryDetail({ category }: Props) {
 
   const _handleNewEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
-    formData.dataCategoryId = category.id;
     await createDataEntry(formData);
     await fetchInitialData();
   };
@@ -154,7 +153,6 @@ export default function CategoryDetail({ category }: Props) {
 
   const _handleUpdateEntryFormData = async (formData: Record<string, any>) => {
     console.log("Received form data:", formData);
-    formData.dataCategoryId = category.id; // Handle form data submission
     await updateDataEntry(formData);
     await fetchInitialData();
   };
