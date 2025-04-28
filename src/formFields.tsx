@@ -31,6 +31,13 @@ export const getAddEntryFormFieldsWithCategory = (
     },
     { name: "Date", id: "date", type: "date" },
     { name: "Note", id: "note" },
+    {
+      name: "Data Category",
+      id: "dataCategoryId",
+      type: "text",
+      hidden: true,
+      default: category.id,
+    },
   ];
 };
 
@@ -49,6 +56,13 @@ export const getUpdateEntryFormFieldsWithSetCategory = (
   { name: "Date", id: "date", type: "date", default: entry.date ?? "" },
   { name: "Note", id: "note", default: entry.note ?? "" },
   { name: "Id", id: "id", default: entry.id ?? "", hidden: true },
+  {
+    name: "Data Category",
+    id: "dataCategoryId",
+    type: "text",
+    hidden: true,
+    default: category.id,
+  },
 ];
 export const getUpdateCategoryFormFields = (
   category: EnrichedDataCategory,
