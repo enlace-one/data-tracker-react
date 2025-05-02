@@ -74,6 +74,7 @@ export interface FormDataType {
   topicId?: string;
   email?: string;
   isNew?: boolean;
+  topicColorPreference?: string;
 }
 
 export type ResolvedDataType = DataType;

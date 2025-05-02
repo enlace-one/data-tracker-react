@@ -41,6 +41,7 @@ export async function updateProfile(formData: FormData): Promise<void> {
     id: formData.id!,
     email: formData.email, // Ensure a default empty string if missing
     isNew: formData.isNew, // Default empty string
+    topicColorPreference: formData.topicColorPreference,
   });
   console.log("Errors:", errors);
   if (errors) {

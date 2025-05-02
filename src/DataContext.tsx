@@ -103,6 +103,22 @@ export function DataProvider({ children }: DataProviderProps) {
     async function loadProfiles() {
       const profiles = await fetchUserProfiles();
       setUserProfiles(profiles);
+      const topicColorPreference = profiles[0].topicColorPreference ?? "none";
+
+      const sortedTopics = DEFAULT_TOPICS.sort((a, b) => {
+        if (topicColorPreference == "none") {
+          return a.name.localeCompare(b.name);
+        }
+        const aIsColorful = a.name.toLowerCase().includes(topicColorPreference);
+        const bIsColorful = b.name.toLowerCase().includes(topicColorPreference);
+
+        if (aIsColorful && !bIsColorful) return -1;
+        if (!aIsColorful && bIsColorful) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      // Put colorful ones first (they contain colorful) but otherwise alphabetic
+      setTopics(sortedTopics);
     }
     loadProfiles();
   }, []);

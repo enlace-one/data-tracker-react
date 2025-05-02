@@ -11,8 +11,10 @@ import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
 import { aboutLink, helpLink, supportLink, version } from "../../settings";
-import { addExampleData, deleteProfile } from "../../api";
+import { addExampleData, deleteProfile, updateProfile } from "../../api";
 import HoverText from "../../components/HoverText/HoverText";
+import { getUpdateUserProfileFields } from "../../formFields";
+import FlexForm from "../../components/FlexForm/FlexForm";
 
 interface ProfileProps {
   signOut: () => void;
@@ -29,6 +31,19 @@ export default function Profile({ signOut }: ProfileProps) {
   }, [userProfiles]);
 
   if (loading) return <LoadingSymbol size={50} />; // Use Spinner component
+
+  // const handleSetPreferences = () => {
+  //   if (userProfiles.length === 1) {
+  //     fields = getUpdateUserProfileFields(userPro);
+  //   } else {
+  //     console.log(`Invalid number of profiles ${userProfiles.length}`);
+  //   }
+  // };
+
+  const handleFormData = async (formData: Record<string, any>) => {
+    console.log("Updating profile Form Data:", formData);
+    await updateProfile(formData);
+  };
 
   return (
     <>
@@ -47,9 +62,9 @@ export default function Profile({ signOut }: ProfileProps) {
             direction="column"
             justifyContent="center"
             alignItems="center"
-            gap="2rem"
+            gap=".5rem"
             border="1px solid #ccc"
-            padding="2rem"
+            padding="2rem 2rem 1rem 2rem"
             borderRadius="5%"
             className="box"
           >
@@ -62,6 +77,27 @@ export default function Profile({ signOut }: ProfileProps) {
               <small>
                 Updated: <DateSpan date={user.updatedAt} />
               </small>
+              <br />
+              <small>Topic Color Preference: {user.topicColorPreference}</small>
+              <br />
+              <Grid
+                margin="1rem 0"
+                autoFlow="column"
+                justifyContent="center"
+                gap="1rem"
+                alignContent="center"
+              >
+                <Button onClick={signOut}>Sign Out</Button>
+                <FlexForm
+                  heading="Update Settings"
+                  fields={getUpdateUserProfileFields(user)}
+                  handleFormData={handleFormData}
+                >
+                  <Button>Settings</Button>
+                </FlexForm>
+                {/* <Button onClick={handleSetPreferences}>Settings</Button> */}
+              </Grid>
+              {/* <p className={styles.editSettings}>Edit Settings</p> */}
 
               {/* {Object.entries(user).map(
                 ([key, value]) =>
@@ -76,52 +112,42 @@ export default function Profile({ signOut }: ProfileProps) {
                   </Button>
                 </>
               )}
+
+              <Grid
+                margin="0 0"
+                autoFlow="column"
+                justifyContent="center"
+                gap="1rem"
+                alignContent="center"
+              >
+                <Button onClick={() => addExampleData()}>
+                  <HoverText onHoverText="Add example data">Example</HoverText>
+                </Button>
+                <Button onClick={() => setActiveTab("macros")}>Macros</Button>
+              </Grid>
+              <Grid
+                margin="1rem 0"
+                autoFlow="column"
+                justifyContent="center"
+                gap="1rem"
+                alignContent="center"
+              >
+                <a href={helpLink} target="_blank">
+                  Get Help
+                </a>
+
+                <a href={aboutLink} target="_blank">
+                  About
+                </a>
+
+                <a href={supportLink} target="_blank">
+                  Support us
+                </a>
+              </Grid>
             </View>
+            <small>Version: {version}</small>
           </Flex>
         ))}
-      </Grid>
-
-      <Grid
-        margin="0 0"
-        autoFlow="column"
-        justifyContent="center"
-        gap="1rem"
-        alignContent="center"
-      >
-        <a href={helpLink} target="_blank">
-          Get Help
-        </a>
-
-        <a href={aboutLink} target="_blank">
-          About
-        </a>
-
-        <a href={supportLink} target="_blank">
-          Support us
-        </a>
-      </Grid>
-      <small>Version: {version}</small>
-
-      <Grid
-        margin="0 0"
-        autoFlow="column"
-        justifyContent="center"
-        gap="1rem"
-        alignContent="center"
-      >
-        <Button onClick={signOut}>Sign Out</Button>
-        <Button onClick={() => addExampleData()}>
-          <HoverText onHoverText="Add example data">Example</HoverText>
-        </Button>
-      </Grid>
-      <Grid
-        margin="0 0"
-        autoFlow="column"
-        justifyContent="center"
-        gap="1rem"
-        alignContent="center"
-      >
-        <Button onClick={() => setActiveTab("macros")}>Macros</Button>
       </Grid>
     </>
   );

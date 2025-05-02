@@ -14,6 +14,7 @@ const schema = a
         email: a.string().required(),
         isNew: a.boolean().default(true),
         profileOwner: a.string(),
+        topicColorPreference: a.string().default("none"),
       })
       .secondaryIndexes((index) => [index("email")])
       .authorization((allow) => [
