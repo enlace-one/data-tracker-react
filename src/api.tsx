@@ -8,6 +8,7 @@ import {
   FormDataType as FormData,
   Macro,
   Topic,
+  UserProfile,
 } from "./types"; // ✅ Import interfaces
 
 import { DEFAULT_DATA_TYPES, EXAMPLE_DATA } from "./settings";
@@ -42,12 +43,33 @@ export async function updateProfile(formData: FormData): Promise<void> {
     email: formData.email, // Ensure a default empty string if missing
     isNew: formData.isNew, // Default empty string
     topicColorPreference: formData.topicColorPreference,
+    categorySortPreference: formData.categorySortPreference,
+    customCategoryOrder: formData.customCategoryOrder,
   });
   console.log("Errors:", errors);
   if (errors) {
     throw new Error(String(errors));
   }
 }
+
+const saveCustomOrder = async (
+  newOrder: string[],
+  userProfiles: UserProfile[]
+) => {
+  try {
+    await updateProfile({
+      id: userProfiles[0].id!,
+      email: userProfiles[0].email!, // Ensure a default empty string if missing
+      isNew: userProfiles[0].isNew!, // Default empty string
+      topicColorPreference: userProfiles[0].topicColorPreference!,
+      categorySortPreference: userProfiles[0].categorySortPreference!,
+      customCategoryOrder: newOrder,
+    });
+    console.log("Custom order saved!");
+  } catch (e) {
+    console.log("Failed to save custom order:", e);
+  }
+};
 
 export async function deleteProfile(formData: FormData): Promise<void> {
   console.log("Deleting Profile:", formData); // Fixed incorrect variable reference

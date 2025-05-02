@@ -501,17 +501,39 @@ export const getUpdateUserProfileFields = (user: UserProfile) => {
     { label: "red", value: "red" },
     { label: "purple", value: "purple" },
   ];
+  const categorySortOptions = [
+    { label: "Name", value: "name" },
+    { label: "Topic Name", value: "topic" },
+    { label: "DataType Name", value: "type" },
+    { label: "Last Entry Date", value: "lastEntry" },
+    { label: "Entry Count", value: "entryCount" },
+    { label: "Custom", value: "custom" },
+  ];
   return [
     { name: "Id", id: "id", default: user.id ?? "", hidden: true },
     { name: "email", id: "email", default: user.email ?? "", hidden: true },
     { name: "isNew", id: "isNew", default: user.isNew ?? false, hidden: true },
     {
+      name: "customCategoryOrder",
+      id: "customCategoryOrder",
+      default: user.customCategoryOrder ?? [],
+      hidden: true,
+    },
+    {
       name: "Topic Color Preference",
       id: "topicColorPreference",
       type: "select",
       options: topicColorOptions,
-      note: "Will sort topics by color with this one on top",
+      note: "Will put topics of this color on top of the list",
       default: user.topicColorPreference ?? "none",
+    },
+    {
+      name: "Default Category Sort Order",
+      id: "categorySortPreference",
+      type: "select",
+      options: categorySortOptions,
+      note: "Sets the default sort order in the category list view",
+      default: user.categorySortPreference ?? "name",
     },
   ];
 };

@@ -79,8 +79,6 @@ export default function Profile({ signOut }: ProfileProps) {
                 Updated: <DateSpan date={user.updatedAt} />
               </small>
               <br />
-              <small>Topic Color Preference: {user.topicColorPreference}</small>
-              <br />
               {SETTINGS.debug && (
                 <>
                   <small>Is new: {user?.isNew}</small>

@@ -75,6 +75,8 @@ export interface FormDataType {
   email?: string;
   isNew?: boolean;
   topicColorPreference?: string;
+  categorySortPreference?: string;
+  customCategoryOrder?: string[];
 }
 
 export type ResolvedDataType = DataType;

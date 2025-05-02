@@ -23,6 +23,7 @@ export default function Categories() {
     setActionMessage,
     SETTINGS,
     topics,
+    userProfiles,
   } = useData();
 
   const [loading, setLoading] = useState(true);
@@ -35,9 +36,10 @@ export default function Categories() {
     if (dataCategories) {
       setLoading(false);
       // Initially sort by name
-      setSortedDataCategories(
-        [...dataCategories].sort((a, b) => a.name.localeCompare(b.name))
-      );
+      // setSortedDataCategories(
+      //   [...dataCategories].sort((a, b) => a.name.localeCompare(b.name))
+      // );
+      sortCategoryList(userProfiles[0].categorySortPreference ?? "name");
     }
   }, [dataCategories]);
 
@@ -68,8 +70,7 @@ export default function Categories() {
     );
   }
 
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortBy = event.target.value;
+  const sortCategoryList = (sortBy: string) => {
     console.log("Sorting by", sortBy);
 
     // Create a new sorted array to trigger re-render
@@ -91,10 +92,29 @@ export default function Categories() {
       });
     } else if (sortBy === "entryCount") {
       sortedArray.sort((a, b) => (b.entryCount ?? 0) - (a.entryCount ?? 0));
+    } else if (sortBy === "custom") {
+      // Assume userProfiles[0].customCategoryOrder is an array of category IDs
+      const customOrder = userProfiles[0].customCategoryOrder || [];
+      if (customOrder.length > 0) {
+        sortedArray.sort((a, b) => {
+          const indexA = customOrder.indexOf(a.id);
+          const indexB = customOrder.indexOf(b.id);
+          // Handle cases where a category ID is not in customOrder
+          return (
+            (indexA === -1 ? Infinity : indexA) -
+            (indexB === -1 ? Infinity : indexB)
+          );
+        });
+      }
     }
 
     console.log("Sorted array:", sortedArray);
     setSortedDataCategories(sortedArray); // Update state with new array reference
+  };
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const sortBy = event.target.value;
+    sortCategoryList(sortBy);
   };
 
   return (
@@ -126,7 +146,10 @@ export default function Categories() {
           </Button>
         )}
         {/* className={styles.multiSelect} */}
-        <select onChange={handleSortChange}>
+        <select
+          onChange={handleSortChange}
+          value={userProfiles[0].categorySortPreference ?? "name"}
+        >
           <option className={styles.tableRow} value="name">
             Name
           </option>
@@ -141,6 +164,9 @@ export default function Categories() {
           </option>
           <option className={styles.tableRow} value="entryCount">
             Entry Count
+          </option>
+          <option className={styles.tableRow} value="custom">
+            Custom
           </option>
         </select>
       </Grid>
