@@ -15,6 +15,7 @@ import { addExampleData, deleteProfile, updateProfile } from "../../api";
 import HoverText from "../../components/HoverText/HoverText";
 import { getUpdateUserProfileFields } from "../../formFields";
 import FlexForm from "../../components/FlexForm/FlexForm";
+import styles from "./Profile.module.css";
 
 interface ProfileProps {
   signOut: () => void;
@@ -80,30 +81,6 @@ export default function Profile({ signOut }: ProfileProps) {
               <br />
               <small>Topic Color Preference: {user.topicColorPreference}</small>
               <br />
-              <Grid
-                margin="1rem 0"
-                autoFlow="column"
-                justifyContent="center"
-                gap="1rem"
-                alignContent="center"
-              >
-                <Button onClick={signOut}>Sign Out</Button>
-                <FlexForm
-                  heading="Update Settings"
-                  fields={getUpdateUserProfileFields(user)}
-                  handleFormData={handleFormData}
-                >
-                  <Button>Settings</Button>
-                </FlexForm>
-                {/* <Button onClick={handleSetPreferences}>Settings</Button> */}
-              </Grid>
-              {/* <p className={styles.editSettings}>Edit Settings</p> */}
-
-              {/* {Object.entries(user).map(
-                ([key, value]) =>
-                  key !== "id" &&
-                  key !== "name" && <span key={key}> {`${key}: ${value}`}</span>
-              )} */}
               {SETTINGS.debug && (
                 <>
                   <small>Is new: {user?.isNew}</small>
@@ -112,19 +89,46 @@ export default function Profile({ signOut }: ProfileProps) {
                   </Button>
                 </>
               )}
-
               <Grid
-                margin="0 0"
+                margin="1rem 0"
                 autoFlow="column"
                 justifyContent="center"
                 gap="1rem"
                 alignContent="center"
               >
-                <Button onClick={() => addExampleData()}>
+                <Button className={styles.button} onClick={signOut}>
+                  Sign Out
+                </Button>
+                <FlexForm
+                  heading="Update Settings"
+                  fields={getUpdateUserProfileFields(user)}
+                  handleFormData={handleFormData}
+                >
+                  <Button className={styles.button}>Settings</Button>
+                </FlexForm>
+              </Grid>
+
+              <Grid
+                margin="1rem 0 0 0" // 👈 more vertical space between groups
+                autoFlow="column"
+                justifyContent="center"
+                gap="1rem"
+                alignContent="center"
+              >
+                <Button
+                  className={styles.button}
+                  onClick={() => addExampleData()}
+                >
                   <HoverText onHoverText="Add example data">Example</HoverText>
                 </Button>
-                <Button onClick={() => setActiveTab("macros")}>Macros</Button>
+                <Button
+                  className={styles.button}
+                  onClick={() => setActiveTab("macros")}
+                >
+                  Macros
+                </Button>
               </Grid>
+
               <Grid
                 margin="1rem 0"
                 autoFlow="column"
