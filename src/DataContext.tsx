@@ -17,14 +17,10 @@ import {
   DataType,
   ActiveTab,
   Topic,
+  SetActionMessageFunction,
+  AlertInfo,
 } from "./types";
 import { DEFAULT_DATA_TYPES, DEFAULT_TOPICS } from "./settings";
-
-interface AlertInfo {
-  message: string;
-  type: string;
-}
-type SetActionMessageFunction = (alertInfo: AlertInfo) => void;
 
 interface DataContextType {
   actionMessage: AlertInfo;
@@ -92,9 +88,9 @@ export function DataProvider({ children }: DataProviderProps) {
   //   return () => sub.unsubscribe();
   // }, []);
 
-  const setActionMessage = (alertInfo: AlertInfo) => {
+  const setActionMessage = (alertInfo: AlertInfo, timeout = 10000) => {
     _setActionMessage(alertInfo);
-    setTimeout(() => _setActionMessage({ message: "", type: "" }), 10000);
+    setTimeout(() => _setActionMessage({ message: "", type: "" }), timeout);
   };
 
   useEffect(() => {

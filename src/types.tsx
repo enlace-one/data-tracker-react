@@ -145,3 +145,12 @@ export type ActiveTab =
   | "date-graph"
   | "text-graph"
   | "day";
+
+export interface AlertInfo {
+  message: string;
+  type: "" | "success" | "error" | "warning" | "default";
+}
+export type SetActionMessageFunction = (
+  alertInfo: AlertInfo,
+  timeout?: number
+) => void;

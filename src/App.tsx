@@ -35,15 +35,6 @@ export default function App() {
     setLoading(false);
   };
 
-  // Replaced with check of data categories length!
-  // useEffect(() => {
-  //   console.log("Is New:", userProfiles[0]?.isNew ?? "Not defined");
-  //   if (userProfiles[0]?.isNew ?? true) {
-  //     setAddExamplePrompt(true);
-  //     updateProfile({ ...userProfiles[0], isNew: false });
-  //   }
-  // }, [userProfiles]);
-
   const handleAddExampleData = async () => {
     setAddExamplePrompt(false);
     setLoadingText("Adding Example data...");
@@ -96,7 +87,11 @@ export default function App() {
       }}
     >
       {/* Main Content */}
-      <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
+      {actionMessage.message != "" && (
+        <Alert setActionMessage={setActionMessage} type={actionMessage.type}>
+          {actionMessage.message}
+        </Alert>
+      )}
 
       {loading && <LoadingSymbol text={loadingText} />}
       {addExamplePrompt && (
