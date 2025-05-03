@@ -73,15 +73,6 @@ export default function Categories() {
     }
   };
 
-  if (selectedCategory) {
-    return (
-      <CategoryDetail
-        category={selectedCategory}
-        onBack={() => setSelectedCategory(null)}
-      />
-    );
-  }
-
   const sortCategoryList = (customList: string[] | null = null) => {
     console.log("Sorting by", sortBy);
 
@@ -176,6 +167,15 @@ export default function Categories() {
 
     sortCategoryList(currentOrder);
   };
+
+  if (selectedCategory) {
+    return (
+      <CategoryDetail
+        category={selectedCategory}
+        onBack={() => setSelectedCategory(null)}
+      />
+    );
+  }
 
   return (
     <>
@@ -281,12 +281,20 @@ export default function Categories() {
                       alignContent="center"
                     >
                       <Button onClick={() => handleMoveCategory(item.id, "up")}>
-                        <b>^</b>
+                        <img
+                          src="/up-arrow.svg"
+                          alt="Up"
+                          style={{ width: "1rem", height: ".7rem" }}
+                        />
                       </Button>
                       <Button
                         onClick={() => handleMoveCategory(item.id, "down")}
                       >
-                        v
+                        <img
+                          src="/down-arrow.svg"
+                          alt="Down"
+                          style={{ width: "1rem", height: ".6rem" }}
+                        />
                       </Button>
                     </Grid>
                   </td>

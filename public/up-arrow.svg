@@ -1,0 +1,22 @@
+<svg width="600" height="300" xmlns="http://www.w3.org/2000/svg">
+ <g>
+  <title>Layer 1</title>
+  <line transform="rotate(-2 125.391 266.197)" stroke="#9acee6" id="svg_94" y2="101.6985" x2="303.89566" y1="430.69531" x1="-53.1135" stroke-width="99" fill="none"/>
+  <line transform="rotate(-40 772.808 385.514)" stroke="#00bfbf" id="svg_97" y2="533.43049" x2="713.43297" y1="237.59719" x1="832.1829" stroke-width="40" fill="none"/>
+  <line transform="rotate(20 774.957 405.144)" stroke="#00bfbf" id="svg_96" y2="479.10222" x2="856.2067" y1="331.18556" x1="693.70664" stroke-width="40" fill="none"/>
+  <line transform="rotate(90 465.452 246.006)" stroke="#9acee6" id="svg_4" y2="67.40541" x2="635.07956" y1="424.60719" x1="295.82469" stroke-width="99" fill="none"/>
+  <line transform="rotate(44 831.614 363.005)" stroke="#9acee6" id="svg_5" y2="278.63013" x2="924.32282" y1="447.38013" x1="738.90617" stroke-width="40" fill="none" filter="url(#svg_5_blur)"/>
+  <path fill="#00bfbf" stroke="#ffffff" stroke-width="40" opacity="undefined" d="m792.3469,423.66171c-30.50184,0 -55.20833,-25.63881 -55.20833,-57.29166c0,-31.65285 24.70649,-57.29166 55.20833,-57.29166c30.50184,0 55.20833,25.63881 55.20833,57.29166c0,31.65285 -24.70649,57.29166 -55.20833,57.29166z" id="svg_92"/>
+  <ellipse ry="57.29166" rx="55.20833" id="svg_3" cy="320.53932" cx="933.69904" stroke-width="40" stroke="#ffffff" fill="#9acee6"/>
+  <ellipse ry="57.29166" rx="55.20833" id="svg_93" cy="312.19431" cx="732.2638" stroke-width="40" stroke="#ffffff" fill="#00bfbf"/>
+  <line transform="rotate(-41 773.525 277.569)" id="svg_6" y2="362.24079" x2="867.54242" y1="192.89789" x1="679.50757" stroke-width="40" fill="none" stroke="#00bfbf"/>
+  <ellipse stroke="#ffffff" ry="57.29166" rx="55.20833" id="svg_91" cy="237.02637" cx="693.63354" stroke-width="40" fill="#00bfbf"/>
+  <ellipse ry="57.29166" rx="55.20833" id="svg_2" cy="343.11093" cx="755.02249" stroke-width="40" stroke="#ffffff" fill="#9acee6"/>
+  <ellipse stroke="#ffffff" ry="61.13762" rx="60.97727" id="svg_88" cy="72.30332" cx="299.41797" stroke-width="40" fill="#9acee6"/>
+ </g>
+ <defs>
+  <filter id="svg_5_blur">
+   <feGaussianBlur in="SourceGraphic" stdDeviation="0"/>
+  </filter>
+ </defs>
+</svg>
