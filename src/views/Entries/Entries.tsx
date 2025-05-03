@@ -18,6 +18,7 @@ import {
   getAddUpdateDataEntrySecondaryFormFields,
   getAddUpdateDataEntryFormFields,
 } from "../../formFields";
+import { TOPIC_IMAGE_PATH } from "../../settings";
 
 export default function Entries() {
   const { dataCategories, dataTypes, SETTINGS, setActionMessage } = useData();
@@ -220,6 +221,32 @@ export default function Entries() {
                 key={item.id}
                 onContextMenu={(e) => handleRightClick(e, item.id)}
               >
+                <td>
+                  {dataCategories.find((dt) => dt.id === item.dataCategoryId)
+                    ?.topic.imageLink && (
+                    <img
+                      src={
+                        TOPIC_IMAGE_PATH +
+                        dataCategories.find(
+                          (dt) => dt.id === item.dataCategoryId
+                        )!.topic.imageLink
+                      }
+                      alt={
+                        dataCategories.find(
+                          (dt) => dt.id === item.dataCategoryId
+                        )?.topic.name
+                      }
+                      style={{
+                        width: "3rem",
+                        margin: "1rem 1rem 1rem 0rem",
+                        height: "3rem",
+                        padding: "2px",
+                        border: "1px solid #007bff",
+                        borderRadius: "50%",
+                      }}
+                    />
+                  )}
+                </td>
                 <td className={styles.minWidth}>
                   <FlexForm
                     heading="Update Entry"
