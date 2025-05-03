@@ -18,6 +18,7 @@ interface Props {
   getSecondaryFieldsParams?: unknown;
   buttonStyle?: string;
   children: ReactNode;
+  formChildren?: ReactNode;
 }
 
 const FlexForm = ({
@@ -28,6 +29,7 @@ const FlexForm = ({
   getSecondaryFieldsParams,
   buttonStyle = "",
   children,
+  formChildren,
 }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [formStage, setFormStage] = useState<"primary" | "secondary">(
@@ -165,6 +167,7 @@ const FlexForm = ({
         <div className={styles.overlay}>
           <div className={styles.modal}>
             <Heading level={2}>{heading}</Heading>
+            {formChildren}
             <form onSubmit={handleSubmit}>
               {(formStage === "primary" ? fields : secondaryFields).map(
                 (field) =>

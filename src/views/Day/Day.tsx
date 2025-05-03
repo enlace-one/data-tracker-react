@@ -4,6 +4,7 @@ import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataEntry,
+  deleteDataEntry,
   fetchEnrichedDataEntriesByDate,
   fetchMacros,
   updateDataEntry,
@@ -252,6 +253,11 @@ export default function Day() {
       }
     }
   };
+
+  const handleDeleteDataEntry = async (entryId: string) => {
+    await deleteDataEntry(entryId);
+  };
+
   return (
     <>
       <Heading level={1}>Day</Heading>
@@ -283,6 +289,11 @@ export default function Day() {
                       entry.dataCategory
                     )}
                     handleFormData={handleUpdateEntryFormData}
+                    formChildren={
+                      <Button onClick={() => handleDeleteDataEntry(entry.id)}>
+                        Delete
+                      </Button>
+                    }
                   >
                     <small>{entry.dataCategory?.name}</small>
                   </FlexForm>
