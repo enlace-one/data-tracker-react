@@ -597,7 +597,10 @@ export default function DateGraph() {
             alignContent="center"
           >
             <Button onClick={() => setActiveTab("text-graph")}>
-              Bar Graph
+              Bar Chart
+            </Button>
+            <Button onClick={() => setActiveTab("heat-map-graph")}>
+              Heatmap
             </Button>
             <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
           </Grid>

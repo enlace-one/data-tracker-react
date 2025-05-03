@@ -17,6 +17,7 @@ import DateGraph from "./views/DateGraph/DateGraph";
 import { addExampleData } from "./api";
 import Popup from "./components/Popup/Popup";
 import TextGraph from "./views/TextGraph/TextGraph";
+import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -114,6 +115,7 @@ export default function App() {
           {activeTab === "macros" && <Macros />}
           {activeTab === "date-graph" && <DateGraph />}
           {activeTab === "text-graph" && <TextGraph />}
+          {activeTab === "heat-map-graph" && <HeatMapGraph />}
           {/* <Divider /> */}
         </>
       )}
