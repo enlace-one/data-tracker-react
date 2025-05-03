@@ -45,8 +45,6 @@ interface DataContextType {
   screenWidth: number;
   activeTab: ActiveTab;
   setActiveTab: (state: ActiveTab) => void;
-  initialized: boolean;
-  setInitialized: (state: boolean) => void;
   fetchedCats: boolean;
   definatelyFetchedCats: boolean;
   setFetchedCats: (state: boolean) => void;
@@ -69,7 +67,6 @@ export function DataProvider({ children }: DataProviderProps) {
   );
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [initialized, setInitialized] = useState<boolean>(false);
   const [fetchedCats, setFetchedCats] = useState<boolean>(false);
   const [definatelyFetchedCats, setDefinatelyFetchedCats] =
     useState<boolean>(false);
@@ -183,9 +180,7 @@ export function DataProvider({ children }: DataProviderProps) {
         activeTab,
         setActiveTab,
         fetchedCats,
-        initialized,
         definatelyFetchedCats,
-        setInitialized,
         setFetchedCats,
       }}
     >

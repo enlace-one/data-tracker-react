@@ -24,8 +24,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, setInitialized, fetchedCats, definatelyFetchedCats } =
-    useData();
+  const { dataCategories, fetchedCats, definatelyFetchedCats } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -33,7 +32,6 @@ export default function App() {
     await addDefaults(dataCategories);
     setLoadingText("Setting last entry dates");
     await setLastEntryDates(dataCategories);
-    setInitialized(true);
     setLoading(false);
   };
 
