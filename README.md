@@ -23,7 +23,7 @@ If you like this application, want it to be continually improved upon, or desire
 
 # Development Information
 
-Run the dev instance:
+## Run the dev instance
 
 ```
 npm run dev
@@ -31,4 +31,10 @@ npm run dev
 
 ```
 npx ampx sandbox
+```
+
+## Update Licenses
+
+```
+generate-license-file
 ```

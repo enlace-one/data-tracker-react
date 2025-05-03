@@ -156,6 +156,13 @@ export default function Profile({ signOut }: ProfileProps) {
               </Grid>
             </View>
             <small>Version: {version}</small>
+            <small>
+              View third party licenses
+              <a href="https://enlace.one/#/docs?file=Data+Tracker+%28Mobile+Web+App%29%2FThird+Party+Licenses.md">
+                {" "}
+                here.
+              </a>
+            </small>
           </Flex>
         ))}
       </Grid>
