@@ -60,7 +60,8 @@ export default function DateGraph() {
     "output" | "value 1" | "value 2" | "value 3"
   >("output");
   const [correlation, setCorrelation] = useState<number | null>(null); // New state for correlation
-
+  const [tension, setTension] = useState<number>(0.2);
+  const [lineStyle, setLineStyle] = useState("default");
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
 
@@ -86,6 +87,8 @@ export default function DateGraph() {
     y1MinSetting,
     y1ValueHandling,
     y2ValueHandling,
+    tension,
+    lineStyle,
   ]);
 
   const handleCategoryChange = (
@@ -141,6 +144,16 @@ export default function DateGraph() {
     );
   };
 
+  const handleTensionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTension(Number(event.target.value));
+  };
+
+  const handleLineStyleChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setLineStyle(event.target.value);
+  };
+
   const updateChartData = async (categories: string[]) => {
     if (startDate && endDate && categories.length > 0) {
       console.log("Updating chart...");
@@ -189,7 +202,7 @@ export default function DateGraph() {
         borderColor: index === 0 ? cat_1_color : cat_2_color,
         backgroundColor:
           index === 0 ? "rgba(0, 191, 191, 0.2)" : "rgba(154, 206, 230, 0.2)",
-        tension: 0.1,
+        // tension: tension,
         fill: false,
         yAxisID: index === 0 ? "y1" : "y2",
       });
@@ -254,7 +267,8 @@ export default function DateGraph() {
         data,
         borderColor: dataset.borderColor,
         backgroundColor: dataset.backgroundColor,
-        tension: 0.1,
+        tension: tension,
+        stepped: lineStyle == "stepped" ? true : false,
         fill: false,
         yAxisID: dataset.yAxisID,
         spanGaps: true,
@@ -303,6 +317,9 @@ export default function DateGraph() {
   const options = useMemo(
     () => ({
       responsive: true,
+      useTension: tension,
+      // useTension: 0.4,
+      // cubicInterpolationMode: "monotone",
       maintainAspectRatio: false,
       plugins: {
         legend: {
@@ -536,6 +553,39 @@ export default function DateGraph() {
                 onChange={(e) => handleDateChange(e, "end")}
                 className={styles.dateInput}
               />
+            </div>
+          </Grid>
+          <Divider style={{ margin: "10px" }} />
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={lineStyle}
+                onChange={handleLineStyleChange}
+              >
+                <option value="default">Default</option>
+                <option value="stepped">Stepped</option>
+                {/* <option value="filled">Filled</option> */}
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={tension}
+                onChange={handleTensionChange}
+              >
+                <option value="0.1">Tension: 0.1</option>
+                <option value="0.2">Tension: 0.2</option>
+                <option value="0.3">Tension: 0.3</option>
+                <option value="0.4">Tension: 0.4</option>
+                <option value="0.5">Tension: 0.5</option>
+              </select>
             </div>
           </Grid>
           <Divider style={{ margin: "10px" }} />
