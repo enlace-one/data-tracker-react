@@ -67,6 +67,9 @@ export const DEFAULT_DATA_TYPES = [
   },
 ];
 
+export const UI_IMAGE_PATH =
+  "https://raw.githubusercontent.com/A-Management/common_static/main/ui/";
+
 export const TOPIC_IMAGE_PATH =
   "https://raw.githubusercontent.com/A-Management/common_static/main/topics/";
 

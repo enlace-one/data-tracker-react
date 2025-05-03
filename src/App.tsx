@@ -19,6 +19,7 @@ import Popup from "./components/Popup/Popup";
 import TextGraph from "./views/TextGraph/TextGraph";
 import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
 import Calendar from "./views/Calendar/Calendar";
+import { UI_IMAGE_PATH } from "./settings.tsx";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -156,7 +157,7 @@ export default function App() {
           >
             <HoverText onHoverText="Profile">
               <img
-                src="/profile-view.svg"
+                src={UI_IMAGE_PATH + "profile-view.svg"}
                 alt="Profile View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -168,7 +169,7 @@ export default function App() {
           >
             <HoverText onHoverText="Categories">
               <img
-                src="/category-view.svg"
+                src={UI_IMAGE_PATH + "category-view.svg"}
                 alt="Categories"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -180,7 +181,7 @@ export default function App() {
           >
             <HoverText onHoverText="Entries">
               <img
-                src="/entries-view.svg"
+                src={UI_IMAGE_PATH + "entries-view.svg"}
                 alt="Entries"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -192,7 +193,7 @@ export default function App() {
           >
             <HoverText onHoverText="Day View">
               <img
-                src="/day-view.svg"
+                src={UI_IMAGE_PATH + "day-view.svg"}
                 alt="Day View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -204,7 +205,7 @@ export default function App() {
           >
             <HoverText onHoverText="Graph">
               <img
-                src="/graph-view.svg"
+                src={UI_IMAGE_PATH + "graph-view.svg"}
                 alt="Graph View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -216,8 +217,8 @@ export default function App() {
           >
             <HoverText onHoverText="Calendar">
               <img
-                src="/graph-view.svg"
-                alt="Graph View"
+                src={UI_IMAGE_PATH + "calendar-view.svg"}
+                alt="Calendar View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
             </HoverText>

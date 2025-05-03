@@ -17,7 +17,7 @@ import {
   getAddCategorySecondaryFormFields,
 } from "../../formFields";
 import { getPrettyNameForDate } from "../../util";
-import { TOPIC_IMAGE_PATH } from "../../settings";
+import { TOPIC_IMAGE_PATH, UI_IMAGE_PATH } from "../../settings";
 
 export default function Categories() {
   const {
@@ -282,7 +282,7 @@ export default function Categories() {
                     >
                       <Button onClick={() => handleMoveCategory(item.id, "up")}>
                         <img
-                          src="/up-arrow.svg"
+                          src={UI_IMAGE_PATH + "up-arrow.svg"}
                           alt="Up"
                           style={{ width: "1rem", height: ".7rem" }}
                         />
@@ -291,7 +291,7 @@ export default function Categories() {
                         onClick={() => handleMoveCategory(item.id, "down")}
                       >
                         <img
-                          src="/down-arrow.svg"
+                          src={UI_IMAGE_PATH + "down-arrow.svg"}
                           alt="Down"
                           style={{ width: "1rem", height: ".6rem" }}
                         />
