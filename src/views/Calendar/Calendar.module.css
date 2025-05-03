@@ -44,10 +44,12 @@
   width: 100%;
   border: none;
   font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
 }
 
 :global(.react-calendar__navigation) {
   margin-bottom: 1rem;
+  background-color: #f9f9f9;
 }
 
 :global(.react-calendar__navigation__label) {
@@ -59,6 +61,7 @@
 :global(.react-calendar__month-view__weekdays) {
   font-weight: bold;
   color: #333;
+  background-color: #f9f9f9;
 }
 
 :global(.react-calendar__month-view__weekdays__weekday abbr) {
@@ -67,8 +70,8 @@
 
 :global(.react-calendar__tile) {
   min-height: 60px;
-  /* background-color: #f9f9f9;
-  box-sizing: border-box; */
+  background-color: #f9f9f9;
+  /* box-sizing: border-box; */
 
   /* padding: 10px;
   border-radius: 4px;

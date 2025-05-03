@@ -517,7 +517,7 @@ export default function DateGraph() {
             <div className={styles.formGroup}>
               <select
                 className={styles.multiSelect}
-                value={y1ValueHandling}
+                value={y2ValueHandling}
                 onChange={handleY2ValueChange}
               >
                 <option value="output">Value: Output</option>
