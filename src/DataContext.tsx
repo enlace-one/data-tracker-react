@@ -30,6 +30,7 @@ interface DataContextType {
   actionMessage: AlertInfo;
   setActionMessage: SetActionMessageFunction;
   userProfiles: UserProfile[];
+  setUserProfiles: React.Dispatch<React.SetStateAction<UserProfile[]>>;
   dataCategories: EnrichedDataCategory[];
   setDataCategories: React.Dispatch<
     React.SetStateAction<EnrichedDataCategory[]>
@@ -168,6 +169,7 @@ export function DataProvider({ children }: DataProviderProps) {
     <DataContext.Provider
       value={{
         userProfiles,
+        setUserProfiles,
         dataCategories,
         setDataCategories,
         actionMessage,

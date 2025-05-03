@@ -35,7 +35,10 @@ export async function fetchUserProfiles(): Promise<
   }
 }
 
-export async function updateProfile(formData: FormData): Promise<void> {
+export async function updateProfile(
+  formData: FormData,
+  userProfile: UserProfile
+): Promise<void> {
   console.log("Updating Profile:", formData); // Fixed incorrect variable reference
 
   const { errors } = await client.models.UserProfile.update({
@@ -44,7 +47,8 @@ export async function updateProfile(formData: FormData): Promise<void> {
     isNew: formData.isNew, // Default empty string
     topicColorPreference: formData.topicColorPreference,
     categorySortPreference: formData.categorySortPreference,
-    customCategoryOrder: formData.customCategoryOrder,
+    customCategoryOrder:
+      formData.customCategoryOrder ?? userProfile.customCategoryOrder,
   });
   console.log("Errors:", errors);
   if (errors) {
@@ -52,19 +56,22 @@ export async function updateProfile(formData: FormData): Promise<void> {
   }
 }
 
-const saveCustomOrder = async (
+export const saveCustomOrder = async (
   newOrder: string[],
   userProfiles: UserProfile[]
 ) => {
   try {
-    await updateProfile({
-      id: userProfiles[0].id!,
-      email: userProfiles[0].email!, // Ensure a default empty string if missing
-      isNew: userProfiles[0].isNew!, // Default empty string
-      topicColorPreference: userProfiles[0].topicColorPreference!,
-      categorySortPreference: userProfiles[0].categorySortPreference!,
-      customCategoryOrder: newOrder,
-    });
+    await updateProfile(
+      {
+        id: userProfiles[0].id!,
+        email: userProfiles[0].email!, // Ensure a default empty string if missing
+        isNew: userProfiles[0].isNew!, // Default empty string
+        topicColorPreference: userProfiles[0].topicColorPreference!,
+        categorySortPreference: userProfiles[0].categorySortPreference!,
+        customCategoryOrder: newOrder,
+      },
+      userProfiles[0]
+    );
     console.log("Custom order saved!");
   } catch (e) {
     console.log("Failed to save custom order:", e);

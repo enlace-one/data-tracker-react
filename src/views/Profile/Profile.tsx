@@ -11,7 +11,12 @@ import DateSpan from "../../components/DateSpan/DateSpan";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { useState, useEffect } from "react";
 import { aboutLink, helpLink, supportLink, version } from "../../settings";
-import { addExampleData, deleteProfile, updateProfile } from "../../api";
+import {
+  addExampleData,
+  deleteProfile,
+  fetchUserProfiles,
+  updateProfile,
+} from "../../api";
 import HoverText from "../../components/HoverText/HoverText";
 import { getUpdateUserProfileFields } from "../../formFields";
 import FlexForm from "../../components/FlexForm/FlexForm";
@@ -22,7 +27,7 @@ interface ProfileProps {
 }
 
 export default function Profile({ signOut }: ProfileProps) {
-  const { userProfiles, setActiveTab, SETTINGS } = useData();
+  const { userProfiles, setActiveTab, SETTINGS, setUserProfiles } = useData();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -43,7 +48,10 @@ export default function Profile({ signOut }: ProfileProps) {
 
   const handleFormData = async (formData: Record<string, any>) => {
     console.log("Updating profile Form Data:", formData);
-    await updateProfile(formData);
+    await updateProfile(formData, userProfiles[0]);
+    // Upate profile
+    const profiles = await fetchUserProfiles();
+    setUserProfiles(profiles);
   };
 
   return (

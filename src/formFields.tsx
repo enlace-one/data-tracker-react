@@ -514,12 +514,6 @@ export const getUpdateUserProfileFields = (user: UserProfile) => {
     { name: "email", id: "email", default: user.email ?? "", hidden: true },
     { name: "isNew", id: "isNew", default: user.isNew ?? false, hidden: true },
     {
-      name: "customCategoryOrder",
-      id: "customCategoryOrder",
-      default: user.customCategoryOrder ?? [],
-      hidden: true,
-    },
-    {
       name: "Topic Color Preference",
       id: "topicColorPreference",
       type: "select",

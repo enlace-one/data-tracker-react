@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import { createDataCategory, deleteAllDataCategories } from "../../api";
+import {
+  createDataCategory,
+  deleteAllDataCategories,
+  fetchUserProfiles,
+  saveCustomOrder,
+} from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
 import styles from "./Categories.module.css";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
@@ -24,9 +29,12 @@ export default function Categories() {
     SETTINGS,
     topics,
     userProfiles,
+    setUserProfiles,
   } = useData();
 
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("name");
+  const [editSort, setEditSort] = useState(false);
   const [sortedDataCategories, setSortedDataCategories] = useState<
     EnrichedDataCategory[]
   >([]);
@@ -39,7 +47,11 @@ export default function Categories() {
       // setSortedDataCategories(
       //   [...dataCategories].sort((a, b) => a.name.localeCompare(b.name))
       // );
-      sortCategoryList(userProfiles[0].categorySortPreference ?? "name");
+      setSortBy(userProfiles[0].categorySortPreference ?? "name");
+
+      if (!userProfiles[0].customCategoryOrder) {
+        userProfiles[0].customCategoryOrder = [];
+      }
     }
   }, [dataCategories]);
 
@@ -70,7 +82,7 @@ export default function Categories() {
     );
   }
 
-  const sortCategoryList = (sortBy: string) => {
+  const sortCategoryList = (customList: string[] | null = null) => {
     console.log("Sorting by", sortBy);
 
     // Create a new sorted array to trigger re-render
@@ -94,7 +106,12 @@ export default function Categories() {
       sortedArray.sort((a, b) => (b.entryCount ?? 0) - (a.entryCount ?? 0));
     } else if (sortBy === "custom") {
       // Assume userProfiles[0].customCategoryOrder is an array of category IDs
-      const customOrder = userProfiles[0].customCategoryOrder || [];
+      let customOrder;
+      if (customList != null) {
+        customOrder = customList;
+      } else {
+        customOrder = userProfiles[0].customCategoryOrder || [];
+      }
       if (customOrder.length > 0) {
         sortedArray.sort((a, b) => {
           const indexA = customOrder.indexOf(a.id);
@@ -112,9 +129,52 @@ export default function Categories() {
     setSortedDataCategories(sortedArray); // Update state with new array reference
   };
 
+  useEffect(() => {
+    sortCategoryList();
+  }, [sortBy]);
+
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortBy = event.target.value;
-    sortCategoryList(sortBy);
+    setSortBy(event.target.value);
+  };
+
+  const toggleEditSort = async () => {
+    if (editSort) {
+      setEditSort(false);
+      await saveCustomOrder(
+        // (userProfiles[0]?.customCategoryOrder ?? []).filter(
+        //   (id): id is string => id !== null
+        // ),
+        sortedDataCategories.map((cat) => cat.id),
+        userProfiles
+      );
+      const profiles = await fetchUserProfiles();
+      setUserProfiles(profiles);
+    } else {
+      setEditSort(true);
+    }
+  };
+
+  const handleMoveCategory = (id: string, direction: "up" | "down") => {
+    console.log("Updating order...");
+    const currentOrder = sortedDataCategories.map((cat) => cat.id);
+
+    const index = currentOrder.indexOf(id);
+
+    if (index === -1) {
+      console.log("Error, ID not found i sorting. ", id, currentOrder);
+      return;
+    }
+
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= currentOrder.length) return; // out of bounds
+
+    // Swap positions
+    [currentOrder[index], currentOrder[newIndex]] = [
+      currentOrder[newIndex],
+      currentOrder[index],
+    ];
+
+    sortCategoryList(currentOrder);
   };
 
   return (
@@ -146,10 +206,7 @@ export default function Categories() {
           </Button>
         )}
         {/* className={styles.multiSelect} */}
-        <select
-          onChange={handleSortChange}
-          value={userProfiles[0].categorySortPreference ?? "name"}
-        >
+        <select onChange={handleSortChange} value={sortBy}>
           <option className={styles.tableRow} value="name">
             Name
           </option>
@@ -169,6 +226,7 @@ export default function Categories() {
             Custom
           </option>
         </select>
+        <Button onClick={toggleEditSort}>Sort</Button>
       </Grid>
 
       {loading && <LoadingSymbol size={50} />}
@@ -213,6 +271,26 @@ export default function Categories() {
                   <small>{item.note}</small>
                 </td>
                 <td className={styles.paddingLeft}>{item.entryCount}</td>
+                {editSort && (
+                  <td className={styles.paddingLeft}>
+                    <Grid
+                      margin="0 0 0 0" // 👈 more vertical space between groups
+                      autoFlow="row"
+                      justifyContent="center"
+                      gap="0"
+                      alignContent="center"
+                    >
+                      <Button onClick={() => handleMoveCategory(item.id, "up")}>
+                        <b>^</b>
+                      </Button>
+                      <Button
+                        onClick={() => handleMoveCategory(item.id, "down")}
+                      >
+                        v
+                      </Button>
+                    </Grid>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
