@@ -226,7 +226,7 @@ export default function Categories() {
             Custom
           </option>
         </select>
-        <Button onClick={toggleEditSort}>Sort</Button>
+        {sortBy === "custom" && <Button onClick={toggleEditSort}>Sort</Button>}
       </Grid>
 
       {loading && <LoadingSymbol size={50} />}
