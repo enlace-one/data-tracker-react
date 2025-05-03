@@ -1,22 +1,16 @@
 import { useState, useEffect } from "react";
-import { Heading, Divider, Grid, Button } from "@aws-amplify/ui-react";
+import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import { fetchDataEntriesByCategory } from "../../api";
+import Calendar from "react-calendar";
 import styles from "./Calendar.module.css";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { parseEntryToDisplayValue, parseEntryValueToNumber } from "../../util";
-import { ResponsiveCalendar } from "@nivo/calendar";
+import type { OnArgs } from "react-calendar";
 
-// Define interface for entry
-interface DataEntry {
-  date: string;
-  value: string | number | object;
-  note?: string;
-}
-
-export default function Calendar() {
-  const { dataCategories, screenWidth, setActiveTab } = useData();
+export default function CalendarComponent() {
+  const { dataCategories, screenWidth } = useData();
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
@@ -38,35 +32,20 @@ export default function Calendar() {
 
       // Set start of current month
       const monthStart = new Date(currentYear, currentMonth, 1);
-      // Set end of current month
-      const monthEnd = new Date(currentYear, currentMonth + 1, 0);
 
-      setStartDate(monthStart.toISOString().split("T")[0]);
-      setEndDate(monthEnd.toISOString().split("T")[0]);
+      setDateRange(monthStart);
       setLoading(false);
     }
   }, [dataCategories]);
 
   useEffect(() => {
     updateCalendarData(selectedCategory);
-  }, [selectedCategory, valueHandling, startDate, endDate]);
+  }, [selectedCategory, valueHandling]);
 
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setSelectedCategory(event.target.value);
-  };
-
-  const handleDateChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    type: "start" | "end"
-  ) => {
-    const newDate = event.target.value;
-    if (type === "start") {
-      setStartDate(newDate);
-    } else {
-      setEndDate(newDate);
-    }
   };
 
   const handleValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -81,8 +60,6 @@ export default function Calendar() {
     }
 
     setLoading(true);
-    const start = new Date(startDate);
-    const end = new Date(endDate);
     const category = dataCategories.find((cat) => cat.id === categoryId);
     if (!category) {
       setCalendarData([]);
@@ -90,20 +67,23 @@ export default function Calendar() {
       return;
     }
 
-    const entries: DataEntry[] = await fetchDataEntriesByCategory(categoryId);
-    const dataPoints: DataPoint[] = entries
-      .map((entry) => ({
-        name: entry.date,
-        displayValue: parseEntryToDisplayValue(entry, category),
-        value: parseEntryValueToNumber(entry.value, category, valueHandling),
-        note: entry.note || "",
-      }))
-      .filter((point) => {
-        const pointDate = new Date(point.name);
-        return pointDate >= start && pointDate <= end;
-      });
+    const entries = await fetchDataEntriesByCategory(categoryId);
+    const dataPoints: DataPoint[] = entries.map((entry) => ({
+      name: entry.date,
+      displayValue: parseEntryToDisplayValue(entry, category),
+      value: parseEntryValueToNumber(
+        entry.value as string,
+        category,
+        valueHandling
+      ),
+      note: entry.note || "",
+    }));
+    // .filter((point) => {
+    //   const pointDate = new Date(point.name);
+    //   return pointDate >= start && pointDate <= end;
+    // });
 
-    // Format data for Nivo calendar
+    // Format data for calendar
     const calendarData = dataPoints.map((point) => ({
       day: point.name,
       value: point.value !== undefined ? point.value : 0,
@@ -114,10 +94,74 @@ export default function Calendar() {
     setLoading(false);
   };
 
-  // Ensure the calendar displays the current month
+  const setDateRange = (date: Date) => {
+    // Start of the calendar grid (may include days from the previous month)
+    const visibleStart = new Date(date);
+    visibleStart.setDate(1);
+    const startDayOfWeek = visibleStart.getDay(); // Sunday = 0
+    visibleStart.setDate(visibleStart.getDate() - startDayOfWeek);
+
+    // End of the calendar grid (includes trailing days from next month)
+    const visibleEnd = new Date(date);
+    visibleEnd.setMonth(visibleEnd.getMonth() + 1);
+    visibleEnd.setDate(0); // last day of target month
+    const endDayOfWeek = visibleEnd.getDay();
+    visibleEnd.setDate(visibleEnd.getDate() + (6 - endDayOfWeek));
+
+    const startStr = visibleStart.toISOString().split("T")[0];
+    const endStr = visibleEnd.toISOString().split("T")[0];
+
+    console.log("Visible calendar range:", startStr, "to", endStr);
+
+    setStartDate(startStr);
+    setEndDate(endStr);
+  };
+
+  const handleActiveDateChange = ({ activeStartDate, view }: OnArgs) => {
+    if (!(activeStartDate instanceof Date) || view !== "month") return;
+    setDateRange(activeStartDate);
+  };
+
+  // Customize tile content to display values
+  const tileContent = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== "month") return null;
+
+    const dateStr = date.toISOString().split("T")[0];
+    const dataPoint = calendarData.find((data) => data.day === dateStr);
+
+    if (!dataPoint) return null;
+
+    return (
+      <div className={styles.tileValue}>
+        {dataPoint.value}
+        {dataPoint.note && (
+          <span className={styles.tileNote} data-note={dataPoint.note}>
+            *
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  // Customize tile class for styling
+  const tileClassName = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== "month") return "";
+
+    const dateStr = date.toISOString().split("T")[0];
+    const dataPoint = calendarData.find((data) => data.day === dateStr);
+    const isToday =
+      date.getDate() === new Date().getDate() &&
+      date.getMonth() === new Date().getMonth() &&
+      date.getFullYear() === new Date().getFullYear();
+
+    return [dataPoint ? styles.hasData : "", isToday ? styles.today : ""]
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  // Set maxDate to end of current month to prevent future navigation
   const today = new Date();
-  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  const maxDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
   return (
     <>
@@ -126,89 +170,22 @@ export default function Calendar() {
       {loading && <LoadingSymbol size={50} />}
       {!loading && (
         <div
-          style={{ height: "300px", width: Math.max(screenWidth - 600, 400) }}
+          style={{ width: Math.max(screenWidth - 600, 400), padding: "1rem" }}
         >
-          {calendarData.length > 0 && (
-            <ResponsiveCalendar
-              data={calendarData}
-              from={monthStart.toISOString().split("T")[0]}
-              to={monthEnd.toISOString().split("T")[0]}
-              colors={[color]}
-              emptyColor="#d3d3d3"
-              margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-              monthBorderColor="#ffffff"
-              dayBorderWidth={2}
-              dayBorderColor="#ffffff"
-              direction="vertical"
-              align="top"
-              daySpacing={4}
-              tooltip={({ day, value, note }) => (
-                <div
-                  style={{
-                    background: "white",
-                    padding: "8px",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  <strong>Date:</strong> {day}
-                  <br />
-                  <strong>Value:</strong>{" "}
-                  {value !== 0 ? value.toFixed(2) : "No Entry"}
-                  <br />
-                  {note && (
-                    <>
-                      <strong>Note:</strong> {note}
-                    </>
-                  )}
-                </div>
-              )}
-              theme={{
-                textColor: "#333",
-                fontSize: 12,
-                tooltip: {
-                  container: {
-                    background: "white",
-                    color: "#333",
-                    fontSize: "12px",
-                  },
-                },
-              }}
-              // Render custom day to show circle and value
-              day={({ date, data, size }) => {
-                const dayData = data.find(
-                  (d: any) => d.day === date.toISOString().split("T")[0]
-                );
-                const hasEntry = dayData && dayData.value !== 0;
-                const value = hasEntry ? dayData.value.toFixed(2) : "";
-                return (
-                  <g transform={`translate(${size / 2}, ${size / 2})`}>
-                    {hasEntry && (
-                      <>
-                        <circle
-                          r={size / 2 - 2}
-                          fill="none"
-                          stroke={color}
-                          strokeWidth={2}
-                        />
-                        <text
-                          textAnchor="middle"
-                          dominantBaseline="central"
-                          style={{
-                            fontSize: "10px",
-                            fill: "#333",
-                          }}
-                        >
-                          {value}
-                        </text>
-                      </>
-                    )}
-                  </g>
-                );
-              }}
+          <div className={styles.calendar}>
+            <Calendar
+              tileContent={tileContent}
+              tileClassName={tileClassName}
+              defaultView="month"
+              maxDetail="month"
+              minDetail="month"
+              value={new Date()}
+              maxDate={maxDate}
+              prev2Label="«"
+              next2Label={null}
+              onActiveStartDateChange={handleActiveDateChange}
             />
-          )}
+          </div>
           <Grid
             margin="1rem 0"
             autoFlow="column"
@@ -262,46 +239,7 @@ export default function Calendar() {
               </select>
             </div>
           </Grid>
-          <Grid
-            margin="1rem 0"
-            autoFlow="column"
-            justifyContent="center"
-            gap="1rem"
-            alignContent="center"
-          >
-            <div className={styles.formGroup}>
-              <label>Start Date</label>
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => handleDateChange(e, "start")}
-                className={styles.dateInput}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>End Date</label>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => handleDateChange(e, "end")}
-                className={styles.dateInput}
-              />
-            </div>
-          </Grid>
           <Divider style={{ margin: "10px" }} />
-          <Grid
-            margin="0 0"
-            autoFlow="column"
-            justifyContent="center"
-            gap="1rem"
-            alignContent="center"
-          >
-            <Button onClick={() => setActiveTab("text-graph")}>
-              Bar Graph
-            </Button>
-            <Button onClick={() => setActiveTab("graph")}>Legacy Graph</Button>
-          </Grid>
-          <div style={{ padding: "50px" }}></div>
         </div>
       )}
     </>
