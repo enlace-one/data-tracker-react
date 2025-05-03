@@ -18,6 +18,7 @@ import { addExampleData } from "./api";
 import Popup from "./components/Popup/Popup";
 import TextGraph from "./views/TextGraph/TextGraph";
 import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
+import Calendar from "./views/Calendar/Calendar";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -116,6 +117,7 @@ export default function App() {
           {activeTab === "date-graph" && <DateGraph />}
           {activeTab === "text-graph" && <TextGraph />}
           {activeTab === "heat-map-graph" && <HeatMapGraph />}
+          {activeTab === "calendar" && <Calendar />}
           {/* <Divider /> */}
         </>
       )}
@@ -201,6 +203,18 @@ export default function App() {
             onClick={() => setActiveTab("date-graph")}
           >
             <HoverText onHoverText="Graph">
+              <img
+                src="/graph-view.svg"
+                alt="Graph View"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("calendar")}
+          >
+            <HoverText onHoverText="Calendar">
               <img
                 src="/graph-view.svg"
                 alt="Graph View"

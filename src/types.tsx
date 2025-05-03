@@ -145,6 +145,7 @@ export type ActiveTab =
   | "date-graph"
   | "text-graph"
   | "heat-map-graph"
+  | "calendar"
   | "day";
 
 export interface AlertInfo {
