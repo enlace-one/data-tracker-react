@@ -81,34 +81,40 @@ export const parseEntryValueToNumber = (
 ) => {
   const inputType = category.dataType.inputType;
   const typeId = category.dataType.id;
+  let finalOutput;
   if (
     type == "output" ||
     !(inputType == "time-difference" || typeId == "complex-number-001")
   ) {
-    return inputType == "boolean-string"
-      ? parseBooleanToNumber(value)
-      : typeId == "select-numeric-001"
-      ? parseNumericSelectToNumber(value)
-      : inputType == "time"
-      ? parseTimeToNumber(value)
-      : inputType == "time-difference"
-      ? parseTimeDifferenceToNumber(value)
-      : typeId == "complex-number-001"
-      ? parseComplexNumberToNumber(value)
-      : Number(value);
+    finalOutput =
+      inputType == "boolean-string"
+        ? parseBooleanToNumber(value)
+        : typeId == "select-numeric-001"
+        ? parseNumericSelectToNumber(value)
+        : inputType == "time"
+        ? parseTimeToNumber(value)
+        : inputType == "time-difference"
+        ? parseTimeDifferenceToNumber(value)
+        : typeId == "complex-number-001"
+        ? parseComplexNumberToNumber(value)
+        : Number(value);
   } else if (type == "value 1") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/);
-    return match ? parseFloat(match[0]) : 0;
+    finalOutput = match ? parseFloat(match[0]) : 0;
   } else if (type == "value 2") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/g);
-    return match ? parseFloat(match[1]) : 0;
+    finalOutput = match ? parseFloat(match[1]) : 0;
   } else if (type == "value 3") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/g);
-    return match ? parseFloat(match[2]) : 0;
+    finalOutput = match ? parseFloat(match[2]) : 0;
   }
+  console.debug(
+    `[data tracker] Parsed value is ${finalOutput} for ${category.name}`
+  );
+  return finalOutput;
 };
 
 export const parseEntryToDisplayValue = (
@@ -298,3 +304,18 @@ export function getPrettyNameForDate(date: string) {
     return moment(date).fromNow();
   }
 }
+
+export const fillAllDates = (sortedDates: string[]) => {
+  const maxDate = sortedDates[sortedDates.length - 1];
+  const minDate = sortedDates[0];
+  const allDatesSorted = [minDate];
+  let currentDate = new Date(minDate);
+
+  while (currentDate < new Date(maxDate)) {
+    currentDate = new Date(currentDate);
+    currentDate.setDate(currentDate.getDate() + 1);
+    allDatesSorted.push(currentDate.toISOString().split("T")[0]);
+  }
+
+  return allDatesSorted;
+};

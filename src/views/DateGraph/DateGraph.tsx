@@ -5,7 +5,11 @@ import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./DateGraph.module.css";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseEntryToDisplayValue, parseEntryValueToNumber } from "../../util";
+import {
+  fillAllDates,
+  parseEntryToDisplayValue,
+  parseEntryValueToNumber,
+} from "../../util";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -211,21 +215,6 @@ export default function DateGraph() {
     const sortedDates = Array.from(allDates).sort(
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
-
-    const fillAllDates = (sortedDates: string[]) => {
-      const maxDate = sortedDates[sortedDates.length - 1];
-      const minDate = sortedDates[0];
-      const allDatesSorted = [minDate];
-      let currentDate = new Date(minDate);
-
-      while (currentDate < new Date(maxDate)) {
-        currentDate = new Date(currentDate);
-        currentDate.setDate(currentDate.getDate() + 1);
-        allDatesSorted.push(currentDate.toISOString().split("T")[0]);
-      }
-
-      return allDatesSorted;
-    };
 
     const newAllDatesSorted = fillAllDates(sortedDates);
     setAllDatesSorted(newAllDatesSorted); // Set state

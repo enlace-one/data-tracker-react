@@ -5,7 +5,11 @@ import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./HeatMapGraph.module.css";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseEntryToDisplayValue, parseEntryValueToNumber } from "../../util";
+import {
+  fillAllDates,
+  parseEntryToDisplayValue,
+  parseEntryValueToNumber,
+} from "../../util";
 import { Scatter } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -18,9 +22,10 @@ import {
 // Register ChartJS components
 ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
 
-export default function HeatMapGraph()61 {
+export default function HeatMapGraph() {
   const { dataCategories, screenWidth } = useData();
   const [loading, setLoading] = useState(true);
+  // const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]); // N
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -28,7 +33,7 @@ export default function HeatMapGraph()61 {
     datasets: [],
   });
   const [datasets, setDatasets] = useState<any[]>([]);
-  const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]);
+  // const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]);
   const [correlation, setCorrelation] = useState<number | null>(null);
   const [y1ValueHandling, setY1ValueHandling] = useState<
     "output" | "value 1" | "value 2" | "value 3"
@@ -63,8 +68,6 @@ export default function HeatMapGraph()61 {
     selectedCategories,
     y1ValueHandling,
     y2ValueHandling,
-    y1BlankHandling,
-    y2BlankHandling,
     startDate,
     endDate,
   ]);
@@ -165,72 +168,68 @@ export default function HeatMapGraph()61 {
       (a, b) => new Date(a).getTime() - new Date(b).getTime()
     );
 
-    const fillAllDates = (sortedDates: string[]) => {
-      if (sortedDates.length === 0) return [];
-      const maxDate = sortedDates[sortedDates.length - 1];
-      const minDate = sortedDates[0];
-      const allDatesSorted = [minDate];
-      let currentDate = new Date(minDate);
-
-      while (currentDate < new Date(maxDate)) {
-        currentDate = new Date(currentDate);
-        currentDate.setDate(currentDate.getDate() + 1);
-        allDatesSorted.push(currentDate.toISOString().split("T")[0]);
-      }
-
-      return allDatesSorted;
-    };
-
     const newAllDatesSorted = fillAllDates(sortedDates);
-    setAllDatesSorted(newAllDatesSorted);
+    // setAllDatesSorted(newAllDatesSorted);
     setDatasets(newDatasets);
 
-    // Align data points with blank handling
-    const alignedData = newDatasets.map((dataset, index) => {
-      const dataMap = new Map(
+    for (const [index, dataset] of newDatasets.entries()) {
+      const dataMap = new Map<string, DataPoint>(
         dataset.dataPoints.map((point: DataPoint) => [point.name, point])
       );
+
       const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
+      const valueHandling = index === 0 ? y1ValueHandling : y2ValueHandling;
 
-      const values = newAllDatesSorted.map((date) => {
-        const point = dataMap.get(date);
-        if (point && point.value !== undefined && point.value !== null) {
-          return point.value;
+      const alignedDataPoints: DataPoint[] = [];
+
+      for (const date of newAllDatesSorted) {
+        const existingPoint = dataMap.get(date);
+
+        if (existingPoint) {
+          alignedDataPoints.push(existingPoint);
+        } else {
+          let value: number;
+
+          switch (blankHandling) {
+            case "zeroize":
+              value = 0;
+              break;
+
+            case "previous": {
+              const prevIndex = newAllDatesSorted.indexOf(date) - 1;
+              const prevDate =
+                prevIndex >= 0 ? newAllDatesSorted[prevIndex] : null;
+              const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
+              value = prevPoint?.value ?? 0;
+              break;
+            }
+
+            case "default":
+              value = parseEntryValueToNumber(
+                dataset.category.defaultValue ?? "0",
+                dataset.category,
+                valueHandling
+              );
+              break;
+
+            case "skip":
+            default:
+              continue;
+          }
+
+          alignedDataPoints.push({
+            name: date,
+            value,
+            displayValue: String(value),
+            note: "",
+          });
         }
+      }
 
-        switch (blankHandling) {
-          case "zeroize":
-            return 0;
-          case "previous":
-            const prevIndex = newAllDatesSorted.indexOf(date) - 1;
-            return prevIndex >= 0 &&
-              dataMap.get(newAllDatesSorted[prevIndex])?.value !== undefined
-              ? dataMap.get(newAllDatesSorted[prevIndex])!.value
-              : 0;
-          case "default":
-            return parseEntryValueToNumber(
-              dataset.category.defaultValue ?? "0",
-              dataset.category,
-              index === 0 ? y1ValueHandling : y2ValueHandling
-            );
-          case "skip":
-          default:
-            return undefined;
-        }
-      });
+      dataset.dataPoints = alignedDataPoints;
+    }
 
-      const notes = newAllDatesSorted.map((date) => {
-        const point = dataMap.get(date);
-        return point && point.note ? point.note : "";
-      });
-
-      return {
-        values,
-        notes,
-        label: dataset.label,
-        category: dataset.category,
-      };
-    });
+    // console.debug(alignedDatasets);
 
     // Create heatmap data
     const heatmapData: {
@@ -240,28 +239,36 @@ export default function HeatMapGraph()61 {
       note: string;
       count: number;
     }[] = [];
-    if (alignedData.length === 2) {
+    if (newDatasets.length === 2) {
+      const cat1Data = new Map(
+        newDatasets[0].dataPoints.map((point: DataPoint) => [point.name, point])
+      );
+      const cat2Data = new Map(
+        newDatasets[1].dataPoints.map((point: DataPoint) => [point.name, point])
+      );
+
       const pairedPoints: {
         x: number;
         y: number;
         date: string;
         note: string;
       }[] = [];
-      for (let i = 0; i < newAllDatesSorted.length; i++) {
-        const xVal = alignedData[1].values[i];
-        const yVal = alignedData[0].values[i];
-        const note = [
-          alignedData[0].notes[i] ? alignedData[0].notes[i] : "",
-          alignedData[1].notes[i] ? alignedData[1].notes[i] : "",
-        ]
-          .filter(Boolean)
-          .join("; ");
-        if (xVal !== undefined && yVal !== undefined) {
+      for (const date of newAllDatesSorted) {
+        const cat1Point = cat1Data.get(date) as DataPoint;
+        const cat2Point = cat2Data.get(date) as DataPoint;
+        if (
+          cat1Point &&
+          cat2Point &&
+          cat1Point.value !== undefined &&
+          cat2Point.value !== undefined
+        ) {
           pairedPoints.push({
-            x: xVal,
-            y: yVal,
-            date: newAllDatesSorted[i],
-            note,
+            x: cat2Point.value,
+            y: cat1Point.value,
+            date,
+            note: `${cat1Point.note ? cat1Point.note + "; " : ""}${
+              cat2Point.note || ""
+            }`,
           });
         }
       }
@@ -274,7 +281,7 @@ export default function HeatMapGraph()61 {
       const yMin = Math.min(...yValues);
       const yMax = Math.max(...yValues);
 
-      const numBins = 20;
+      const numBins = 20; // Number of bins for each axis
       const xBinSize = (xMax - xMin) / numBins || 1;
       const yBinSize = (yMax - yMin) / numBins || 1;
 
@@ -367,6 +374,9 @@ export default function HeatMapGraph()61 {
     });
     setLoading(false);
   };
+
+  console.debug("Cat 1 data");
+  console.debug(datasets);
 
   const options = useMemo(
     () => ({
