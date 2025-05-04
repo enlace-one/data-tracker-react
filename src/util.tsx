@@ -322,3 +322,52 @@ export const fillAllDates = (sortedDates: string[]) => {
 
   return allDatesSorted;
 };
+
+export const sortCategories = (
+  sortBy: string,
+  customList: string[] | null = null,
+  dataCategories: EnrichedDataCategory[],
+  customCategoryOrder: string[] | null = null
+) => {
+  console.log("Sorting by", sortBy);
+
+  // Create a new sorted array to trigger re-render
+  let sortedArray = [...dataCategories];
+
+  if (sortBy === "name") {
+    sortedArray.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortBy === "type") {
+    sortedArray.sort((a, b) => a.dataType.name.localeCompare(b.dataType.name));
+  } else if (sortBy === "topic") {
+    sortedArray.sort((a, b) => a.topic.name.localeCompare(b.topic.name));
+  } else if (sortBy === "lastEntry") {
+    sortedArray.sort((a, b) => {
+      const dateA = new Date(a.lastEntryDate || "1999-01-01");
+      const dateB = new Date(b.lastEntryDate || "1999-01-01");
+      return dateB.getTime() - dateA.getTime();
+    });
+  } else if (sortBy === "entryCount") {
+    sortedArray.sort((a, b) => (b.entryCount ?? 0) - (a.entryCount ?? 0));
+  } else if (sortBy === "custom") {
+    // Assume userProfiles[0].customCategoryOrder is an array of category IDs
+    let customOrder;
+    if (customList != null) {
+      customOrder = customList;
+    } else {
+      customOrder = customCategoryOrder;
+    }
+    if (customOrder && customOrder.length > 0) {
+      sortedArray.sort((a, b) => {
+        const indexA = customOrder.indexOf(a.id);
+        const indexB = customOrder.indexOf(b.id);
+        // Handle cases where a category ID is not in customOrder
+        return (
+          (indexA === -1 ? Infinity : indexA) -
+          (indexB === -1 ? Infinity : indexB)
+        );
+      });
+    }
+  }
+  console.log("Sorted array:", sortedArray);
+  return sortedArray; // Update state with new array reference
+};

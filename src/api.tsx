@@ -10,6 +10,7 @@ import {
   UserProfile,
 } from "./types";
 import { DEFAULT_DATA_TYPES, EXAMPLE_DATA } from "./settings";
+import { sortCategories } from "./util";
 
 // Initialize the Amplify client
 const client = generateClient<Schema>();
@@ -205,7 +206,8 @@ export async function getDataCategory(
 export function subscribeToDataCategories(
   callback: (items: EnrichedDataCategory[]) => void,
   dataTypes: DataType[],
-  topics: Topic[]
+  topics: Topic[],
+  userProfiles: UserProfile[]
 ): () => void {
   const sub = client.models.DataCategory.observeQuery().subscribe({
     next: async (result: { items?: Schema["DataCategory"]["type"][] }) => {
@@ -217,7 +219,7 @@ export function subscribeToDataCategories(
       }
 
       try {
-        const enrichedItems = await Promise.all(
+        let enrichedItems = await Promise.all(
           result.items.map(async (item) => {
             const dataType = item.dataTypeId
               ? dataTypes.find((dt) => dt.id === item.dataTypeId)
@@ -231,7 +233,18 @@ export function subscribeToDataCategories(
           })
         );
 
-        enrichedItems.sort((a, b) => a.name.localeCompare(b.name));
+        if (userProfiles.length > 0) {
+          enrichedItems = sortCategories(
+            userProfiles[0].categorySortPreference ?? "name",
+            null,
+            enrichedItems as EnrichedDataCategory[],
+            (userProfiles[0]?.customCategoryOrder ?? []).filter(
+              (item): item is string => item !== null
+            )
+          );
+        } else {
+          enrichedItems.sort((a, b) => a.name.localeCompare(b.name));
+        }
 
         callback(enrichedItems as unknown as EnrichedDataCategory[]);
       } catch (error) {
