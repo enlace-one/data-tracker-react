@@ -27,7 +27,12 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, fetchedCats, definatelyFetchedCats } = useData();
+  const {
+    dataCategories,
+    fetchedCats,
+    definatelyFetchedCats,
+    selectedCategory,
+  } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -73,9 +78,13 @@ export default function App() {
         signOut();
       }
     };
-
     handleAuthCheck();
   }, [authStatus]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [activeTab, selectedCategory]);
+
   return (
     <Flex
       className="App"
