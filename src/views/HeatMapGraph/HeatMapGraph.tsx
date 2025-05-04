@@ -18,7 +18,7 @@ import {
 // Register ChartJS components
 ChartJS.register(LinearScale, PointElement, Tooltip, Legend);
 
-export default function HeatMapGraph() {
+export default function HeatMapGraph()61 {
   const { dataCategories, screenWidth } = useData();
   const [loading, setLoading] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -28,14 +28,20 @@ export default function HeatMapGraph() {
     datasets: [],
   });
   const [datasets, setDatasets] = useState<any[]>([]);
-  // const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]);
+  const [allDatesSorted, setAllDatesSorted] = useState<string[]>([]);
   const [correlation, setCorrelation] = useState<number | null>(null);
   const [y1ValueHandling, setY1ValueHandling] = useState<
-    "output" | "value 1" | "value 2"
+    "output" | "value 1" | "value 2" | "value 3"
   >("output");
   const [y2ValueHandling, setY2ValueHandling] = useState<
-    "output" | "value 1" | "value 2"
+    "output" | "value 1" | "value 2" | "value 3"
   >("output");
+  const [y1BlankHandling, setY1BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
+  const [y2BlankHandling, setY2BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
 
@@ -57,6 +63,8 @@ export default function HeatMapGraph() {
     selectedCategories,
     y1ValueHandling,
     y2ValueHandling,
+    y1BlankHandling,
+    y2BlankHandling,
     startDate,
     endDate,
   ]);
@@ -68,6 +76,18 @@ export default function HeatMapGraph() {
     const newSelectedCategories = [...selectedCategories];
     newSelectedCategories[categoryIndex] = event.target.value;
     setSelectedCategories(newSelectedCategories.filter(Boolean));
+  };
+
+  const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
+  };
+
+  const handleY2BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
   };
 
   const handleDateChange = (
@@ -83,11 +103,15 @@ export default function HeatMapGraph() {
   };
 
   const handleY1ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setY1ValueHandling(event.target.value as "output" | "value 1" | "value 2");
+    setY1ValueHandling(
+      event.target.value as "output" | "value 1" | "value 2" | "value 3"
+    );
   };
 
   const handleY2ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setY2ValueHandling(event.target.value as "output" | "value 1" | "value 2");
+    setY2ValueHandling(
+      event.target.value as "output" | "value 1" | "value 2" | "value 3"
+    );
   };
 
   const updateChartData = async (categories: string[]) => {
@@ -158,8 +182,55 @@ export default function HeatMapGraph() {
     };
 
     const newAllDatesSorted = fillAllDates(sortedDates);
-    // setAllDatesSorted(newAllDatesSorted);
+    setAllDatesSorted(newAllDatesSorted);
     setDatasets(newDatasets);
+
+    // Align data points with blank handling
+    const alignedData = newDatasets.map((dataset, index) => {
+      const dataMap = new Map(
+        dataset.dataPoints.map((point: DataPoint) => [point.name, point])
+      );
+      const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
+
+      const values = newAllDatesSorted.map((date) => {
+        const point = dataMap.get(date);
+        if (point && point.value !== undefined && point.value !== null) {
+          return point.value;
+        }
+
+        switch (blankHandling) {
+          case "zeroize":
+            return 0;
+          case "previous":
+            const prevIndex = newAllDatesSorted.indexOf(date) - 1;
+            return prevIndex >= 0 &&
+              dataMap.get(newAllDatesSorted[prevIndex])?.value !== undefined
+              ? dataMap.get(newAllDatesSorted[prevIndex])!.value
+              : 0;
+          case "default":
+            return parseEntryValueToNumber(
+              dataset.category.defaultValue ?? "0",
+              dataset.category,
+              index === 0 ? y1ValueHandling : y2ValueHandling
+            );
+          case "skip":
+          default:
+            return undefined;
+        }
+      });
+
+      const notes = newAllDatesSorted.map((date) => {
+        const point = dataMap.get(date);
+        return point && point.note ? point.note : "";
+      });
+
+      return {
+        values,
+        notes,
+        label: dataset.label,
+        category: dataset.category,
+      };
+    });
 
     // Create heatmap data
     const heatmapData: {
@@ -169,36 +240,28 @@ export default function HeatMapGraph() {
       note: string;
       count: number;
     }[] = [];
-    if (newDatasets.length === 2) {
-      const cat1Data = new Map(
-        newDatasets[0].dataPoints.map((point: DataPoint) => [point.name, point])
-      );
-      const cat2Data = new Map(
-        newDatasets[1].dataPoints.map((point: DataPoint) => [point.name, point])
-      );
-
+    if (alignedData.length === 2) {
       const pairedPoints: {
         x: number;
         y: number;
         date: string;
         note: string;
       }[] = [];
-      for (const date of newAllDatesSorted) {
-        const cat1Point = cat1Data.get(date) as DataPoint;
-        const cat2Point = cat2Data.get(date) as DataPoint;
-        if (
-          cat1Point &&
-          cat2Point &&
-          cat1Point.value !== undefined &&
-          cat2Point.value !== undefined
-        ) {
+      for (let i = 0; i < newAllDatesSorted.length; i++) {
+        const xVal = alignedData[1].values[i];
+        const yVal = alignedData[0].values[i];
+        const note = [
+          alignedData[0].notes[i] ? alignedData[0].notes[i] : "",
+          alignedData[1].notes[i] ? alignedData[1].notes[i] : "",
+        ]
+          .filter(Boolean)
+          .join("; ");
+        if (xVal !== undefined && yVal !== undefined) {
           pairedPoints.push({
-            x: cat2Point.value,
-            y: cat1Point.value,
-            date,
-            note: `${cat1Point.note ? cat1Point.note + "; " : ""}${
-              cat2Point.note || ""
-            }`,
+            x: xVal,
+            y: yVal,
+            date: newAllDatesSorted[i],
+            note,
           });
         }
       }
@@ -211,7 +274,7 @@ export default function HeatMapGraph() {
       const yMin = Math.min(...yValues);
       const yMax = Math.max(...yValues);
 
-      const numBins = 20; // Number of bins for each axis
+      const numBins = 20;
       const xBinSize = (xMax - xMin) / numBins || 1;
       const yBinSize = (yMax - yMin) / numBins || 1;
 
@@ -421,6 +484,7 @@ export default function HeatMapGraph() {
                 <option value="output">Value: Output</option>
                 <option value="value 1">Value: # 1</option>
                 <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
               </select>
             </div>
             <div className={styles.formGroup}>
@@ -432,6 +496,39 @@ export default function HeatMapGraph() {
                 <option value="output">Value: Output</option>
                 <option value="value 1">Value: # 1</option>
                 <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1BlankHandling}
+                onChange={handleY1BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2BlankHandling}
+                onChange={handleY2BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
               </select>
             </div>
           </Grid>

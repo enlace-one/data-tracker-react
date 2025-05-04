@@ -19,7 +19,7 @@ export default function CalendarComponent() {
     { day: string; value: number; note?: string }[]
   >([]);
   const [valueHandling, setValueHandling] = useState<
-    "output" | "value 1" | "value 2"
+    "output" | "value 1" | "value 2" | "value 3"
   >("output");
   const color = "#00bfbf";
 
@@ -49,7 +49,9 @@ export default function CalendarComponent() {
   };
 
   const handleValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setValueHandling(event.target.value as "output" | "value 1" | "value 2");
+    setValueHandling(
+      event.target.value as "output" | "value 1" | "value 2" | "value 3"
+    );
   };
 
   const updateCalendarData = async (categoryId: string) => {
@@ -236,6 +238,7 @@ export default function CalendarComponent() {
                 <option value="output">Value: Output</option>
                 <option value="value 1">Value: # 1</option>
                 <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
               </select>
             </div>
           </Grid>
