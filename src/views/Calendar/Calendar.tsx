@@ -181,7 +181,7 @@ export default function CalendarComponent() {
               minDetail="month"
               value={new Date()}
               maxDate={maxDate}
-              prev2Label="«"
+              prev2Label={null}
               next2Label={null}
               onActiveStartDateChange={handleActiveDateChange}
             />
