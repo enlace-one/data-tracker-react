@@ -14,7 +14,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { parseEntryValueToNumber } from "../../util";
+import {
+  fillAllDates,
+  parseEntryToDisplayValue,
+  parseEntryValueToNumber,
+} from "../../util";
+import { DataPoint } from "../../types";
 
 // Register Chart.js components
 ChartJS.register(
@@ -104,78 +109,123 @@ export default function TextGraph() {
   ]);
 
   const updateChartData = async () => {
+    // setLoading(true);
+    const newDatasets: any[] = [];
+    const allDates = new Set<string>();
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Fetch data for first category
-    let category1Data: { [key: string]: number } = {};
-    if (selectedCategories[0]) {
-      const category = dataCategories.find(
-        (cat) => cat.id === selectedCategories[0]
-      );
-      if (category) {
-        let entries = await fetchDataEntriesByCategory(selectedCategories[0]);
-        console.log(
-          `Category ${category.name} has ${entries.length} entries returned.`
-        );
+    for (const [index, catId] of selectedCategories.entries()) {
+      if (!catId) continue;
 
-        entries = entries.filter((entry) => {
-          const entryDate = new Date(entry.date);
-          return entryDate >= start && entryDate <= end;
+      const entries = await fetchDataEntriesByCategory(catId);
+      const category = dataCategories.find((cat) => cat.id === catId);
+      if (!category) continue;
+
+      const dataPoints: DataPoint[] = entries
+        .map((entry) => ({
+          name: entry.date,
+          displayValue: parseEntryToDisplayValue(entry, category),
+          value: parseEntryValueToNumber(
+            entry.value,
+            category,
+            index === 0 ? y1ValueHandling : y2ValueHandling
+          ),
+          note: entry.note || "",
+        }))
+        .filter((point) => {
+          const pointDate = new Date(point.name);
+          return pointDate >= start && pointDate <= end;
         });
 
-        for (const entry of entries) {
-          const value =
-            y1ValueHandling == "text"
-              ? entry.value
-              : parseEntryValueToNumber(entry.value, category, y1ValueHandling);
-          if (value in category1Data) {
-            category1Data[value] += 1;
-          } else {
-            category1Data[value] = 1;
-          }
-        }
-        console.log(
-          `Found ${entries.length} between ${start} and ${end} for category 1`
-        );
-      }
+      dataPoints.forEach((point) => allDates.add(point.name));
+
+      newDatasets.push({
+        label: category.name,
+        dataPoints: dataPoints,
+        category,
+        backgroundColor: index === 0 ? cat_1_color : cat_2_color,
+      });
     }
 
-    // Fetch data for second category
-    let category2Data: { [key: string]: number } = {};
-    if (selectedCategories[1]) {
-      const category = dataCategories.find(
-        (cat) => cat.id === selectedCategories[1]
+    const sortedDates = Array.from(allDates).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    );
+
+    const newAllDatesSorted = fillAllDates(sortedDates);
+    // setAllDatesSorted(newAllDatesSorted);
+    // setDatasets(newDatasets);
+
+    for (const [index, dataset] of newDatasets.entries()) {
+      const dataMap = new Map<string, DataPoint>(
+        dataset.dataPoints.map((point: DataPoint) => [point.name, point])
       );
-      if (category) {
-        let entries = await fetchDataEntriesByCategory(selectedCategories[1]);
-        console.log(
-          `Category ${category.name} has ${entries.length} entries returned.`
-        );
 
-        entries = entries.filter((entry) => {
-          const entryDate = new Date(entry.date);
-          return entryDate >= start && entryDate <= end;
-        });
+      const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
+      const valueHandling = index === 0 ? y1ValueHandling : y2ValueHandling;
 
-        for (const entry of entries) {
-          const value =
-            y2ValueHandling == "text"
-              ? entry.value
-              : parseEntryValueToNumber(entry.value, category, y2ValueHandling);
-          if (value in category2Data) {
-            category2Data[value] += 1;
-          } else {
-            category2Data[value] = 1;
+      const alignedDataPoints: DataPoint[] = [];
+
+      for (const date of newAllDatesSorted) {
+        const existingPoint = dataMap.get(date);
+
+        if (existingPoint) {
+          alignedDataPoints.push(existingPoint);
+        } else {
+          let value: number;
+
+          switch (blankHandling) {
+            case "zeroize":
+              value = 0;
+              break;
+
+            case "previous": {
+              const prevIndex = newAllDatesSorted.indexOf(date) - 1;
+              const prevDate =
+                prevIndex >= 0 ? newAllDatesSorted[prevIndex] : null;
+              const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
+              value = prevPoint?.value ?? 0;
+              break;
+            }
+
+            case "default":
+              value = parseEntryValueToNumber(
+                dataset.category.defaultValue ?? "0",
+                dataset.category,
+                valueHandling
+              );
+              break;
+
+            case "skip":
+            default:
+              continue;
           }
+
+          alignedDataPoints.push({
+            name: date,
+            value,
+            displayValue: String(value),
+            note: "",
+          });
         }
-        console.log(
-          `Found ${entries.length} between ${start} and ${end} for category 2`
-        );
       }
+
+      dataset.dataPoints = alignedDataPoints as DataPoint[];
     }
 
-    setData({ category1: category1Data, category2: category2Data });
+    if (newDatasets.length == 2) {
+      const category1Data: { [key: string]: number } = {};
+      newDatasets[0].dataPoints.map((dp: DataPoint) => {
+        const key = String(dp.value);
+        category1Data[key] = (category1Data[key] || 0) + 1;
+      });
+      const category2Data: { [key: string]: number } = {};
+      newDatasets[1].dataPoints.map((dp: DataPoint) => {
+        const key = String(dp.value);
+        category2Data[key] = (category2Data[key] || 0) + 1;
+      });
+      setData({ category1: category1Data, category2: category2Data });
+    }
   };
 
   // Prepare data for Chart.js
@@ -324,10 +374,10 @@ export default function TextGraph() {
                         ].includes(item.dataType.id)
                     ),
                   ]
-                    .filter(
-                      (item) =>
-                        item.id !== selectedCategories[index === 0 ? 1 : 0]
-                    )
+                    // .filter(
+                    //   (item) =>
+                    //     item.id !== selectedCategories[index === 0 ? 1 : 0]
+                    // )
                     .map((item) => (
                       <option
                         className={styles.tableRow}

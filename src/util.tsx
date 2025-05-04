@@ -77,11 +77,14 @@ export const parseEntryToNumber = (
 export const parseEntryValueToNumber = (
   value: string,
   category: EnrichedDataCategory,
-  type: "output" | "value 1" | "value 2" | "value 3"
+  type: "text" | "output" | "value 1" | "value 2" | "value 3"
 ) => {
   const inputType = category.dataType.inputType;
   const typeId = category.dataType.id;
   let finalOutput;
+  if (type == "text") {
+    return value;
+  }
   if (
     type == "output" ||
     !(inputType == "time-difference" || typeId == "complex-number-001")
