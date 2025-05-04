@@ -12,6 +12,7 @@ import type { OnArgs } from "react-calendar";
 export default function CalendarComponent() {
   const { dataCategories, screenWidth } = useData();
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -136,9 +137,8 @@ export default function CalendarComponent() {
     return (
       <div className={styles.tileValue}>
         {dataPoint.value}
-        {dataPoint.note && (
-          <span className={styles.tileNote} data-note={dataPoint.note}></span>
-        )}
+        {selectedDate &&
+          date.toDateString() === selectedDate.toDateString() && <span></span>}
       </div>
     );
   };
@@ -163,6 +163,10 @@ export default function CalendarComponent() {
   const today = new Date();
   const maxDate = new Date(today.getFullYear(), today.getMonth() + 1, 0);
 
+  const handleClickDay = (value: Date) => {
+    setSelectedDate(value);
+  };
+
   return (
     <>
       <Heading level={1}>Calendar</Heading>
@@ -179,6 +183,7 @@ export default function CalendarComponent() {
               defaultView="month"
               maxDetail="month"
               minDetail="month"
+              onClickDay={handleClickDay}
               value={new Date()}
               maxDate={maxDate}
               prev2Label={null}
