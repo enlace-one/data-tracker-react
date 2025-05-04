@@ -137,9 +137,7 @@ export default function CalendarComponent() {
       <div className={styles.tileValue}>
         {dataPoint.value}
         {dataPoint.note && (
-          <span className={styles.tileNote} data-note={dataPoint.note}>
-            *
-          </span>
+          <span className={styles.tileNote} data-note={dataPoint.note}></span>
         )}
       </div>
     );
