@@ -68,6 +68,8 @@ export default function HeatMapGraph() {
     selectedCategories,
     y1ValueHandling,
     y2ValueHandling,
+    y1BlankHandling,
+    y2BlankHandling,
     startDate,
     endDate,
   ]);

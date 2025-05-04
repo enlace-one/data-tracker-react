@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { parseEntryValueToNumber } from "../../util";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,6 +40,18 @@ export default function TextGraph() {
   ]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [y1ValueHandling, setY1ValueHandling] = useState<
+    "text" | "output" | "value 1" | "value 2" | "value 3"
+  >("text");
+  const [y2ValueHandling, setY2ValueHandling] = useState<
+    "text" | "output" | "value 1" | "value 2" | "value 3"
+  >("text");
+  const [y1BlankHandling, setY1BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
+  const [y2BlankHandling, setY2BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
 
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
@@ -80,7 +93,15 @@ export default function TextGraph() {
     if (startDate && endDate) {
       updateChartData();
     }
-  }, [startDate, endDate, selectedCategories]);
+  }, [
+    startDate,
+    endDate,
+    selectedCategories,
+    y2BlankHandling,
+    y2ValueHandling,
+    y1BlankHandling,
+    y1ValueHandling,
+  ]);
 
   const updateChartData = async () => {
     const start = new Date(startDate);
@@ -104,9 +125,10 @@ export default function TextGraph() {
         });
 
         for (const entry of entries) {
-          const value = Array.isArray(entry.value)
-            ? entry.value.join(",") // Handle array values
-            : entry.value;
+          const value =
+            y1ValueHandling == "text"
+              ? entry.value
+              : parseEntryValueToNumber(entry.value, category, y1ValueHandling);
           if (value in category1Data) {
             category1Data[value] += 1;
           } else {
@@ -137,9 +159,10 @@ export default function TextGraph() {
         });
 
         for (const entry of entries) {
-          const value = Array.isArray(entry.value)
-            ? entry.value.join(",") // Handle array values
-            : entry.value;
+          const value =
+            y2ValueHandling == "text"
+              ? entry.value
+              : parseEntryValueToNumber(entry.value, category, y2ValueHandling);
           if (value in category2Data) {
             category2Data[value] += 1;
           } else {
@@ -219,6 +242,40 @@ export default function TextGraph() {
     },
   };
 
+  const handleY1ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1ValueHandling(
+      event.target.value as
+        | "text"
+        | "output"
+        | "value 1"
+        | "value 2"
+        | "value 3"
+    );
+  };
+
+  const handleY2ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2ValueHandling(
+      event.target.value as
+        | "text"
+        | "output"
+        | "value 1"
+        | "value 2"
+        | "value 3"
+    );
+  };
+
+  const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
+  };
+
+  const handleY2BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
+  };
+
   return (
     <>
       <Heading level={1}>Bar Graph</Heading>
@@ -283,6 +340,72 @@ export default function TextGraph() {
                 </select>
               </div>
             ))}
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1ValueHandling}
+                onChange={handleY1ValueChange}
+              >
+                <option value="text">Value: Text</option>
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2ValueHandling}
+                onChange={handleY2ValueChange}
+              >
+                <option value="text">Value: Text</option>
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1BlankHandling}
+                onChange={handleY1BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2BlankHandling}
+                onChange={handleY2BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
           </Grid>
           <Grid
             margin="1rem 0"
