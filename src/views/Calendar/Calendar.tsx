@@ -203,22 +203,15 @@ export default function CalendarComponent() {
                 style={{ color, fontWeight: "bold" }}
               >
                 <option value="">Choose Category</option>
-                {dataCategories.map(
-                  (item) =>
-                    (item.dataType.inputType === "number" ||
-                      item.dataType.inputType === "boolean-string" ||
-                      item.dataType.inputType === "time" ||
-                      item.dataType.id === "select-numeric-001" ||
-                      item.dataType.isComplex) && (
-                      <option
-                        className={styles.tableRow}
-                        key={item.id}
-                        value={item.id}
-                      >
-                        {item.name}
-                      </option>
-                    )
-                )}
+                {dataCategories.map((item) => (
+                  <option
+                    className={styles.tableRow}
+                    key={item.id}
+                    value={item.id}
+                  >
+                    {item.name}
+                  </option>
+                ))}
               </select>
             </div>
           </Grid>
