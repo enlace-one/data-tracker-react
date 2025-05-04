@@ -25,7 +25,9 @@ ReactDOM.createRoot(root).render(
                 alt="Data Tracker Logo"
                 style={{ maxWidth: "60px" }}
               />
-              <h2 style={{ marginTop: "1rem" }}>Welcome to Data Tracker</h2>
+              <h2 style={{ marginTop: "1rem", color: "black" }}>
+                Welcome to Data Tracker
+              </h2>
             </div>
           );
         },
