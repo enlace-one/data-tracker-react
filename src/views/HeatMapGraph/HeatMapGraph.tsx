@@ -392,11 +392,22 @@ export default function HeatMapGraph() {
           callbacks: {
             label: function (context: any) {
               const point = context.raw;
+              const p1 = datasets[0]?.dataPoints.find(
+                (d: { name: string; value: number }) => d.name === point.date
+              );
+              const p2 = datasets[1]?.dataPoints.find(
+                (d: { name: string; value: number; displayValue: string }) =>
+                  d.name === point.date
+              );
               return [
                 `Count: ${point.count}`,
                 `Date(s): ${point.date}`,
-                `${datasets[0]?.label || "Category 1"}: ${point.y.toFixed(2)}`,
-                `${datasets[1]?.label || "Category 2"}: ${point.x.toFixed(2)}`,
+                `${p1?.label || "Category 1"}: ${p1?.value} (${
+                  p1?.displayValue
+                })`,
+                `${p2?.label || "Category 2"}: ${p2?.value} (${
+                  p2?.displayValue
+                })`,
                 point.note ? `Note: ${point.note}` : "",
               ].filter(Boolean);
             },
