@@ -131,8 +131,8 @@ export function DataProvider({ children }: DataProviderProps) {
       unsubscribeCategories = subscribeToDataCategories(
         setDataCategories,
         types,
-        topics,
-        userProfiles
+        topics
+        // userProfiles
       );
 
       setTimeout(() => {

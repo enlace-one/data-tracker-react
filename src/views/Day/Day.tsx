@@ -23,6 +23,8 @@ export default function Day() {
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
+  const [query, setQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [dataEntries, setDataEntries] = useState<EnrichedDataEntry[]>([]);
@@ -33,6 +35,13 @@ export default function Day() {
   const [categoriesToShow, setCategoriesToShow] = useState<
     EnrichedDataCategory[]
   >([]);
+
+  const filtered =
+    query == ""
+      ? categoriesToShow
+      : categoriesToShow.filter((cat) =>
+          cat.name.toLowerCase().includes(query.toLowerCase())
+        );
 
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
@@ -228,21 +237,21 @@ export default function Day() {
     updateDataEntryValue(entry, String(value));
   };
 
-  const handleAddCategory = async (
-    e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLSelectElement>
-  ) => {
-    console.log("Adding cat");
+  const handleAddCategory = async (categoryId: string) => {
+    console.log("Adding cat: ", categoryId);
+    setLoading(true);
 
-    const value = e.target.value;
+    setQuery(""); // Clear the input after selection
+    setShowResults(false); // Hide results
 
-    console.log("Value", value);
-
-    const category = dataCategories.find((category) => category.id === value);
+    const category = dataCategories.find(
+      (category) => category.id === categoryId
+    );
 
     if (category) {
       try {
         await createDataEntry({
-          dataCategoryId: value,
+          dataCategoryId: categoryId,
           date: date,
           value: category.defaultValue ?? "", // Ensure a valid default value is set
         });
@@ -389,10 +398,43 @@ export default function Day() {
             ))}
             <tr className={styles.tableRow} key="new">
               <td className={styles.minWidth}>
-                {/* <small>Add Entry for Another Category</small>
-                <br /> */}
+                {categoriesToShow.length > 0 && (
+                  <div className={styles.searchContainer}>
+                    <input
+                      type="search"
+                      placeholder="Add entry..."
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setShowResults(true);
+                      }}
+                      onFocus={() => setShowResults(true)}
+                      onBlur={() =>
+                        setTimeout(() => setShowResults(false), 100)
+                      }
+                      className={styles.searchInput}
+                    />
+                    {showResults && (
+                      <ul className={styles.searchResults}>
+                        {filtered.length > 0 ? (
+                          filtered.map((cat) => (
+                            <li
+                              key={cat.id}
+                              onClick={() => handleAddCategory(cat.id)}
+                              className={styles.searchResultItem}
+                            >
+                              {cat.name}
+                            </li>
+                          ))
+                        ) : (
+                          <li className={styles.searchNoResults}>No matches</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                )}
 
-                <select
+                {/* <select
                   onChange={handleAddCategory}
                   className={styles.CategorySelect}
                 >
@@ -404,7 +446,7 @@ export default function Day() {
                       {category.name}
                     </option>
                   ))}
-                </select>
+                </select> */}
               </td>
             </tr>
           </tbody>
