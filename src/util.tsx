@@ -266,7 +266,11 @@ export async function runMacros(
 }
 
 export function parseNumericSelectToNumber(value: string) {
-  return Number(value.split("(")[1].split(")")[0]);
+  try {
+    return Number(value.split("(")[1].split(")")[0]);
+  } catch (e) {
+    console.log("Error on parseNumericSelectToNumber for ", value, e);
+  }
 }
 
 export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
@@ -419,6 +423,72 @@ export const getDataPointsForSingleCategory = async (
   );
 };
 
+export const getDataPointEntriesForTwoCategories = async (
+  categoryIds: string[],
+  categories: EnrichedDataCategory[],
+  valueHandlings: ValueHandling[],
+  zeroHandlings: ZeroHandling[],
+  blankHandlings: BlankHandling[],
+  startDate: string,
+  endDate: string,
+  colors: string[]
+) => {
+  const datasets: any[] = [];
+  const allDates = new Set<string>();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  for (const [index, catId] of categoryIds.entries()) {
+    if (!catId) continue;
+
+    const entries = await fetchDataEntriesByCategory(catId);
+    const category = categories.find((cat) => cat.id === catId);
+    if (!category) continue;
+
+    const dataPoints: DataPoint[] = entries
+      .map((entry) => ({
+        name: entry.date,
+        displayValue: parseEntryToDisplayValue(entry, category),
+        value: parseEntryValueToNumber(
+          entry.value,
+          category,
+          valueHandlings[index]
+        ),
+        note: entry.note || "",
+      }))
+      .filter((point) => {
+        const pointDate = new Date(point.name);
+        return pointDate >= start && pointDate <= end;
+      });
+
+    dataPoints.forEach((point) => allDates.add(point.name));
+
+    datasets.push({
+      label: category.name,
+      dataPoints: dataPoints,
+      category,
+      backgroundColor: colors[index],
+    });
+  }
+  const sortedDates = Array.from(allDates).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  const allDatesSorted = fillAllDates(sortedDates);
+
+  for (const [index, dataset] of datasets.entries()) {
+    dataset.dataPoints = await processDataPoints(
+      dataset.category,
+      valueHandlings[index],
+      zeroHandlings[index],
+      blankHandlings[index],
+      dataset.dataPoints,
+      allDatesSorted
+    );
+  }
+  return datasets;
+};
+
 export const processDataPoints = async (
   category: EnrichedDataCategory,
   valueHandling: ValueHandling,
@@ -481,4 +551,5 @@ export const processDataPoints = async (
       });
     }
   }
+  return alignedDataPoints;
 };

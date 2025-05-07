@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import { fetchDataEntriesByCategory } from "../../api";
 import Calendar from "react-calendar";
 import styles from "./Calendar.module.css";
-import { DataPoint } from "../../types";
-import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import {
-  fillAllDates,
-  parseEntryToDisplayValue,
-  parseEntryValueToNumber,
-} from "../../util";
+  BlankHandling,
+  DataPoint,
+  ValueHandling,
+  ZeroHandling,
+} from "../../types";
+import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
+import { getDataPointsForSingleCategory } from "../../util";
 import type { OnArgs } from "react-calendar";
 
 export default function CalendarComponent() {
@@ -23,13 +23,9 @@ export default function CalendarComponent() {
   const [calendarData, setCalendarData] = useState<
     { day: string; value: number; note?: string }[]
   >([]);
-  const [valueHandling, setValueHandling] = useState<
-    "output" | "value 1" | "value 2" | "value 3"
-  >("output");
-  const [blankHandling, setBlankHandling] = useState<
-    "skip" | "zeroize" | "default" | "previous"
-  >("skip");
-  const [zeroHandling, setZeroHandling] = useState<string>("default");
+  const [valueHandling, setValueHandling] = useState<ValueHandling>("output");
+  const [blankHandling, setBlankHandling] = useState<BlankHandling>("skip");
+  const [zeroHandling, setZeroHandling] = useState<ZeroHandling>("default");
   const color = "#00bfbf";
 
   // Set current month and date range
@@ -64,7 +60,7 @@ export default function CalendarComponent() {
   };
 
   const handleZeroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setZeroHandling(event.target.value);
+    setZeroHandling(event.target.value as ZeroHandling);
   };
 
   const updateCalendarData = async (categoryId: string) => {
@@ -82,88 +78,12 @@ export default function CalendarComponent() {
       return;
     }
 
-    const allDates = new Set<string>();
-
-    const entries = await fetchDataEntriesByCategory(categoryId);
-    let dataPoints: DataPoint[] = entries.map((entry) => ({
-      name: entry.date,
-      displayValue: parseEntryToDisplayValue(entry, category),
-      value: parseEntryValueToNumber(
-        entry.value as string,
-        category,
-        valueHandling
-      ),
-      note: entry.note || "",
-    }));
-
-    dataPoints.forEach((point) => allDates.add(point.name));
-
-    const sortedDates = Array.from(allDates).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    const alignedDataPoints: DataPoint[] = await getDataPointsForSingleCategory(
+      category,
+      valueHandling,
+      zeroHandling,
+      blankHandling
     );
-
-    const newAllDatesSorted = fillAllDates(sortedDates);
-
-    const alignedDataPoints: DataPoint[] = [];
-
-    if (zeroHandling == "treat-as-blank") {
-      dataPoints = dataPoints.filter((dp) => {
-        return dp.value != 0;
-      });
-    }
-
-    const dataMap = new Map<string, DataPoint>(
-      dataPoints.map((point: DataPoint) => [point.name, point])
-    );
-
-    for (const date of newAllDatesSorted) {
-      const existingPoint = dataMap.get(date);
-
-      if (existingPoint) {
-        alignedDataPoints.push(existingPoint);
-      } else {
-        let value: number;
-
-        switch (blankHandling) {
-          case "zeroize":
-            value = 0;
-            break;
-
-          case "previous": {
-            const prevIndex = newAllDatesSorted.indexOf(date) - 1;
-            const prevDate =
-              prevIndex >= 0 ? newAllDatesSorted[prevIndex] : null;
-            const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
-            value = prevPoint?.value ?? 0;
-            break;
-          }
-
-          case "default":
-            value = parseEntryValueToNumber(
-              category.defaultValue ?? "0",
-              category,
-              valueHandling
-            );
-            break;
-
-          case "skip":
-          default:
-            continue;
-        }
-
-        alignedDataPoints.push({
-          name: date,
-          value,
-          displayValue: String(value),
-          note: "",
-        });
-      }
-    }
-
-    // .filter((point) => {
-    //   const pointDate = new Date(point.name);
-    //   return pointDate >= start && pointDate <= end;
-    // });
 
     // Format data for calendar
     const calendarData = alignedDataPoints.map((point) => ({
@@ -247,9 +167,7 @@ export default function CalendarComponent() {
   };
 
   const handleBlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setBlankHandling(
-      event.target.value as "skip" | "zeroize" | "default" | "previous"
-    );
+    setBlankHandling(event.target.value as BlankHandling);
   };
 
   return (

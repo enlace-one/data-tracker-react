@@ -408,7 +408,8 @@ export const EXAMPLE_DATA = [
       name: "Push Ups",
       dataTypeId: "number-001",
       note: "Example category",
-      topicId: "treadmil-colorful.svg",
+      defaultValue: "79",
+      topicId: "pushups-colorful.svg",
     },
     entries: [
       {
@@ -427,6 +428,7 @@ export const EXAMPLE_DATA = [
       name: "Read Bible",
       dataTypeId: "boolean-001",
       note: "Example category",
+      defaultValue: "true",
       topicId: "book-blue.svg",
     },
     entries: [
@@ -446,7 +448,8 @@ export const EXAMPLE_DATA = [
       name: "Dumbell Lifts",
       dataTypeId: "complex-number-001",
       note: "Example category, weight*reps",
-      topicId: "treadmil-black.svg",
+      topicId: "dumbell-black.svg",
+      defaultValue: "30*30",
     },
     entries: [
       {
@@ -466,6 +469,7 @@ export const EXAMPLE_DATA = [
       dataTypeId: "time-001",
       note: "Example category",
       topicId: "clock-cyan.svg",
+      defaultValue: "06:30",
     },
     entries: [
       {
@@ -486,6 +490,7 @@ export const EXAMPLE_DATA = [
       note: "Example category",
       options: "Off (0), Remote (1), In Office (2)",
       topicId: "work-black.svg",
+      defaultValue: "Off (0)",
     },
     entries: [
       {
