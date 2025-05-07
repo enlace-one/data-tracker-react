@@ -156,3 +156,14 @@ export type SetActionMessageFunction = (
   alertInfo: AlertInfo,
   timeout?: number
 ) => void;
+
+export type ValueHandling =
+  | "text"
+  | "output"
+  | "value 1"
+  | "value 2"
+  | "value 3";
+
+export type ZeroHandling = "default" | "treat-as-blank";
+
+export type BlankHandling = "skip" | "zeroize" | "default" | "previous";

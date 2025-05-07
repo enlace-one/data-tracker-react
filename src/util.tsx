@@ -1,6 +1,14 @@
 import { evaluate } from "mathjs";
 import later from "@breejs/later";
-import { DataEntry, EnrichedDataCategory, Macro } from "./types";
+import {
+  BlankHandling,
+  DataEntry,
+  DataPoint,
+  EnrichedDataCategory,
+  Macro,
+  ValueHandling,
+  ZeroHandling,
+} from "./types";
 import {
   createDataEntry,
   fetchDataEntries,
@@ -370,4 +378,107 @@ export const sortCategories = (
   }
   console.log("Sorted array:", sortedArray);
   return sortedArray; // Update state with new array reference
+};
+
+export const getDataPointsForSingleCategory = async (
+  category: EnrichedDataCategory,
+  valueHandling: ValueHandling,
+  zeroHandling: ZeroHandling,
+  blankHandling: BlankHandling
+) => {
+  const allDates = new Set<string>();
+
+  // Fetch Entries and make datapoints
+  const entries = await fetchDataEntriesByCategory(category.id);
+  let dataPoints: DataPoint[] = entries.map((entry) => ({
+    name: entry.date,
+    displayValue: parseEntryToDisplayValue(entry, category),
+    value: parseEntryValueToNumber(
+      entry.value as string,
+      category,
+      valueHandling
+    ),
+    note: entry.note || "",
+  }));
+
+  // Get all dates
+  dataPoints.forEach((point) => allDates.add(point.name));
+
+  const sortedDates = Array.from(allDates).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+  const newAllDatesSorted = fillAllDates(sortedDates);
+
+  return processDataPoints(
+    category,
+    valueHandling,
+    zeroHandling,
+    blankHandling,
+    dataPoints,
+    newAllDatesSorted
+  );
+};
+
+export const processDataPoints = async (
+  category: EnrichedDataCategory,
+  valueHandling: ValueHandling,
+  zeroHandling: ZeroHandling,
+  blankHandling: BlankHandling,
+  dataPoints: DataPoint[],
+  allDatesSorted: string[]
+) => {
+  const alignedDataPoints: DataPoint[] = [];
+
+  // Zero Handling
+  if (zeroHandling == "treat-as-blank") {
+    dataPoints = dataPoints.filter((dp) => {
+      return dp.value != 0;
+    });
+  }
+  const dataMap = new Map<string, DataPoint>(
+    dataPoints.map((point: DataPoint) => [point.name, point])
+  );
+
+  for (const date of allDatesSorted) {
+    const existingPoint = dataMap.get(date);
+
+    if (existingPoint) {
+      alignedDataPoints.push(existingPoint);
+    } else {
+      let value: number;
+
+      switch (blankHandling) {
+        case "zeroize":
+          value = 0;
+          break;
+
+        case "previous": {
+          const prevIndex = allDatesSorted.indexOf(date) - 1;
+          const prevDate = prevIndex >= 0 ? allDatesSorted[prevIndex] : null;
+          const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
+          value = prevPoint?.value ?? 0;
+          break;
+        }
+
+        case "default":
+          value = parseEntryValueToNumber(
+            category.defaultValue ?? "0",
+            category,
+            valueHandling
+          );
+          break;
+
+        case "skip":
+        default:
+          continue;
+      }
+
+      alignedDataPoints.push({
+        name: date,
+        value,
+        displayValue: String(value),
+        note: "",
+      });
+    }
+  }
 };
