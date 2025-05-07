@@ -78,7 +78,9 @@ export default function Categories() {
   };
 
   useEffect(() => {
-    sortCategoryList();
+    sortCategoryList(
+      (userProfiles[0]?.customCategoryOrder as string[]) ?? ([] as string[])
+    );
   }, [sortBy]);
 
   const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
