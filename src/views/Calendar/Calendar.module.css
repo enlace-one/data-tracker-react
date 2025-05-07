@@ -76,6 +76,7 @@
 
 :global(.react-calendar__tile) {
   min-height: 60px;
+  padding: 1px 6px;
   background-color: #f9f9f9;
   /* box-sizing: border-box; */
 

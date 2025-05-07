@@ -22,6 +22,7 @@ export default function CalendarComponent() {
   const [valueHandling, setValueHandling] = useState<
     "output" | "value 1" | "value 2" | "value 3"
   >("output");
+  const [zeroHandling, setZeroHandling] = useState<string>("default");
   const color = "#00bfbf";
 
   // Set current month and date range
@@ -55,6 +56,10 @@ export default function CalendarComponent() {
     );
   };
 
+  const handleZeroChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setZeroHandling(event.target.value);
+  };
+
   const updateCalendarData = async (categoryId: string) => {
     if (!startDate || !endDate || !categoryId) {
       setCalendarData([]);
@@ -71,7 +76,7 @@ export default function CalendarComponent() {
     }
 
     const entries = await fetchDataEntriesByCategory(categoryId);
-    const dataPoints: DataPoint[] = entries.map((entry) => ({
+    let dataPoints: DataPoint[] = entries.map((entry) => ({
       name: entry.date,
       displayValue: parseEntryToDisplayValue(entry, category),
       value: parseEntryValueToNumber(
@@ -81,6 +86,12 @@ export default function CalendarComponent() {
       ),
       note: entry.note || "",
     }));
+
+    if (zeroHandling == "treat-as-blank") {
+      dataPoints = dataPoints.filter((dp) => {
+        return dp.value != 0;
+      });
+    }
     // .filter((point) => {
     //   const pointDate = new Date(point.name);
     //   return pointDate >= start && pointDate <= end;
@@ -235,6 +246,24 @@ export default function CalendarComponent() {
                 <option value="value 1">Value: # 1</option>
                 <option value="value 2">Value: # 2</option>
                 <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={zeroHandling}
+                onChange={handleZeroChange}
+              >
+                <option value="default">Show 0 as 0</option>
+                <option value="treat-as-blank">Show 0 as blank</option>
               </select>
             </div>
           </Grid>
