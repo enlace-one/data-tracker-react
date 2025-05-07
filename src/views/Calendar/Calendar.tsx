@@ -6,7 +6,11 @@ import Calendar from "react-calendar";
 import styles from "./Calendar.module.css";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { parseEntryToDisplayValue, parseEntryValueToNumber } from "../../util";
+import {
+  fillAllDates,
+  parseEntryToDisplayValue,
+  parseEntryValueToNumber,
+} from "../../util";
 import type { OnArgs } from "react-calendar";
 
 export default function CalendarComponent() {
@@ -22,6 +26,9 @@ export default function CalendarComponent() {
   const [valueHandling, setValueHandling] = useState<
     "output" | "value 1" | "value 2" | "value 3"
   >("output");
+  const [blankHandling, setBlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
   const [zeroHandling, setZeroHandling] = useState<string>("default");
   const color = "#00bfbf";
 
@@ -42,7 +49,7 @@ export default function CalendarComponent() {
 
   useEffect(() => {
     updateCalendarData(selectedCategory);
-  }, [selectedCategory, valueHandling]);
+  }, [selectedCategory, valueHandling, blankHandling, zeroHandling]);
 
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -75,6 +82,8 @@ export default function CalendarComponent() {
       return;
     }
 
+    const allDates = new Set<string>();
+
     const entries = await fetchDataEntriesByCategory(categoryId);
     let dataPoints: DataPoint[] = entries.map((entry) => ({
       name: entry.date,
@@ -87,18 +96,77 @@ export default function CalendarComponent() {
       note: entry.note || "",
     }));
 
+    dataPoints.forEach((point) => allDates.add(point.name));
+
+    const sortedDates = Array.from(allDates).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    );
+
+    const newAllDatesSorted = fillAllDates(sortedDates);
+
+    const alignedDataPoints: DataPoint[] = [];
+
     if (zeroHandling == "treat-as-blank") {
       dataPoints = dataPoints.filter((dp) => {
         return dp.value != 0;
       });
     }
+
+    const dataMap = new Map<string, DataPoint>(
+      dataPoints.map((point: DataPoint) => [point.name, point])
+    );
+
+    for (const date of newAllDatesSorted) {
+      const existingPoint = dataMap.get(date);
+
+      if (existingPoint) {
+        alignedDataPoints.push(existingPoint);
+      } else {
+        let value: number;
+
+        switch (blankHandling) {
+          case "zeroize":
+            value = 0;
+            break;
+
+          case "previous": {
+            const prevIndex = newAllDatesSorted.indexOf(date) - 1;
+            const prevDate =
+              prevIndex >= 0 ? newAllDatesSorted[prevIndex] : null;
+            const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
+            value = prevPoint?.value ?? 0;
+            break;
+          }
+
+          case "default":
+            value = parseEntryValueToNumber(
+              category.defaultValue ?? "0",
+              category,
+              valueHandling
+            );
+            break;
+
+          case "skip":
+          default:
+            continue;
+        }
+
+        alignedDataPoints.push({
+          name: date,
+          value,
+          displayValue: String(value),
+          note: "",
+        });
+      }
+    }
+
     // .filter((point) => {
     //   const pointDate = new Date(point.name);
     //   return pointDate >= start && pointDate <= end;
     // });
 
     // Format data for calendar
-    const calendarData = dataPoints.map((point) => ({
+    const calendarData = alignedDataPoints.map((point) => ({
       day: point.name,
       value: point.value !== undefined ? point.value : 0,
       note: point.note,
@@ -176,6 +244,12 @@ export default function CalendarComponent() {
 
   const handleClickDay = (value: Date) => {
     setSelectedDate(value);
+  };
+
+  const handleBlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setBlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
   };
 
   return (
@@ -264,6 +338,26 @@ export default function CalendarComponent() {
               >
                 <option value="default">Show 0 as 0</option>
                 <option value="treat-as-blank">Show 0 as blank</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={blankHandling}
+                onChange={handleBlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
               </select>
             </div>
           </Grid>
