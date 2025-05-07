@@ -288,6 +288,59 @@ export default function Day() {
       {!loading && (
         <table className={styles.table}>
           <tbody>
+            <tr className={styles.tableRow} key="new">
+              <td className={styles.minWidth}>
+                {categoriesToShow.length > 0 && (
+                  <div className={styles.searchContainer}>
+                    <input
+                      type="search"
+                      placeholder="Add entry..."
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setShowResults(true);
+                      }}
+                      onFocus={() => setShowResults(true)}
+                      onBlur={() =>
+                        setTimeout(() => setShowResults(false), 100)
+                      }
+                      className={styles.searchInput}
+                    />
+                    {showResults && (
+                      <ul className={styles.searchResults}>
+                        {filtered.length > 0 ? (
+                          filtered.map((cat) => (
+                            <li
+                              key={cat.id}
+                              onClick={() => handleAddCategory(cat.id)}
+                              className={styles.searchResultItem}
+                            >
+                              {cat.name}
+                            </li>
+                          ))
+                        ) : (
+                          <li className={styles.searchNoResults}>No matches</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {/* <select
+                  onChange={handleAddCategory}
+                  className={styles.CategorySelect}
+                >
+                  <option key="default" value="">
+                    Pick a Category
+                  </option>
+                  {categoriesToShow.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select> */}
+              </td>
+            </tr>
             {dataEntries.map((entry) => (
               <tr className={styles.tableRow} key={entry.id}>
                 <td className={styles.minWidth}>
@@ -396,59 +449,6 @@ export default function Day() {
                 </td>
               </tr>
             ))}
-            <tr className={styles.tableRow} key="new">
-              <td className={styles.minWidth}>
-                {categoriesToShow.length > 0 && (
-                  <div className={styles.searchContainer}>
-                    <input
-                      type="search"
-                      placeholder="Add entry..."
-                      value={query}
-                      onChange={(e) => {
-                        setQuery(e.target.value);
-                        setShowResults(true);
-                      }}
-                      onFocus={() => setShowResults(true)}
-                      onBlur={() =>
-                        setTimeout(() => setShowResults(false), 100)
-                      }
-                      className={styles.searchInput}
-                    />
-                    {showResults && (
-                      <ul className={styles.searchResults}>
-                        {filtered.length > 0 ? (
-                          filtered.map((cat) => (
-                            <li
-                              key={cat.id}
-                              onClick={() => handleAddCategory(cat.id)}
-                              className={styles.searchResultItem}
-                            >
-                              {cat.name}
-                            </li>
-                          ))
-                        ) : (
-                          <li className={styles.searchNoResults}>No matches</li>
-                        )}
-                      </ul>
-                    )}
-                  </div>
-                )}
-
-                {/* <select
-                  onChange={handleAddCategory}
-                  className={styles.CategorySelect}
-                >
-                  <option key="default" value="">
-                    Pick a Category
-                  </option>
-                  {categoriesToShow.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select> */}
-              </td>
-            </tr>
           </tbody>
         </table>
       )}
