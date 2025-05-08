@@ -1,16 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { Heading, Divider, Grid, Text } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
-import { fetchDataEntriesByCategory } from "../../api";
 import styles from "./HeatMapGraph.module.css";
 import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import {
-  fillAllDates,
-  getDataPointEntriesForTwoCategories,
-  parseEntryToDisplayValue,
-  parseEntryValueToNumber,
-} from "../../util";
+import { getDataPointEntriesForTwoCategories } from "../../util";
 import { Scatter } from "react-chartjs-2";
 import {
   Chart as ChartJS,

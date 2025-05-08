@@ -3,7 +3,6 @@ import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import styles from "./TextGraph.module.css";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { fetchDataEntriesByCategory } from "../../api";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,12 +13,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import {
-  fillAllDates,
-  getDataPointEntriesForTwoCategories,
-  parseEntryToDisplayValue,
-  parseEntryValueToNumber,
-} from "../../util";
+import { getDataPointEntriesForTwoCategories } from "../../util";
 import { DataPoint } from "../../types";
 
 // Register Chart.js components
