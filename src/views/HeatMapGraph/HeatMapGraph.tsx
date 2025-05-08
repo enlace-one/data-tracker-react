@@ -7,6 +7,7 @@ import { DataPoint } from "../../types";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import {
   fillAllDates,
+  getDataPointEntriesForTwoCategories,
   parseEntryToDisplayValue,
   parseEntryValueToNumber,
 } from "../../util";
@@ -128,108 +129,20 @@ export default function HeatMapGraph() {
     }
 
     setLoading(true);
-    const newDatasets: any[] = [];
-    const allDates = new Set<string>();
-    const start = new Date(startDate);
-    const end = new Date(endDate);
 
-    for (const [index, catId] of categories.entries()) {
-      if (!catId) continue;
-
-      const entries = await fetchDataEntriesByCategory(catId);
-      const category = dataCategories.find((cat) => cat.id === catId);
-      if (!category) continue;
-
-      const dataPoints: DataPoint[] = entries
-        .map((entry) => ({
-          name: entry.date,
-          displayValue: parseEntryToDisplayValue(entry, category),
-          value: parseEntryValueToNumber(
-            entry.value,
-            category,
-            index === 0 ? y1ValueHandling : y2ValueHandling
-          ),
-          note: entry.note || "",
-        }))
-        .filter((point) => {
-          const pointDate = new Date(point.name);
-          return pointDate >= start && pointDate <= end;
-        });
-
-      dataPoints.forEach((point) => allDates.add(point.name));
-
-      newDatasets.push({
-        label: category.name,
-        dataPoints: dataPoints,
-        category,
-        backgroundColor: index === 0 ? cat_1_color : cat_2_color,
-      });
-    }
-
-    const sortedDates = Array.from(allDates).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
-
-    const newAllDatesSorted = fillAllDates(sortedDates);
-    // setAllDatesSorted(newAllDatesSorted);
-    setDatasets(newDatasets);
-
-    for (const [index, dataset] of newDatasets.entries()) {
-      const dataMap = new Map<string, DataPoint>(
-        dataset.dataPoints.map((point: DataPoint) => [point.name, point])
+    const { datasets: newDatasets, allDatesSorted: newAllDatesSorted } =
+      await getDataPointEntriesForTwoCategories(
+        selectedCategories,
+        dataCategories,
+        [y1ValueHandling, y2ValueHandling],
+        ["default", "default"],
+        [y1BlankHandling, y2BlankHandling],
+        startDate,
+        endDate,
+        [cat_1_color, cat_2_color]
       );
 
-      const blankHandling = index === 0 ? y1BlankHandling : y2BlankHandling;
-      const valueHandling = index === 0 ? y1ValueHandling : y2ValueHandling;
-
-      const alignedDataPoints: DataPoint[] = [];
-
-      for (const date of newAllDatesSorted) {
-        const existingPoint = dataMap.get(date);
-
-        if (existingPoint) {
-          alignedDataPoints.push(existingPoint);
-        } else {
-          let value: number;
-
-          switch (blankHandling) {
-            case "zeroize":
-              value = 0;
-              break;
-
-            case "previous": {
-              const prevIndex = newAllDatesSorted.indexOf(date) - 1;
-              const prevDate =
-                prevIndex >= 0 ? newAllDatesSorted[prevIndex] : null;
-              const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
-              value = prevPoint?.value ?? 0;
-              break;
-            }
-
-            case "default":
-              value = parseEntryValueToNumber(
-                dataset.category.defaultValue ?? "0",
-                dataset.category,
-                valueHandling
-              );
-              break;
-
-            case "skip":
-            default:
-              continue;
-          }
-
-          alignedDataPoints.push({
-            name: date,
-            value,
-            displayValue: String(value),
-            note: "",
-          });
-        }
-      }
-
-      dataset.dataPoints = alignedDataPoints;
-    }
+    setDatasets(newDatasets);
 
     // console.debug(alignedDatasets);
 
@@ -392,12 +305,18 @@ export default function HeatMapGraph() {
           callbacks: {
             label: function (context: any) {
               const point = context.raw;
+              console.log(
+                "point:",
+                point.date.split(",")[0].trim(),
+                point.date.split(",")[0].trim() === "2025-05-03"
+              );
               const p1 = datasets[0]?.dataPoints.find(
-                (d: { name: string; value: number }) => d.name === point.date
+                (d: { name: string; value: number }) =>
+                  d.name === point.date.split(",")[0].trim()
               );
               const p2 = datasets[1]?.dataPoints.find(
                 (d: { name: string; value: number; displayValue: string }) =>
-                  d.name === point.date
+                  d.name === point.date.split(",")[0].trim()
               );
               return [
                 `Count: ${point.count}`,

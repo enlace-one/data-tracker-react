@@ -486,7 +486,11 @@ export const getDataPointEntriesForTwoCategories = async (
       allDatesSorted
     );
   }
-  return datasets;
+  console.log("Datasets: ", datasets);
+  return {
+    datasets: datasets,
+    allDatesSorted: allDatesSorted,
+  };
 };
 
 export const processDataPoints = async (

@@ -110,7 +110,7 @@ export default function TextGraph() {
   ]);
 
   const updateChartData = async () => {
-    const newDatasets = await getDataPointEntriesForTwoCategories(
+    const { datasets: newDatasets } = await getDataPointEntriesForTwoCategories(
       selectedCategories,
       dataCategories,
       [y1ValueHandling, y2ValueHandling],
