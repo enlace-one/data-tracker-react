@@ -191,10 +191,10 @@ export default function TextGraph() {
         },
       },
       y: {
-        title: {
-          display: true,
-          text: "Count",
-        },
+        // title: {
+        //   display: true,
+        //   text: "Count",
+        // },
         beginAtZero: true,
         ticks: {
           stepSize: 1,
