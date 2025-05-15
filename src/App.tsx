@@ -20,10 +20,11 @@ import TextGraph from "./views/TextGraph/TextGraph";
 import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
 import Calendar from "./views/Calendar/Calendar";
 import { UI_IMAGE_PATH } from "./settings.tsx";
+import { signOut } from "aws-amplify/auth";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
-  const { authStatus, signOut } = useAuthenticator((context) => [context.user]);
+  const { authStatus } = useAuthenticator((context) => [context.user]);
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
@@ -240,7 +241,7 @@ export default function App() {
               >
                 Types
               </Button>
-              <Button style={{ border: "none" }} onClick={signOut}>
+              <Button style={{ border: "none" }} onClick={() => signOut()}>
                 Sign Out
               </Button>
             </>
