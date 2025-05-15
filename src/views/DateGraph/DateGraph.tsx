@@ -63,6 +63,10 @@ export default function DateGraph() {
   const [y2ValueHandling, setY2ValueHandling] = useState<
     "output" | "value 1" | "value 2" | "value 3"
   >("output");
+  const [y1Average, setY1Average] = useState<string>("");
+  const [y2Average, setY2Average] = useState<string>("");
+  const [y1StandardDev, setY1StandardDev] = useState<string>("");
+  const [y2StandardDev, setY2StandardDev] = useState<string>("");
   const [correlation, setCorrelation] = useState<number | null>(null); // New state for correlation
   const [tension, setTension] = useState<number>(0.2);
   const [lineStyle, setLineStyle] = useState("default");
@@ -264,36 +268,69 @@ export default function DateGraph() {
       };
     });
 
-    if (alignedDatasets.length === 2) {
+    if (alignedDatasets.length >= 1) {
       const x = alignedDatasets[0].data;
-      const y = alignedDatasets[1].data;
+      const y = alignedDatasets.length === 2 ? alignedDatasets[1].data : null;
       let sumX = 0,
         sumY = 0,
         sumXY = 0,
         sumX2 = 0,
         sumY2 = 0,
-        n = 0;
+        nX = 0,
+        nY = 0,
+        nPairs = 0;
 
       for (let i = 0; i < newAllDatesSorted.length; i++) {
-        const xVal = x[i] !== undefined ? x[i] : 0;
-        const yVal = y[i] !== undefined ? y[i] : 0;
-        if (xVal !== null && yVal !== null) {
+        const xVal = x[i] ?? null;
+        const yVal = y?.[i] ?? null;
+
+        if (xVal !== null) {
           sumX += xVal;
-          sumY += yVal;
-          sumXY += xVal * yVal;
           sumX2 += xVal * xVal;
+          nX++;
+        }
+        if (yVal !== null) {
+          sumY += yVal;
           sumY2 += yVal * yVal;
-          n++;
+          nY++;
+        }
+        if (xVal !== null && yVal !== null) {
+          sumXY += xVal * yVal;
+          nPairs++;
         }
       }
 
-      const numerator = n * sumXY - sumX * sumY;
-      const denominator = Math.sqrt(
-        (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
+      setY1Average(nX > 0 ? (sumX / nX).toFixed(3) : "");
+      setY1StandardDev(
+        nX > 0
+          ? Math.sqrt(nX > 1 ? sumX2 / nX - (sumX / nX) ** 2 : 0).toFixed(3)
+          : ""
       );
-      const correlationValue = denominator === 0 ? 0 : numerator / denominator;
-      setCorrelation(Number(correlationValue.toFixed(3)));
+      setY2Average(nY > 0 ? (sumY / nY).toFixed(3) : "");
+      setY2StandardDev(
+        nY > 0
+          ? Math.sqrt(nY > 1 ? sumY2 / nY - (sumY / nY) ** 2 : 0).toFixed(3)
+          : ""
+      );
+
+      setCorrelation(
+        alignedDatasets.length === 2 && nPairs >= 2
+          ? Number(
+              (
+                (nPairs * sumXY - sumX * sumY) /
+                  Math.sqrt(
+                    (nPairs * sumX2 - sumX * sumX) *
+                      (nPairs * sumY2 - sumY * sumY)
+                  ) || 0
+              ).toFixed(3)
+            )
+          : null
+      );
     } else {
+      setY1Average("");
+      setY2Average("");
+      setY1StandardDev("");
+      setY2StandardDev("");
       setCorrelation(null);
     }
 
@@ -384,6 +421,40 @@ export default function DateGraph() {
               Correlation Coefficient: {correlation}
             </Text>
           )}
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            {[0, 1].map((index) => (
+              <Text key={`Average${index}`}>
+                {(index == 0 ? y1Average : y2Average) != ""
+                  ? index == 0
+                    ? `Average: ${y1Average}`
+                    : `Average: ${y2Average}`
+                  : ""}
+              </Text>
+            ))}
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            {[0, 1].map((index) => (
+              <Text key={`SD${index}`}>
+                {(index == 0 ? y1StandardDev : y2StandardDev) != ""
+                  ? index == 0
+                    ? `SD: ${y1StandardDev}`
+                    : `SD: ${y2StandardDev}`
+                  : ""}
+              </Text>
+            ))}
+          </Grid>
           <Grid
             margin="1rem 0"
             autoFlow="column"
