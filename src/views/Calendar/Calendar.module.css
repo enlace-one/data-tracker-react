@@ -1,0 +1,155 @@
+.multiSelect {
+  min-width: 200px;
+  width: 100%;
+}
+
+.formGroup {
+  margin-bottom: 12px;
+  display: flex; /* Use flexbox for side-by-side layout */
+  gap: 16px; /* Space between the selects */
+}
+
+.formGroup {
+  margin-bottom: 12px;
+  display: flex; /* Align elements side by side */
+  justify-content: space-between; /* Space between the label and the select elements */
+  align-items: center; /* Vertically align the label and select */
+}
+
+.formGroup label {
+  font-weight: bold;
+  margin-bottom: 0; /* No extra space below the label */
+  margin-right: 10px; /* Space between label and select */
+}
+
+.formGroup select {
+  width: 48%; /* Give them some space side by side */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}
+.calendar {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-top: 20px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+:global(.react-calendar) {
+  width: 100%;
+  border: none;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+:global(.react-calendar__navigation) {
+  margin-bottom: 1rem;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+:global(.react-calendar__navigation__label) {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+:global(.react-calendar__navigation__arrow) {
+  background-color: #f9f9f9;
+}
+
+:global(.react-calendar__month-view__weekdays) {
+  font-weight: bold;
+  color: #333;
+  background-color: #f9f9f9;
+}
+
+:global(.react-calendar__month-view__weekdays__weekday abbr) {
+  text-decoration: none;
+}
+
+:global(.react-calendar__tile) {
+  min-height: 60px;
+  padding: 1px 6px;
+  background-color: #f9f9f9;
+  /* box-sizing: border-box; */
+
+  /* padding: 10px;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  text-align: center;
+  position: relative;
+  
+  max-height: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; */
+}
+
+:global(.react-calendar__tile--hasActive),
+:global(.react-calendar__tile--active) {
+  background-color: #4dabf7 !important; /* Softer blue for selected/active day */
+  color: white !important;
+}
+
+.hasData {
+  background-color: #e0f7fa !important;
+}
+
+.today {
+  background-color: #c6e4fc !important; /* Softer blue for today */
+  color: black !important;
+}
+
+.tileValue {
+  font-size: 0.8rem;
+  color: #00bfbf;
+  margin-top: 5px;
+  /* overflow: hidden; */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tileNote {
+  margin-left: 2px;
+  cursor: pointer;
+}
+
+.tileNote:hover::after {
+  content: attr(data-note);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.multiSelect {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.tableRow {
+  padding: 8px;
+}

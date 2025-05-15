@@ -3,7 +3,6 @@ import { Heading, Divider, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import styles from "./TextGraph.module.css";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
-import { fetchDataEntriesByCategory } from "../../api";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -14,6 +13,8 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { getDataPointEntriesForTwoCategories } from "../../util";
+import { DataPoint } from "../../types";
 
 // Register Chart.js components
 ChartJS.register(
@@ -39,6 +40,18 @@ export default function TextGraph() {
   ]);
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
+  const [y1ValueHandling, setY1ValueHandling] = useState<
+    "text" | "output" | "value 1" | "value 2" | "value 3"
+  >("text");
+  const [y2ValueHandling, setY2ValueHandling] = useState<
+    "text" | "output" | "value 1" | "value 2" | "value 3"
+  >("text");
+  const [y1BlankHandling, setY1BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
+  const [y2BlankHandling, setY2BlankHandling] = useState<
+    "skip" | "zeroize" | "default" | "previous"
+  >("skip");
 
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
@@ -80,79 +93,50 @@ export default function TextGraph() {
     if (startDate && endDate) {
       updateChartData();
     }
-  }, [startDate, endDate, selectedCategories]);
+  }, [
+    startDate,
+    endDate,
+    selectedCategories,
+    y2BlankHandling,
+    y2ValueHandling,
+    y1BlankHandling,
+    y1ValueHandling,
+  ]);
 
   const updateChartData = async () => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    const { datasets: newDatasets } = await getDataPointEntriesForTwoCategories(
+      selectedCategories,
+      dataCategories,
+      [y1ValueHandling, y2ValueHandling],
+      ["default", "default"],
+      [y1BlankHandling, y2BlankHandling],
+      startDate,
+      endDate,
+      [cat_1_color, cat_2_color]
+    );
 
-    // Fetch data for first category
-    let category1Data: { [key: string]: number } = {};
-    if (selectedCategories[0]) {
-      const category = dataCategories.find(
-        (cat) => cat.id === selectedCategories[0]
-      );
-      if (category) {
-        let entries = await fetchDataEntriesByCategory(selectedCategories[0]);
-        console.log(
-          `Category ${category.name} has ${entries.length} entries returned.`
-        );
-
-        entries = entries.filter((entry) => {
-          const entryDate = new Date(entry.date);
-          return entryDate >= start && entryDate <= end;
-        });
-
-        for (const entry of entries) {
-          const value = Array.isArray(entry.value)
-            ? entry.value.join(",") // Handle array values
-            : entry.value;
-          if (value in category1Data) {
-            category1Data[value] += 1;
-          } else {
-            category1Data[value] = 1;
-          }
-        }
-        console.log(
-          `Found ${entries.length} between ${start} and ${end} for category 1`
-        );
-      }
+    if (newDatasets.length == 1) {
+      const category1Data: { [key: string]: number } = {};
+      newDatasets[0].dataPoints.map((dp: DataPoint) => {
+        const key = String(dp.value);
+        category1Data[key] = (category1Data[key] || 0) + 1;
+      });
+      setData({ category1: category1Data, category2: {} });
+    } else if (newDatasets.length == 2) {
+      const category1Data: { [key: string]: number } = {};
+      newDatasets[0].dataPoints.map((dp: DataPoint) => {
+        const key = String(dp.value);
+        category1Data[key] = (category1Data[key] || 0) + 1;
+      });
+      const category2Data: { [key: string]: number } = {};
+      newDatasets[1].dataPoints.map((dp: DataPoint) => {
+        const key = String(dp.value);
+        category2Data[key] = (category2Data[key] || 0) + 1;
+      });
+      setData({ category1: category1Data, category2: category2Data });
+    } else {
+      setData({ category1: {}, category2: {} });
     }
-
-    // Fetch data for second category
-    let category2Data: { [key: string]: number } = {};
-    if (selectedCategories[1]) {
-      const category = dataCategories.find(
-        (cat) => cat.id === selectedCategories[1]
-      );
-      if (category) {
-        let entries = await fetchDataEntriesByCategory(selectedCategories[1]);
-        console.log(
-          `Category ${category.name} has ${entries.length} entries returned.`
-        );
-
-        entries = entries.filter((entry) => {
-          const entryDate = new Date(entry.date);
-          return entryDate >= start && entryDate <= end;
-        });
-
-        for (const entry of entries) {
-          const value = Array.isArray(entry.value)
-            ? entry.value.join(",") // Handle array values
-            : entry.value;
-          if (value in category2Data) {
-            category2Data[value] += 1;
-          } else {
-            category2Data[value] = 1;
-          }
-        }
-        console.log(
-          `Found ${entries.length} between ${start} and ${end} for category 2`
-        );
-      }
-    }
-
-    setData({ category1: category1Data, category2: category2Data });
   };
 
   // Prepare data for Chart.js
@@ -219,6 +203,40 @@ export default function TextGraph() {
     },
   };
 
+  const handleY1ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1ValueHandling(
+      event.target.value as
+        | "text"
+        | "output"
+        | "value 1"
+        | "value 2"
+        | "value 3"
+    );
+  };
+
+  const handleY2ValueChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2ValueHandling(
+      event.target.value as
+        | "text"
+        | "output"
+        | "value 1"
+        | "value 2"
+        | "value 3"
+    );
+  };
+
+  const handleY1BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY1BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
+  };
+
+  const handleY2BlankChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setY2BlankHandling(
+      event.target.value as "skip" | "zeroize" | "default" | "previous"
+    );
+  };
+
   return (
     <>
       <Heading level={1}>Bar Graph</Heading>
@@ -267,10 +285,10 @@ export default function TextGraph() {
                         ].includes(item.dataType.id)
                     ),
                   ]
-                    .filter(
-                      (item) =>
-                        item.id !== selectedCategories[index === 0 ? 1 : 0]
-                    )
+                    // .filter(
+                    //   (item) =>
+                    //     item.id !== selectedCategories[index === 0 ? 1 : 0]
+                    // )
                     .map((item) => (
                       <option
                         className={styles.tableRow}
@@ -283,6 +301,72 @@ export default function TextGraph() {
                 </select>
               </div>
             ))}
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1ValueHandling}
+                onChange={handleY1ValueChange}
+              >
+                <option value="text">Value: Text</option>
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2ValueHandling}
+                onChange={handleY2ValueChange}
+              >
+                <option value="text">Value: Text</option>
+                <option value="output">Value: Output</option>
+                <option value="value 1">Value: # 1</option>
+                <option value="value 2">Value: # 2</option>
+                <option value="value 3">Value: # 3</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y1BlankHandling}
+                onChange={handleY1BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={y2BlankHandling}
+                onChange={handleY2BlankChange}
+              >
+                <option value="skip">Blanks: Skip</option>
+                <option value="zeroize">Blanks: 0</option>
+                <option value="previous">Blanks: Previous</option>
+                <option value="default">Blanks: Default</option>
+              </select>
+            </div>
           </Grid>
           <Grid
             margin="1rem 0"

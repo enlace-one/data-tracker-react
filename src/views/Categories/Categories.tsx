@@ -2,7 +2,12 @@ import { useState, useEffect } from "react";
 import { Heading, Divider, Button, Grid } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
-import { createDataCategory, deleteAllDataCategories } from "../../api";
+import {
+  createDataCategory,
+  deleteAllDataCategories,
+  fetchUserProfiles,
+  saveCustomOrder,
+} from "../../api";
 import CategoryDetail from "../CategoryDetail/CategoryDetail";
 import styles from "./Categories.module.css";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
@@ -11,8 +16,8 @@ import {
   getAddCategoryFormFields,
   getAddCategorySecondaryFormFields,
 } from "../../formFields";
-import { getPrettyNameForDate } from "../../util";
-import { TOPIC_IMAGE_PATH } from "../../settings";
+import { getPrettyNameForDate, sortCategories } from "../../util";
+import { TOPIC_IMAGE_PATH, UI_IMAGE_PATH } from "../../settings";
 
 export default function Categories() {
   const {
@@ -23,9 +28,13 @@ export default function Categories() {
     setActionMessage,
     SETTINGS,
     topics,
+    userProfiles,
+    setUserProfiles,
   } = useData();
 
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState("name");
+  const [editSort, setEditSort] = useState(false);
   const [sortedDataCategories, setSortedDataCategories] = useState<
     EnrichedDataCategory[]
   >([]);
@@ -35,9 +44,14 @@ export default function Categories() {
     if (dataCategories) {
       setLoading(false);
       // Initially sort by name
-      setSortedDataCategories(
-        [...dataCategories].sort((a, b) => a.name.localeCompare(b.name))
-      );
+      // setSortedDataCategories(
+      //   [...dataCategories].sort((a, b) => a.name.localeCompare(b.name))
+      // );
+      setSortBy(userProfiles[0].categorySortPreference ?? "name");
+
+      if (!userProfiles[0].customCategoryOrder) {
+        userProfiles[0].customCategoryOrder = [];
+      }
     }
   }, [dataCategories]);
 
@@ -59,6 +73,60 @@ export default function Categories() {
     }
   };
 
+  const sortCategoryList = (customList: string[] | null = null) => {
+    setSortedDataCategories(sortCategories(sortBy, customList, dataCategories));
+  };
+
+  useEffect(() => {
+    sortCategoryList(
+      (userProfiles[0]?.customCategoryOrder as string[]) ?? ([] as string[])
+    );
+  }, [sortBy]);
+
+  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSortBy(event.target.value);
+  };
+
+  const toggleEditSort = async () => {
+    if (editSort) {
+      setEditSort(false);
+      await saveCustomOrder(
+        // (userProfiles[0]?.customCategoryOrder ?? []).filter(
+        //   (id): id is string => id !== null
+        // ),
+        sortedDataCategories.map((cat) => cat.id),
+        userProfiles
+      );
+      const profiles = await fetchUserProfiles();
+      setUserProfiles(profiles);
+    } else {
+      setEditSort(true);
+    }
+  };
+
+  const handleMoveCategory = (id: string, direction: "up" | "down") => {
+    console.log("Updating order...");
+    const currentOrder = sortedDataCategories.map((cat) => cat.id);
+
+    const index = currentOrder.indexOf(id);
+
+    if (index === -1) {
+      console.log("Error, ID not found i sorting. ", id, currentOrder);
+      return;
+    }
+
+    const newIndex = direction === "up" ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= currentOrder.length) return; // out of bounds
+
+    // Swap positions
+    [currentOrder[index], currentOrder[newIndex]] = [
+      currentOrder[newIndex],
+      currentOrder[index],
+    ];
+
+    sortCategoryList(currentOrder);
+  };
+
   if (selectedCategory) {
     return (
       <CategoryDetail
@@ -67,35 +135,6 @@ export default function Categories() {
       />
     );
   }
-
-  const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const sortBy = event.target.value;
-    console.log("Sorting by", sortBy);
-
-    // Create a new sorted array to trigger re-render
-    let sortedArray = [...dataCategories];
-
-    if (sortBy === "name") {
-      sortedArray.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === "type") {
-      sortedArray.sort((a, b) =>
-        a.dataType.name.localeCompare(b.dataType.name)
-      );
-    } else if (sortBy === "topic") {
-      sortedArray.sort((a, b) => a.topic.name.localeCompare(b.topic.name));
-    } else if (sortBy === "lastEntry") {
-      sortedArray.sort((a, b) => {
-        const dateA = new Date(a.lastEntryDate || "1999-01-01");
-        const dateB = new Date(b.lastEntryDate || "1999-01-01");
-        return dateB.getTime() - dateA.getTime();
-      });
-    } else if (sortBy === "entryCount") {
-      sortedArray.sort((a, b) => (b.entryCount ?? 0) - (a.entryCount ?? 0));
-    }
-
-    console.log("Sorted array:", sortedArray);
-    setSortedDataCategories(sortedArray); // Update state with new array reference
-  };
 
   return (
     <>
@@ -126,7 +165,7 @@ export default function Categories() {
           </Button>
         )}
         {/* className={styles.multiSelect} */}
-        <select onChange={handleSortChange}>
+        <select onChange={handleSortChange} value={sortBy}>
           <option className={styles.tableRow} value="name">
             Name
           </option>
@@ -142,7 +181,11 @@ export default function Categories() {
           <option className={styles.tableRow} value="entryCount">
             Entry Count
           </option>
+          <option className={styles.tableRow} value="custom">
+            Custom
+          </option>
         </select>
+        {sortBy === "custom" && <Button onClick={toggleEditSort}>Sort</Button>}
       </Grid>
 
       {loading && <LoadingSymbol size={50} />}
@@ -187,6 +230,34 @@ export default function Categories() {
                   <small>{item.note}</small>
                 </td>
                 <td className={styles.paddingLeft}>{item.entryCount}</td>
+                {editSort && (
+                  <td className={styles.paddingLeft}>
+                    <Grid
+                      margin="0 0 0 0" // 👈 more vertical space between groups
+                      autoFlow="row"
+                      justifyContent="center"
+                      gap="0"
+                      alignContent="center"
+                    >
+                      <Button onClick={() => handleMoveCategory(item.id, "up")}>
+                        <img
+                          src={UI_IMAGE_PATH + "up-arrow.svg"}
+                          alt="Up"
+                          style={{ width: "1rem", height: ".7rem" }}
+                        />
+                      </Button>
+                      <Button
+                        onClick={() => handleMoveCategory(item.id, "down")}
+                      >
+                        <img
+                          src={UI_IMAGE_PATH + "down-arrow.svg"}
+                          alt="Down"
+                          style={{ width: "1rem", height: ".6rem" }}
+                        />
+                      </Button>
+                    </Grid>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

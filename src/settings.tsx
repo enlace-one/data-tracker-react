@@ -67,6 +67,9 @@ export const DEFAULT_DATA_TYPES = [
   },
 ];
 
+export const UI_IMAGE_PATH =
+  "https://raw.githubusercontent.com/A-Management/common_static/main/ui/";
+
 export const TOPIC_IMAGE_PATH =
   "https://raw.githubusercontent.com/A-Management/common_static/main/topics/";
 
@@ -184,7 +187,6 @@ export const DEFAULT_TOPICS = [
   { name: "File (Green)", imageLink: "file-green.svg" },
   { name: "File (Purple)", imageLink: "file-purple.svg" },
   { name: "File (Red)", imageLink: "file-red.svg" },
-  { name: "Fruit", imageLink: "fruit.svg" },
   { name: "Gears (Black)", imageLink: "gears-black.svg" },
   { name: "Gears (Blue)", imageLink: "gears-blue.svg" },
   { name: "Gears (Colorful)", imageLink: "gears-colorful.svg" },
@@ -269,6 +271,20 @@ export const DEFAULT_TOPICS = [
   { name: "Music (Green)", imageLink: "music-green.svg" },
   { name: "Music (Purple)", imageLink: "music-purple.svg" },
   { name: "Music (Red)", imageLink: "music-red.svg" },
+  { name: "Phone (Black)", imageLink: "phone-black.svg" },
+  { name: "Phone (Blue)", imageLink: "phone-blue.svg" },
+  { name: "Phone (Colorful)", imageLink: "phone-colorful.svg" },
+  { name: "Phone (Cyan)", imageLink: "phone-cyan.svg" },
+  { name: "Phone (Green)", imageLink: "phone-green.svg" },
+  { name: "Phone (Purple)", imageLink: "phone-purple.svg" },
+  { name: "Phone (Red)", imageLink: "phone-red.svg" },
+  { name: "Pickleball (Black)", imageLink: "pickleball-black.svg" },
+  { name: "Pickleball (Blue)", imageLink: "pickleball-blue.svg" },
+  { name: "Pickleball (Colorful)", imageLink: "pickleball-colorful.svg" },
+  { name: "Pickleball (Cyan)", imageLink: "pickleball-cyan.svg" },
+  { name: "Pickleball (Green)", imageLink: "pickleball-green.svg" },
+  { name: "Pickleball (Purple)", imageLink: "pickleball-purple.svg" },
+  { name: "Pickleball (Red)", imageLink: "pickleball-red.svg" },
   { name: "Pin (Black)", imageLink: "pin-black.svg" },
   { name: "Pin (Blue)", imageLink: "pin-blue.svg" },
   { name: "Pin (Colorful)", imageLink: "pin-colorful.svg" },
@@ -283,6 +299,13 @@ export const DEFAULT_TOPICS = [
   { name: "Plane (Green)", imageLink: "plane-green.svg" },
   { name: "Plane (Purple)", imageLink: "plane-purple.svg" },
   { name: "Plane (Red)", imageLink: "plane-red.svg" },
+  { name: "Pushups (Black)", imageLink: "pushups-black.svg" },
+  { name: "Pushups (Blue)", imageLink: "pushups-blue.svg" },
+  { name: "Pushups (Colorful)", imageLink: "pushups-colorful.svg" },
+  { name: "Pushups (Cyan)", imageLink: "pushups-cyan.svg" },
+  { name: "Pushups (Green)", imageLink: "pushups-green.svg" },
+  { name: "Pushups (Purple)", imageLink: "pushups-purple.svg" },
+  { name: "Pushups (Red)", imageLink: "pushups-red.svg" },
   { name: "Rain (Black)", imageLink: "rain-black.svg" },
   { name: "Rain (Blue)", imageLink: "rain-blue.svg" },
   { name: "Rain (Colorful)", imageLink: "rain-colorful.svg" },
@@ -297,6 +320,13 @@ export const DEFAULT_TOPICS = [
   { name: "Shirt (Green)", imageLink: "shirt-green.svg" },
   { name: "Shirt (Purple)", imageLink: "shirt-purple.svg" },
   { name: "Shirt (Red)", imageLink: "shirt-red.svg" },
+  { name: "Sports (Black)", imageLink: "sports-black.svg" },
+  { name: "Sports (Blue)", imageLink: "sports-blue.svg" },
+  { name: "Sports (Colorful)", imageLink: "sports-colorful.svg" },
+  { name: "Sports (Cyan)", imageLink: "sports-cyan.svg" },
+  { name: "Sports (Green)", imageLink: "sports-green.svg" },
+  { name: "Sports (Purple)", imageLink: "sports-purple.svg" },
+  { name: "Sports (Red)", imageLink: "sports-red.svg" },
   { name: "Temp (Black)", imageLink: "temp-black.svg" },
   { name: "Temp (Blue)", imageLink: "temp-blue.svg" },
   { name: "Temp (Colorful)", imageLink: "temp-colorful.svg" },
@@ -378,7 +408,8 @@ export const EXAMPLE_DATA = [
       name: "Push Ups",
       dataTypeId: "number-001",
       note: "Example category",
-      topicId: "treadmil-colorful.svg",
+      defaultValue: "79",
+      topicId: "pushups-colorful.svg",
     },
     entries: [
       {
@@ -397,6 +428,7 @@ export const EXAMPLE_DATA = [
       name: "Read Bible",
       dataTypeId: "boolean-001",
       note: "Example category",
+      defaultValue: "true",
       topicId: "book-blue.svg",
     },
     entries: [
@@ -416,7 +448,8 @@ export const EXAMPLE_DATA = [
       name: "Dumbell Lifts",
       dataTypeId: "complex-number-001",
       note: "Example category, weight*reps",
-      topicId: "treadmil-black.svg",
+      topicId: "dumbell-black.svg",
+      defaultValue: "30*30",
     },
     entries: [
       {
@@ -436,6 +469,7 @@ export const EXAMPLE_DATA = [
       dataTypeId: "time-001",
       note: "Example category",
       topicId: "clock-cyan.svg",
+      defaultValue: "06:30",
     },
     entries: [
       {
@@ -456,6 +490,7 @@ export const EXAMPLE_DATA = [
       note: "Example category",
       options: "Off (0), Remote (1), In Office (2)",
       topicId: "work-black.svg",
+      defaultValue: "Off (0)",
     },
     entries: [
       {

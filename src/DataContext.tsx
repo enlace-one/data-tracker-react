@@ -17,19 +17,16 @@ import {
   DataType,
   ActiveTab,
   Topic,
+  SetActionMessageFunction,
+  AlertInfo,
 } from "./types";
 import { DEFAULT_DATA_TYPES, DEFAULT_TOPICS } from "./settings";
-
-interface AlertInfo {
-  message: string;
-  type: string;
-}
-type SetActionMessageFunction = (alertInfo: AlertInfo) => void;
 
 interface DataContextType {
   actionMessage: AlertInfo;
   setActionMessage: SetActionMessageFunction;
   userProfiles: UserProfile[];
+  setUserProfiles: React.Dispatch<React.SetStateAction<UserProfile[]>>;
   dataCategories: EnrichedDataCategory[];
   setDataCategories: React.Dispatch<
     React.SetStateAction<EnrichedDataCategory[]>
@@ -44,8 +41,6 @@ interface DataContextType {
   screenWidth: number;
   activeTab: ActiveTab;
   setActiveTab: (state: ActiveTab) => void;
-  initialized: boolean;
-  setInitialized: (state: boolean) => void;
   fetchedCats: boolean;
   definatelyFetchedCats: boolean;
   setFetchedCats: (state: boolean) => void;
@@ -68,7 +63,6 @@ export function DataProvider({ children }: DataProviderProps) {
   );
   const [dataTypes, setDataTypes] = useState<DataType[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [initialized, setInitialized] = useState<boolean>(false);
   const [fetchedCats, setFetchedCats] = useState<boolean>(false);
   const [definatelyFetchedCats, setDefinatelyFetchedCats] =
     useState<boolean>(false);
@@ -94,15 +88,31 @@ export function DataProvider({ children }: DataProviderProps) {
   //   return () => sub.unsubscribe();
   // }, []);
 
-  const setActionMessage = (alertInfo: AlertInfo) => {
+  const setActionMessage = (alertInfo: AlertInfo, timeout = 10000) => {
     _setActionMessage(alertInfo);
-    setTimeout(() => _setActionMessage({ message: "", type: "" }), 10000);
+    setTimeout(() => _setActionMessage({ message: "", type: "" }), timeout);
   };
 
   useEffect(() => {
     async function loadProfiles() {
       const profiles = await fetchUserProfiles();
       setUserProfiles(profiles);
+      const topicColorPreference = profiles[0].topicColorPreference ?? "none";
+
+      const sortedTopics = DEFAULT_TOPICS.sort((a, b) => {
+        if (topicColorPreference == "none") {
+          return a.name.localeCompare(b.name);
+        }
+        const aIsColorful = a.name.toLowerCase().includes(topicColorPreference);
+        const bIsColorful = b.name.toLowerCase().includes(topicColorPreference);
+
+        if (aIsColorful && !bIsColorful) return -1;
+        if (!aIsColorful && bIsColorful) return 1;
+        return a.name.localeCompare(b.name);
+      });
+
+      // Put colorful ones first (they contain colorful) but otherwise alphabetic
+      setTopics(sortedTopics);
     }
     loadProfiles();
   }, []);
@@ -122,6 +132,7 @@ export function DataProvider({ children }: DataProviderProps) {
         setDataCategories,
         types,
         topics
+        // userProfiles
       );
 
       setTimeout(() => {
@@ -152,6 +163,7 @@ export function DataProvider({ children }: DataProviderProps) {
     <DataContext.Provider
       value={{
         userProfiles,
+        setUserProfiles,
         dataCategories,
         setDataCategories,
         actionMessage,
@@ -165,9 +177,7 @@ export function DataProvider({ children }: DataProviderProps) {
         activeTab,
         setActiveTab,
         fetchedCats,
-        initialized,
         definatelyFetchedCats,
-        setInitialized,
         setFetchedCats,
       }}
     >

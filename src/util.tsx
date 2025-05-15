@@ -1,6 +1,14 @@
 import { evaluate } from "mathjs";
 import later from "@breejs/later";
-import { DataEntry, EnrichedDataCategory, Macro } from "./types";
+import {
+  BlankHandling,
+  DataEntry,
+  DataPoint,
+  EnrichedDataCategory,
+  Macro,
+  ValueHandling,
+  ZeroHandling,
+} from "./types";
 import {
   createDataEntry,
   fetchDataEntries,
@@ -77,38 +85,47 @@ export const parseEntryToNumber = (
 export const parseEntryValueToNumber = (
   value: string,
   category: EnrichedDataCategory,
-  type: "output" | "value 1" | "value 2" | "value 3"
+  type: "text" | "output" | "value 1" | "value 2" | "value 3"
 ) => {
   const inputType = category.dataType.inputType;
   const typeId = category.dataType.id;
+  let finalOutput;
+  if (type == "text") {
+    return value;
+  }
   if (
     type == "output" ||
     !(inputType == "time-difference" || typeId == "complex-number-001")
   ) {
-    return inputType == "boolean-string"
-      ? parseBooleanToNumber(value)
-      : typeId == "select-numeric-001"
-      ? parseNumericSelectToNumber(value)
-      : inputType == "time"
-      ? parseTimeToNumber(value)
-      : inputType == "time-difference"
-      ? parseTimeDifferenceToNumber(value)
-      : typeId == "complex-number-001"
-      ? parseComplexNumberToNumber(value)
-      : Number(value);
+    finalOutput =
+      inputType == "boolean-string"
+        ? parseBooleanToNumber(value)
+        : typeId == "select-numeric-001"
+        ? parseNumericSelectToNumber(value)
+        : inputType == "time"
+        ? parseTimeToNumber(value)
+        : inputType == "time-difference"
+        ? parseTimeDifferenceToNumber(value)
+        : typeId == "complex-number-001"
+        ? parseComplexNumberToNumber(value)
+        : Number(value);
   } else if (type == "value 1") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/);
-    return match ? parseFloat(match[0]) : 0;
+    finalOutput = match ? parseFloat(match[0]) : 0;
   } else if (type == "value 2") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/g);
-    return match ? parseFloat(match[1]) : 0;
+    finalOutput = match ? parseFloat(match[1]) : 0;
   } else if (type == "value 3") {
     value = value.replace(":", ".");
     const match = String(value).match(/-?\d*\.?\d+/g);
-    return match ? parseFloat(match[2]) : 0;
+    finalOutput = match ? parseFloat(match[2]) : 0;
   }
+  console.debug(
+    `[data tracker] Parsed value is ${finalOutput} for ${category.name}`
+  );
+  return finalOutput;
 };
 
 export const parseEntryToDisplayValue = (
@@ -249,7 +266,11 @@ export async function runMacros(
 }
 
 export function parseNumericSelectToNumber(value: string) {
-  return Number(value.split("(")[1].split(")")[0]);
+  try {
+    return Number(value.split("(")[1].split(")")[0]);
+  } catch (e) {
+    console.log("Error on parseNumericSelectToNumber for ", value, e);
+  }
 }
 
 export async function addDefaults(dataCategories: EnrichedDataCategory[]) {
@@ -298,3 +319,241 @@ export function getPrettyNameForDate(date: string) {
     return moment(date).fromNow();
   }
 }
+
+export const fillAllDates = (sortedDates: string[]) => {
+  const maxDate = sortedDates[sortedDates.length - 1];
+  const minDate = sortedDates[0];
+  const allDatesSorted = [minDate];
+  let currentDate = new Date(minDate);
+
+  while (currentDate < new Date(maxDate)) {
+    currentDate = new Date(currentDate);
+    currentDate.setDate(currentDate.getDate() + 1);
+    allDatesSorted.push(currentDate.toISOString().split("T")[0]);
+  }
+
+  return allDatesSorted;
+};
+
+export const sortCategories = (
+  sortBy: string,
+  customList: string[] | null = null,
+  dataCategories: EnrichedDataCategory[],
+  customCategoryOrder: string[] | null = null
+) => {
+  console.log("Sorting by", sortBy);
+
+  // Create a new sorted array to trigger re-render
+  let sortedArray = [...dataCategories];
+
+  if (sortBy === "name") {
+    sortedArray.sort((a, b) => a.name.localeCompare(b.name));
+  } else if (sortBy === "type") {
+    sortedArray.sort((a, b) => a.dataType.name.localeCompare(b.dataType.name));
+  } else if (sortBy === "topic") {
+    sortedArray.sort((a, b) => a.topic.name.localeCompare(b.topic.name));
+  } else if (sortBy === "lastEntry") {
+    sortedArray.sort((a, b) => {
+      const dateA = new Date(a.lastEntryDate || "1999-01-01");
+      const dateB = new Date(b.lastEntryDate || "1999-01-01");
+      return dateB.getTime() - dateA.getTime();
+    });
+  } else if (sortBy === "entryCount") {
+    sortedArray.sort((a, b) => (b.entryCount ?? 0) - (a.entryCount ?? 0));
+  } else if (sortBy === "custom") {
+    // Assume userProfiles[0].customCategoryOrder is an array of category IDs
+    let customOrder;
+    if (customList != null) {
+      customOrder = customList;
+    } else {
+      customOrder = customCategoryOrder;
+    }
+    if (customOrder && customOrder.length > 0) {
+      sortedArray.sort((a, b) => {
+        const indexA = customOrder.indexOf(a.id);
+        const indexB = customOrder.indexOf(b.id);
+        // Handle cases where a category ID is not in customOrder
+        return (
+          (indexA === -1 ? Infinity : indexA) -
+          (indexB === -1 ? Infinity : indexB)
+        );
+      });
+    }
+  }
+  console.log("Sorted array:", sortedArray);
+  return sortedArray; // Update state with new array reference
+};
+
+export const getDataPointsForSingleCategory = async (
+  category: EnrichedDataCategory,
+  valueHandling: ValueHandling,
+  zeroHandling: ZeroHandling,
+  blankHandling: BlankHandling
+) => {
+  const allDates = new Set<string>();
+
+  // Fetch Entries and make datapoints
+  const entries = await fetchDataEntriesByCategory(category.id);
+  let dataPoints: DataPoint[] = entries.map((entry) => ({
+    name: entry.date,
+    displayValue: parseEntryToDisplayValue(entry, category),
+    value: parseEntryValueToNumber(
+      entry.value as string,
+      category,
+      valueHandling
+    ),
+    note: entry.note || "",
+  }));
+
+  // Get all dates
+  dataPoints.forEach((point) => allDates.add(point.name));
+
+  const sortedDates = Array.from(allDates).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+  const newAllDatesSorted = fillAllDates(sortedDates);
+
+  return processDataPoints(
+    category,
+    valueHandling,
+    zeroHandling,
+    blankHandling,
+    dataPoints,
+    newAllDatesSorted
+  );
+};
+
+export const getDataPointEntriesForTwoCategories = async (
+  categoryIds: string[],
+  categories: EnrichedDataCategory[],
+  valueHandlings: ValueHandling[],
+  zeroHandlings: ZeroHandling[],
+  blankHandlings: BlankHandling[],
+  startDate: string,
+  endDate: string,
+  colors: string[]
+) => {
+  const datasets: any[] = [];
+  const allDates = new Set<string>();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  for (const [index, catId] of categoryIds.entries()) {
+    if (!catId) continue;
+
+    const entries = await fetchDataEntriesByCategory(catId);
+    const category = categories.find((cat) => cat.id === catId);
+    if (!category) continue;
+
+    const dataPoints: DataPoint[] = entries
+      .map((entry) => ({
+        name: entry.date,
+        displayValue: parseEntryToDisplayValue(entry, category),
+        value: parseEntryValueToNumber(
+          entry.value,
+          category,
+          valueHandlings[index]
+        ),
+        note: entry.note || "",
+      }))
+      .filter((point) => {
+        const pointDate = new Date(point.name);
+        return pointDate >= start && pointDate <= end;
+      });
+
+    dataPoints.forEach((point) => allDates.add(point.name));
+
+    datasets.push({
+      label: category.name,
+      dataPoints: dataPoints,
+      category,
+      backgroundColor: colors[index],
+    });
+  }
+  const sortedDates = Array.from(allDates).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  const allDatesSorted = fillAllDates(sortedDates);
+
+  for (const [index, dataset] of datasets.entries()) {
+    dataset.dataPoints = await processDataPoints(
+      dataset.category,
+      valueHandlings[index],
+      zeroHandlings[index],
+      blankHandlings[index],
+      dataset.dataPoints,
+      allDatesSorted
+    );
+  }
+  console.log("Datasets: ", datasets);
+  return {
+    datasets: datasets,
+    allDatesSorted: allDatesSorted,
+  };
+};
+
+export const processDataPoints = async (
+  category: EnrichedDataCategory,
+  valueHandling: ValueHandling,
+  zeroHandling: ZeroHandling,
+  blankHandling: BlankHandling,
+  dataPoints: DataPoint[],
+  allDatesSorted: string[]
+) => {
+  const alignedDataPoints: DataPoint[] = [];
+
+  // Zero Handling
+  if (zeroHandling == "treat-as-blank") {
+    dataPoints = dataPoints.filter((dp) => {
+      return dp.value != 0;
+    });
+  }
+  const dataMap = new Map<string, DataPoint>(
+    dataPoints.map((point: DataPoint) => [point.name, point])
+  );
+
+  for (const date of allDatesSorted) {
+    const existingPoint = dataMap.get(date);
+
+    if (existingPoint) {
+      alignedDataPoints.push(existingPoint);
+    } else {
+      let value: number;
+
+      switch (blankHandling) {
+        case "zeroize":
+          value = 0;
+          break;
+
+        case "previous": {
+          const prevIndex = allDatesSorted.indexOf(date) - 1;
+          const prevDate = prevIndex >= 0 ? allDatesSorted[prevIndex] : null;
+          const prevPoint = prevDate ? dataMap.get(prevDate) : undefined;
+          value = prevPoint?.value ?? 0;
+          break;
+        }
+
+        case "default":
+          value = parseEntryValueToNumber(
+            category.defaultValue ?? "0",
+            category,
+            valueHandling
+          );
+          break;
+
+        case "skip":
+        default:
+          continue;
+      }
+
+      alignedDataPoints.push({
+        name: date,
+        value,
+        displayValue: String(value),
+        note: "",
+      });
+    }
+  }
+  return alignedDataPoints;
+};

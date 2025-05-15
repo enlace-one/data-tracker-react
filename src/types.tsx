@@ -74,6 +74,9 @@ export interface FormDataType {
   topicId?: string;
   email?: string;
   isNew?: boolean;
+  topicColorPreference?: string;
+  categorySortPreference?: string;
+  customCategoryOrder?: string[];
 }
 
 export type ResolvedDataType = DataType;
@@ -141,4 +144,26 @@ export type ActiveTab =
   | "graph"
   | "date-graph"
   | "text-graph"
+  | "heat-map-graph"
+  | "calendar"
   | "day";
+
+export interface AlertInfo {
+  message: string;
+  type: "" | "success" | "error" | "warning" | "default";
+}
+export type SetActionMessageFunction = (
+  alertInfo: AlertInfo,
+  timeout?: number
+) => void;
+
+export type ValueHandling =
+  | "text"
+  | "output"
+  | "value 1"
+  | "value 2"
+  | "value 3";
+
+export type ZeroHandling = "default" | "treat-as-blank";
+
+export type BlankHandling = "skip" | "zeroize" | "default" | "previous";

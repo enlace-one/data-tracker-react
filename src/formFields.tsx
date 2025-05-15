@@ -6,6 +6,7 @@ import {
   FlexFormField,
   Macro,
   Topic,
+  UserProfile,
 } from "./types";
 
 export const getAddEntryFormFieldsWithCategory = (
@@ -486,5 +487,47 @@ export const getAddUpdateMacroFormFields = (
       default: macro.lastRunOutput,
     },
     { name: "Id", id: "id", default: macro.id ?? "", hidden: true },
+  ];
+};
+
+export const getUpdateUserProfileFields = (user: UserProfile) => {
+  const topicColorOptions = [
+    { label: "none", value: "none" },
+    { label: "colorful", value: "colorful" },
+    { label: "black", value: "black" },
+    { label: "blue", value: "blue" },
+    { label: "cyan", value: "cyan" },
+    { label: "green", value: "green" },
+    { label: "red", value: "red" },
+    { label: "purple", value: "purple" },
+  ];
+  const categorySortOptions = [
+    { label: "Name", value: "name" },
+    { label: "Topic Name", value: "topic" },
+    { label: "DataType Name", value: "type" },
+    { label: "Last Entry Date", value: "lastEntry" },
+    { label: "Entry Count", value: "entryCount" },
+    { label: "Custom", value: "custom" },
+  ];
+  return [
+    { name: "Id", id: "id", default: user.id ?? "", hidden: true },
+    { name: "email", id: "email", default: user.email ?? "", hidden: true },
+    { name: "isNew", id: "isNew", default: user.isNew ?? false, hidden: true },
+    {
+      name: "Topic Color Preference",
+      id: "topicColorPreference",
+      type: "select",
+      options: topicColorOptions,
+      note: "Will put topics of this color on top of the list",
+      default: user.topicColorPreference ?? "none",
+    },
+    {
+      name: "Default Category Sort Order",
+      id: "categorySortPreference",
+      type: "select",
+      options: categorySortOptions,
+      note: "Sets the default sort order in the category list view",
+      default: user.categorySortPreference ?? "name",
+    },
   ];
 };

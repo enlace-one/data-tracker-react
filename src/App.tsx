@@ -17,6 +17,9 @@ import DateGraph from "./views/DateGraph/DateGraph";
 import { addExampleData } from "./api";
 import Popup from "./components/Popup/Popup";
 import TextGraph from "./views/TextGraph/TextGraph";
+import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
+import Calendar from "./views/Calendar/Calendar";
+import { UI_IMAGE_PATH } from "./settings.tsx";
 // import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
 
 export default function App() {
@@ -24,8 +27,12 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
-  const { dataCategories, setInitialized, fetchedCats, definatelyFetchedCats } =
-    useData();
+  const {
+    dataCategories,
+    fetchedCats,
+    definatelyFetchedCats,
+    selectedCategory,
+  } = useData();
   const initialized = useRef(false);
 
   const loadEverything = async () => {
@@ -33,18 +40,8 @@ export default function App() {
     await addDefaults(dataCategories);
     setLoadingText("Setting last entry dates");
     await setLastEntryDates(dataCategories);
-    setInitialized(true);
     setLoading(false);
   };
-
-  // Replaced with check of data categories length!
-  // useEffect(() => {
-  //   console.log("Is New:", userProfiles[0]?.isNew ?? "Not defined");
-  //   if (userProfiles[0]?.isNew ?? true) {
-  //     setAddExamplePrompt(true);
-  //     updateProfile({ ...userProfiles[0], isNew: false });
-  //   }
-  // }, [userProfiles]);
 
   const handleAddExampleData = async () => {
     setAddExamplePrompt(false);
@@ -81,9 +78,13 @@ export default function App() {
         signOut();
       }
     };
-
     handleAuthCheck();
   }, [authStatus]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [activeTab, selectedCategory]);
+
   return (
     <Flex
       className="App"
@@ -98,7 +99,11 @@ export default function App() {
       }}
     >
       {/* Main Content */}
-      <Alert type={actionMessage.type}>{actionMessage.message}</Alert>
+      {actionMessage.message != "" && (
+        <Alert setActionMessage={setActionMessage} type={actionMessage.type}>
+          {actionMessage.message}
+        </Alert>
+      )}
 
       {loading && <LoadingSymbol text={loadingText} />}
       {addExamplePrompt && (
@@ -121,6 +126,8 @@ export default function App() {
           {activeTab === "macros" && <Macros />}
           {activeTab === "date-graph" && <DateGraph />}
           {activeTab === "text-graph" && <TextGraph />}
+          {activeTab === "heat-map-graph" && <HeatMapGraph />}
+          {activeTab === "calendar" && <Calendar />}
           {/* <Divider /> */}
         </>
       )}
@@ -159,7 +166,7 @@ export default function App() {
           >
             <HoverText onHoverText="Profile">
               <img
-                src="/profile-view.svg"
+                src={UI_IMAGE_PATH + "profile-view.svg"}
                 alt="Profile View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -171,7 +178,7 @@ export default function App() {
           >
             <HoverText onHoverText="Categories">
               <img
-                src="/category-view.svg"
+                src={UI_IMAGE_PATH + "category-view.svg"}
                 alt="Categories"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -183,7 +190,7 @@ export default function App() {
           >
             <HoverText onHoverText="Entries">
               <img
-                src="/entries-view.svg"
+                src={UI_IMAGE_PATH + "entries-view.svg"}
                 alt="Entries"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -195,7 +202,7 @@ export default function App() {
           >
             <HoverText onHoverText="Day View">
               <img
-                src="/day-view.svg"
+                src={UI_IMAGE_PATH + "day-view.svg"}
                 alt="Day View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
@@ -207,8 +214,20 @@ export default function App() {
           >
             <HoverText onHoverText="Graph">
               <img
-                src="/graph-view.svg"
+                src={UI_IMAGE_PATH + "graph-view.svg"}
                 alt="Graph View"
+                style={{ width: "1.5rem", height: "1.5rem" }}
+              />
+            </HoverText>
+          </Button>
+          <Button
+            style={{ border: "none" }}
+            onClick={() => setActiveTab("calendar")}
+          >
+            <HoverText onHoverText="Calendar">
+              <img
+                src={UI_IMAGE_PATH + "calendar-view.svg"}
+                alt="Calendar View"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
             </HoverText>

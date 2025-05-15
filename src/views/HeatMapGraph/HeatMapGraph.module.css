@@ -1,0 +1,31 @@
+.multiSelect {
+  min-width: 200px;
+  width: 100%;
+}
+
+.formGroup {
+  margin-bottom: 12px;
+  display: flex; /* Use flexbox for side-by-side layout */
+  gap: 16px; /* Space between the selects */
+}
+
+.formGroup {
+  margin-bottom: 12px;
+  display: flex; /* Align elements side by side */
+  justify-content: space-between; /* Space between the label and the select elements */
+  align-items: center; /* Vertically align the label and select */
+}
+
+.formGroup label {
+  font-weight: bold;
+  margin-bottom: 0; /* No extra space below the label */
+  margin-right: 10px; /* Space between label and select */
+}
+
+.formGroup select {
+  width: 48%; /* Give them some space side by side */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
+}

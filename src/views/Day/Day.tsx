@@ -4,6 +4,7 @@ import { useData } from "../../DataContext";
 import FlexForm from "../../components/FlexForm/FlexForm";
 import {
   createDataEntry,
+  deleteDataEntry,
   fetchEnrichedDataEntriesByDate,
   fetchMacros,
   updateDataEntry,
@@ -14,10 +15,7 @@ import styles from "./Day.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
 import LoadingSymbol from "../../components/LoadingSymbol/LoadingSymbol";
 import { parseNumberToTime, parseTimeToNumber, runMacros } from "../../util";
-import {
-  getAddUpdateDataEntryFormFields,
-  getUpdateEntryFormFieldsWithSetCategory,
-} from "../../formFields";
+import { getUpdateEntryFormFieldsWithSetCategory } from "../../formFields";
 import TimeDifferenceField from "../../components/TimeDifferenceField/TimeDifferenceField";
 export default function Day() {
   const { dataCategories, setActionMessage } = useData();
@@ -25,6 +23,8 @@ export default function Day() {
   // const [selectedCategory, setSelectedCategory] = useState<DataCategory | null>(
   //   null
   // );
+  const [query, setQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [dataEntries, setDataEntries] = useState<EnrichedDataEntry[]>([]);
@@ -35,6 +35,13 @@ export default function Day() {
   const [categoriesToShow, setCategoriesToShow] = useState<
     EnrichedDataCategory[]
   >([]);
+
+  const filtered =
+    query == ""
+      ? categoriesToShow
+      : categoriesToShow.filter((cat) =>
+          cat.name.toLowerCase().includes(query.toLowerCase())
+        );
 
   function standardWrapper<T extends (...args: any[]) => Promise<any>>(
     fn: T
@@ -230,21 +237,21 @@ export default function Day() {
     updateDataEntryValue(entry, String(value));
   };
 
-  const handleAddCategory = async (
-    e: ChangeEvent<HTMLSelectElement> | ChangeEvent<HTMLSelectElement>
-  ) => {
-    console.log("Adding cat");
+  const handleAddCategory = async (categoryId: string) => {
+    console.log("Adding cat: ", categoryId);
+    setLoading(true);
 
-    const value = e.target.value;
+    setQuery(""); // Clear the input after selection
+    setShowResults(false); // Hide results
 
-    console.log("Value", value);
-
-    const category = dataCategories.find((category) => category.id === value);
+    const category = dataCategories.find(
+      (category) => category.id === categoryId
+    );
 
     if (category) {
       try {
         await createDataEntry({
-          dataCategoryId: value,
+          dataCategoryId: categoryId,
           date: date,
           value: category.defaultValue ?? "", // Ensure a valid default value is set
         });
@@ -255,6 +262,11 @@ export default function Day() {
       }
     }
   };
+
+  const handleDeleteDataEntry = async (entryId: string) => {
+    await deleteDataEntry(entryId);
+  };
+
   return (
     <>
       <Heading level={1}>Day</Heading>
@@ -276,6 +288,59 @@ export default function Day() {
       {!loading && (
         <table className={styles.table}>
           <tbody>
+            <tr className={styles.tableRow} key="new">
+              <td className={styles.minWidth}>
+                {categoriesToShow.length > 0 && (
+                  <div className={styles.searchContainer}>
+                    <input
+                      type="search"
+                      placeholder="Add entry..."
+                      value={query}
+                      onChange={(e) => {
+                        setQuery(e.target.value);
+                        setShowResults(true);
+                      }}
+                      onFocus={() => setShowResults(true)}
+                      onBlur={() =>
+                        setTimeout(() => setShowResults(false), 100)
+                      }
+                      className={styles.searchInput}
+                    />
+                    {showResults && (
+                      <ul className={styles.searchResults}>
+                        {filtered.length > 0 ? (
+                          filtered.map((cat) => (
+                            <li
+                              key={cat.id}
+                              onClick={() => handleAddCategory(cat.id)}
+                              className={styles.searchResultItem}
+                            >
+                              {cat.name}
+                            </li>
+                          ))
+                        ) : (
+                          <li className={styles.searchNoResults}>No matches</li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {/* <select
+                  onChange={handleAddCategory}
+                  className={styles.CategorySelect}
+                >
+                  <option key="default" value="">
+                    Pick a Category
+                  </option>
+                  {categoriesToShow.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select> */}
+              </td>
+            </tr>
             {dataEntries.map((entry) => (
               <tr className={styles.tableRow} key={entry.id}>
                 <td className={styles.minWidth}>
@@ -286,6 +351,11 @@ export default function Day() {
                       entry.dataCategory
                     )}
                     handleFormData={handleUpdateEntryFormData}
+                    formChildren={
+                      <Button onClick={() => handleDeleteDataEntry(entry.id)}>
+                        Delete
+                      </Button>
+                    }
                   >
                     <small>{entry.dataCategory?.name}</small>
                   </FlexForm>
@@ -379,26 +449,6 @@ export default function Day() {
                 </td>
               </tr>
             ))}
-            <tr className={styles.tableRow} key="new">
-              <td className={styles.minWidth}>
-                {/* <small>Add Entry for Another Category</small>
-                <br /> */}
-
-                <select
-                  onChange={handleAddCategory}
-                  className={styles.CategorySelect}
-                >
-                  <option key="default" value="">
-                    Pick a Category
-                  </option>
-                  {categoriesToShow.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </td>
-            </tr>
           </tbody>
         </table>
       )}
