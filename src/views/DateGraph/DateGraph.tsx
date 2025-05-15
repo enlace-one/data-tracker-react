@@ -70,6 +70,8 @@ export default function DateGraph() {
   const [correlation, setCorrelation] = useState<number | null>(null); // New state for correlation
   const [tension, setTension] = useState<number>(0.2);
   const [lineStyle, setLineStyle] = useState("default");
+  const [maxHandling, setMaxHandling] = useState("default");
+  const [maxValue, setMaxValue] = useState(-1000);
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
 
@@ -91,6 +93,7 @@ export default function DateGraph() {
     selectedCategories,
     y2BlankHandling,
     y1BlankHandling,
+    maxHandling,
     y2MinSetting,
     y1MinSetting,
     y1ValueHandling,
@@ -160,6 +163,12 @@ export default function DateGraph() {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setLineStyle(event.target.value);
+  };
+
+  const handleMaxHandlingChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setMaxHandling(event.target.value);
   };
 
   const updateChartData = async (categories: string[]) => {
@@ -276,6 +285,7 @@ export default function DateGraph() {
         sumXY = 0,
         sumX2 = 0,
         sumY2 = 0,
+        localMax = -1000,
         nX = 0,
         nY = 0,
         nPairs = 0;
@@ -288,11 +298,13 @@ export default function DateGraph() {
           sumX += xVal;
           sumX2 += xVal * xVal;
           nX++;
+          localMax = Math.max(localMax, xVal);
         }
         if (yVal !== null) {
           sumY += yVal;
           sumY2 += yVal * yVal;
           nY++;
+          localMax = Math.max(localMax, yVal);
         }
         if (xVal !== null && yVal !== null) {
           sumXY += xVal * yVal;
@@ -326,12 +338,15 @@ export default function DateGraph() {
             )
           : null
       );
+      console.log("Setting max value to ", localMax);
+      setMaxValue(localMax);
     } else {
       setY1Average("");
       setY2Average("");
       setY1StandardDev("");
       setY2StandardDev("");
       setCorrelation(null);
+      setMaxValue(-1000);
     }
 
     setChartData({
@@ -340,6 +355,7 @@ export default function DateGraph() {
     });
     setLoading(false);
   };
+
   const options = useMemo(
     () => ({
       responsive: true,
@@ -390,6 +406,12 @@ export default function DateGraph() {
             drawOnChartArea: false,
           },
           min: y1MinSetting === "zeroize" ? 0 : undefined,
+          max:
+            maxHandling === "default"
+              ? undefined
+              : maxHandling === "match"
+              ? maxValue
+              : parseInt(maxHandling, 10),
         },
         y2: {
           type: "linear" as const,
@@ -400,6 +422,12 @@ export default function DateGraph() {
             color: cat_2_color,
           },
           min: y2MinSetting === "zeroize" ? 0 : undefined,
+          max:
+            maxHandling === "default"
+              ? undefined
+              : maxHandling === "match"
+              ? maxValue
+              : parseInt(maxHandling, 10),
         },
       },
     }),
@@ -645,6 +673,31 @@ export default function DateGraph() {
                 <option value="0.3">Tension: 0.3</option>
                 <option value="0.4">Tension: 0.4</option>
                 <option value="0.5">Tension: 0.5</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={maxHandling}
+                onChange={handleMaxHandlingChange}
+              >
+                <option value="default">Max: Default</option>
+                <option value="match">Max: Match</option>
+                <option value="1">Max: 1</option>
+                <option value="2">Max: 2</option>
+                <option value="10">Max: 10</option>
+                <option value="100">Max: 100</option>
+                <option value="1000">Max: 1000</option>
+                <option value="10000">Max: 10000</option>
+                {/* <option value="filled">Filled</option> */}
               </select>
             </div>
           </Grid>
