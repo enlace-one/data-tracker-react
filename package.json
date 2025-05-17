@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@aws-amplify/auth": "^6.11.2",
-    "@aws-amplify/ui-react": "^6.9.1",
+    "@aws-amplify/ui-react": "^6.11.0",
     "@breejs/later": "^4.2.0",
     "aws-amplify": "^6.12.2",
     "chartjs": "^0.3.24",
