@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Flex } from "@aws-amplify/ui-react";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
-import { SETTINGS, useData } from "./DataContext"; // Import provider
+import { SETTINGS, useData } from "./DataContext";
 import Profile from "./views/Profile/Profile";
 import Categories from "./views/Categories/Categories";
 import Entries from "./views/Entries/Entries";
@@ -21,13 +21,15 @@ import HeatMapGraph from "./views/HeatMapGraph/HeatMapGraph";
 import Calendar from "./views/Calendar/Calendar";
 import { UI_IMAGE_PATH } from "./settings.tsx";
 import { signOut } from "aws-amplify/auth";
-// import LoadingSymbol from "./components/LoadingSymbol/LoadingSymbol";
+import { ActiveTab } from "./types.tsx";
 
 export default function App() {
   const { authStatus } = useAuthenticator((context) => [context.user]);
   const [loading, setLoading] = useState(true);
   const [addExamplePrompt, setAddExamplePrompt] = useState(false);
   const [loadingText, setLoadingText] = useState("Adding default entries...");
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const moreButtonRef = useRef<HTMLButtonElement>(null); // Ref for More button
   const {
     dataCategories,
     fetchedCats,
@@ -53,8 +55,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    // This used to be dataCategories.length but that don't owrk if you got no categories!
-    // So I added the second condition.
     console.log("Initialized.current:", initialized);
     if (!initialized.current && fetchedCats) {
       initialized.current = true;
@@ -63,7 +63,7 @@ export default function App() {
       setLoading(false);
     }
     console.log(fetchedCats, dataCategories.length);
-    if (definatelyFetchedCats && dataCategories.length == 0) {
+    if (definatelyFetchedCats && dataCategories.length === 0) {
       console.log("Adding example prompt");
       setAddExamplePrompt(true);
     }
@@ -86,6 +86,15 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }, [activeTab, selectedCategory]);
 
+  const toggleMoreMenu = () => {
+    setIsMoreOpen((prev) => !prev);
+  };
+
+  const handleMenuOptionClick = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    setIsMoreOpen(false);
+  };
+
   return (
     <Flex
       className="App"
@@ -96,11 +105,10 @@ export default function App() {
       margin="0 auto"
       style={{
         color: "black",
-        paddingBottom: "6rem", // Matches HTML's padding-block-end
+        paddingBottom: "6rem",
       }}
     >
-      {/* Main Content */}
-      {actionMessage.message != "" && (
+      {actionMessage.message !== "" && (
         <Alert setActionMessage={setActionMessage} type={actionMessage.type}>
           {actionMessage.message}
         </Alert>
@@ -129,26 +137,22 @@ export default function App() {
           {activeTab === "text-graph" && <TextGraph />}
           {activeTab === "heat-map-graph" && <HeatMapGraph />}
           {activeTab === "calendar" && <Calendar />}
-          {/* <Divider /> */}
         </>
       )}
-      {/* Div to give space in case bottom menu covers anything */}
-      {/* <div style={{ padding: "50px" }}> </div> */}
 
-      {/* Fixed Bottom Menu */}
       <div
         style={{
           position: "fixed",
           bottom: "0px",
           left: "0px",
-          right: "0px", // Added to span full width like HTML
+          right: "0px",
           margin: "0px",
           backgroundColor: "rgb(255, 255, 255)",
           padding: "0.5rem 1rem",
           borderTop: "1px solid rgb(204, 204, 204)",
           boxShadow: "rgba(0, 0, 0, 0.1) 0px -2px 4px",
           zIndex: 1000,
-          display: "flex", // Use display flex to match Flex behavior
+          display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
@@ -156,9 +160,9 @@ export default function App() {
         <Flex
           justifyContent="center"
           gap=".5rem"
-          // width="70%" // Constrain buttons to match content width
           style={{
-            flexWrap: "wrap", // Moved to style prop
+            flexWrap: "wrap",
+            position: "relative",
           }}
         >
           <Button
@@ -211,28 +215,59 @@ export default function App() {
           </Button>
           <Button
             style={{ border: "none" }}
-            onClick={() => setActiveTab("date-graph")}
+            onClick={toggleMoreMenu}
+            ref={moreButtonRef}
           >
-            <HoverText onHoverText="Graph">
+            <HoverText onHoverText="More">
               <img
-                src={UI_IMAGE_PATH + "graph-view.svg"}
-                alt="Graph View"
+                src={UI_IMAGE_PATH + "more-icon.svg"}
+                alt="More"
                 style={{ width: "1.5rem", height: "1.5rem" }}
               />
             </HoverText>
           </Button>
-          <Button
-            style={{ border: "none" }}
-            onClick={() => setActiveTab("calendar")}
-          >
-            <HoverText onHoverText="Calendar">
-              <img
-                src={UI_IMAGE_PATH + "calendar-view.svg"}
-                alt="Calendar View"
-                style={{ width: "1.5rem", height: "1.5rem" }}
-              />
-            </HoverText>
-          </Button>
+          {isMoreOpen && (
+            <Flex
+              direction="column"
+              gap=".5rem"
+              style={{
+                position: "fixed",
+                left: moreButtonRef.current ? moreButtonRef.current.getBoundingClientRect().left : 0,
+                bottom: moreButtonRef.current ? window.innerHeight - moreButtonRef.current.getBoundingClientRect().top + 4 : 0,
+                backgroundColor: "rgb(255, 255, 255)",
+                padding: "0.5rem",
+                border: "1px solid rgb(204, 204, 204)",
+                boxShadow: "rgba(0, 0, 0, 0.1) 0px 2px 4px",
+                zIndex: 1001,
+                width: "80px",
+              }}
+            >
+              <Button
+                style={{ border: "none" }}
+                onClick={() => handleMenuOptionClick("date-graph")}
+              >
+                <HoverText onHoverText="Graph">
+                  <img
+                    src={UI_IMAGE_PATH + "graph-view.svg"}
+                    alt="Graph View"
+                    style={{ width: "1.5rem", height: "1.5rem" }}
+                  />
+                </HoverText>
+              </Button>
+              <Button
+                style={{ border: "none" }}
+                onClick={() => handleMenuOptionClick("calendar")}
+              >
+                <HoverText onHoverText="Calendar">
+                  <img
+                    src={UI_IMAGE_PATH + "calendar-view.svg"}
+                    alt="Calendar View"
+                    style={{ width: "1.5rem", height: "1.5rem" }}
+                  />
+                </HoverText>
+              </Button>
+            </Flex>
+          )}
           {SETTINGS.debug && (
             <>
               <Button
