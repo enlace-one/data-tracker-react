@@ -23,7 +23,7 @@ import FlexForm from "../../components/FlexForm/FlexForm";
 import styles from "./Profile.module.css";
 
 interface ProfileProps {
-  signOut: () => void;
+  signOut: (input?: undefined) => void;
 }
 
 export default function Profile({ signOut }: ProfileProps) {
@@ -102,7 +102,7 @@ export default function Profile({ signOut }: ProfileProps) {
                 gap="1rem"
                 alignContent="center"
               >
-                <Button className={styles.button} onClick={signOut}>
+                <Button className={styles.button} onClick={() => signOut()}>
                   Sign Out
                 </Button>
                 <FlexForm

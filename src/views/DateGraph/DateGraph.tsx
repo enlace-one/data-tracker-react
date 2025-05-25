@@ -63,9 +63,15 @@ export default function DateGraph() {
   const [y2ValueHandling, setY2ValueHandling] = useState<
     "output" | "value 1" | "value 2" | "value 3"
   >("output");
+  const [y1Average, setY1Average] = useState<string>("");
+  const [y2Average, setY2Average] = useState<string>("");
+  const [y1StandardDev, setY1StandardDev] = useState<string>("");
+  const [y2StandardDev, setY2StandardDev] = useState<string>("");
   const [correlation, setCorrelation] = useState<number | null>(null); // New state for correlation
   const [tension, setTension] = useState<number>(0.2);
   const [lineStyle, setLineStyle] = useState("default");
+  const [maxHandling, setMaxHandling] = useState("default");
+  const [maxValue, setMaxValue] = useState(-1000);
   const cat_1_color = "#00bfbf";
   const cat_2_color = "rgb(123, 182, 209)";
 
@@ -87,6 +93,7 @@ export default function DateGraph() {
     selectedCategories,
     y2BlankHandling,
     y1BlankHandling,
+    maxHandling,
     y2MinSetting,
     y1MinSetting,
     y1ValueHandling,
@@ -156,6 +163,12 @@ export default function DateGraph() {
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
     setLineStyle(event.target.value);
+  };
+
+  const handleMaxHandlingChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setMaxHandling(event.target.value);
   };
 
   const updateChartData = async (categories: string[]) => {
@@ -264,37 +277,76 @@ export default function DateGraph() {
       };
     });
 
-    if (alignedDatasets.length === 2) {
+    if (alignedDatasets.length >= 1) {
       const x = alignedDatasets[0].data;
-      const y = alignedDatasets[1].data;
+      const y = alignedDatasets.length === 2 ? alignedDatasets[1].data : null;
       let sumX = 0,
         sumY = 0,
         sumXY = 0,
         sumX2 = 0,
         sumY2 = 0,
-        n = 0;
+        localMax = -1000,
+        nX = 0,
+        nY = 0,
+        nPairs = 0;
 
       for (let i = 0; i < newAllDatesSorted.length; i++) {
-        const xVal = x[i] !== undefined ? x[i] : 0;
-        const yVal = y[i] !== undefined ? y[i] : 0;
-        if (xVal !== null && yVal !== null) {
+        const xVal = x[i] ?? null;
+        const yVal = y?.[i] ?? null;
+
+        if (xVal !== null) {
           sumX += xVal;
-          sumY += yVal;
-          sumXY += xVal * yVal;
           sumX2 += xVal * xVal;
+          nX++;
+          localMax = Math.max(localMax, xVal);
+        }
+        if (yVal !== null) {
+          sumY += yVal;
           sumY2 += yVal * yVal;
-          n++;
+          nY++;
+          localMax = Math.max(localMax, yVal);
+        }
+        if (xVal !== null && yVal !== null) {
+          sumXY += xVal * yVal;
+          nPairs++;
         }
       }
 
-      const numerator = n * sumXY - sumX * sumY;
-      const denominator = Math.sqrt(
-        (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY)
+      setY1Average(nX > 0 ? (sumX / nX).toFixed(3) : "");
+      setY1StandardDev(
+        nX > 0
+          ? Math.sqrt(nX > 1 ? sumX2 / nX - (sumX / nX) ** 2 : 0).toFixed(3)
+          : ""
       );
-      const correlationValue = denominator === 0 ? 0 : numerator / denominator;
-      setCorrelation(Number(correlationValue.toFixed(3)));
+      setY2Average(nY > 0 ? (sumY / nY).toFixed(3) : "");
+      setY2StandardDev(
+        nY > 0
+          ? Math.sqrt(nY > 1 ? sumY2 / nY - (sumY / nY) ** 2 : 0).toFixed(3)
+          : ""
+      );
+
+      setCorrelation(
+        alignedDatasets.length === 2 && nPairs >= 2
+          ? Number(
+              (
+                (nPairs * sumXY - sumX * sumY) /
+                  Math.sqrt(
+                    (nPairs * sumX2 - sumX * sumX) *
+                      (nPairs * sumY2 - sumY * sumY)
+                  ) || 0
+              ).toFixed(3)
+            )
+          : null
+      );
+      console.log("Setting max value to ", localMax);
+      setMaxValue(localMax);
     } else {
+      setY1Average("");
+      setY2Average("");
+      setY1StandardDev("");
+      setY2StandardDev("");
       setCorrelation(null);
+      setMaxValue(-1000);
     }
 
     setChartData({
@@ -303,6 +355,7 @@ export default function DateGraph() {
     });
     setLoading(false);
   };
+
   const options = useMemo(
     () => ({
       responsive: true,
@@ -353,6 +406,12 @@ export default function DateGraph() {
             drawOnChartArea: false,
           },
           min: y1MinSetting === "zeroize" ? 0 : undefined,
+          max:
+            maxHandling === "default"
+              ? undefined
+              : maxHandling === "match"
+              ? maxValue
+              : parseInt(maxHandling, 10),
         },
         y2: {
           type: "linear" as const,
@@ -363,6 +422,12 @@ export default function DateGraph() {
             color: cat_2_color,
           },
           min: y2MinSetting === "zeroize" ? 0 : undefined,
+          max:
+            maxHandling === "default"
+              ? undefined
+              : maxHandling === "match"
+              ? maxValue
+              : parseInt(maxHandling, 10),
         },
       },
     }),
@@ -384,6 +449,40 @@ export default function DateGraph() {
               Correlation Coefficient: {correlation}
             </Text>
           )}
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            {[0, 1].map((index) => (
+              <Text key={`Average${index}`}>
+                {(index == 0 ? y1Average : y2Average) != ""
+                  ? index == 0
+                    ? `Average: ${y1Average}`
+                    : `Average: ${y2Average}`
+                  : ""}
+              </Text>
+            ))}
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            {[0, 1].map((index) => (
+              <Text key={`SD${index}`}>
+                {(index == 0 ? y1StandardDev : y2StandardDev) != ""
+                  ? index == 0
+                    ? `SD: ${y1StandardDev}`
+                    : `SD: ${y2StandardDev}`
+                  : ""}
+              </Text>
+            ))}
+          </Grid>
           <Grid
             margin="1rem 0"
             autoFlow="column"
@@ -574,6 +673,31 @@ export default function DateGraph() {
                 <option value="0.3">Tension: 0.3</option>
                 <option value="0.4">Tension: 0.4</option>
                 <option value="0.5">Tension: 0.5</option>
+              </select>
+            </div>
+          </Grid>
+          <Grid
+            margin="1rem 0"
+            autoFlow="column"
+            justifyContent="center"
+            gap="1rem"
+            alignContent="center"
+          >
+            <div className={styles.formGroup}>
+              <select
+                className={styles.multiSelect}
+                value={maxHandling}
+                onChange={handleMaxHandlingChange}
+              >
+                <option value="default">Max: Default</option>
+                <option value="match">Max: Match</option>
+                <option value="1">Max: 1</option>
+                <option value="2">Max: 2</option>
+                <option value="10">Max: 10</option>
+                <option value="100">Max: 100</option>
+                <option value="1000">Max: 1000</option>
+                <option value="10000">Max: 10000</option>
+                {/* <option value="filled">Filled</option> */}
               </select>
             </div>
           </Grid>

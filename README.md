@@ -33,6 +33,12 @@ npm run dev
 npx ampx sandbox
 ```
 
+## Set Up on New Machine
+1. Clone
+2. Run `npm install`
+3. Run `npx ampx sandbox`
+4. Run `npm run dev`
+
 ## Update Licenses
 
 ```
