@@ -7,7 +7,6 @@ import {
   deleteDataCategory,
   updateDataEntry,
   client,
-  createDataCategory,
   duplicateDataCategory,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
