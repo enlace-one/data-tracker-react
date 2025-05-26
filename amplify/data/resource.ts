@@ -30,6 +30,7 @@ const schema = a
         note: a.string(),
         addDefault: a.boolean().required(),
         defaultValue: a.string(),
+        useLastEntryAsDefaultValue: a.boolean(),
         options: a.string().array(), // For future use with options of values
         dataEntries: a.hasMany("DataEntry", "dataCategoryId"),
         dataTypeId: a.string(), // ✅ Explicitly define the reference field

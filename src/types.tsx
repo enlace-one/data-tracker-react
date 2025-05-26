@@ -55,6 +55,7 @@ export interface FormDataType {
   isComplex?: boolean;
   defaultValue?: string;
   addDefault?: boolean;
+  useLastEntryAsDefaultValue?: boolean;
   dataTypeId?: string;
   dataCategoryId?: string;
   inputType?: string;

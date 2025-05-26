@@ -73,13 +73,15 @@ export async function createDataCategory(formData: FormData): Promise<void> {
     throw new Error("Error: Duplicate category name");
   }
 
-  console.log("Adding category:", formData.name);
+  console.log("Adding category:", formData.name, "with form data:");
+  console.log(formData)
 
   const { errors } = await client.models.DataCategory.create({
     name: formData.name || "",
     defaultValue: formData.defaultValue || "",
     note: formData.note || "",
     addDefault: formData.addDefault ?? false,
+    useLastEntryAsDefaultValue: formData.useLastEntryAsDefaultValue ?? false,
     dataTypeId: formData.dataTypeId!,
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
@@ -271,6 +273,7 @@ export async function updateDataCategory(formData: FormData): Promise<void> {
     defaultValue: formData.defaultValue || "",
     note: formData.note || "",
     addDefault: formData.addDefault ?? false,
+    useLastEntryAsDefaultValue: formData.useLastEntryAsDefaultValue ?? false, 
     dataTypeId: formData.dataTypeId!,
     positiveIncrement: Number(formData.positiveIncrement || "1"),
     negativeIncrement: Number(formData.negativeIncrement || "1"),
@@ -357,6 +360,37 @@ export async function updateDataCategoryLastEntryDate(
   } else {
     console.log("Successfully updated category entry date:", date);
   }
+}
+
+
+/**
+ * Updates the entry count for a data category.
+ * @param {string} categoryId - The ID of the data category.
+ * @param {number} adjustment - The adjustment value for the entry count.
+ * @returns {Promise<void>}
+ */
+export async function duplicateDataCategory(
+  category: EnrichedDataCategory,
+): Promise<void> {
+  console.log(
+    "Duplicating category for category:",
+    category.name
+  );
+
+  const formData = {
+    name: `${category.name} copy`,
+    defaultValue: category.defaultValue || "",
+    note: category.note || "",
+    addDefault: category.addDefault ?? false,
+    useLastEntryAsDefaultValue: category.useLastEntryAsDefaultValue ?? false, 
+    dataTypeId: category.dataTypeId!,
+    positiveIncrement: category.positiveIncrement,
+    negativeIncrement: category.negativeIncrement,
+    topicId: category.topicId!,
+    options: (category.options || []).join(",")
+  }
+
+  return await createDataCategory(formData as FormData)
 }
 
 // DataEntry Functions

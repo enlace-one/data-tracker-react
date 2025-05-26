@@ -7,6 +7,8 @@ import {
   deleteDataCategory,
   updateDataEntry,
   client,
+  createDataCategory,
+  duplicateDataCategory,
 } from "../../api"; // Make sure fetchDataTypes is imported
 import TextButton from "../../components/TextButton/TextButton";
 import { DataEntry, FormDataType, EnrichedDataCategory } from "../../types";
@@ -168,6 +170,15 @@ export default function CategoryDetail({ category }: Props) {
     });
   };
   const handleDeleteDataCategory = standardWrapper(_handleDeleteDataCategory);
+
+  const _handleDuplicateDataCategory = async () => {
+    await duplicateDataCategory(category)
+    setActionMessage({
+      message: "Data category duplicated successfully.",
+      type: "success",
+    });
+  };
+  const handleDuplicateDataCategory = standardWrapper(_handleDuplicateDataCategory);
 
   const _handleDeleteDataEntry = async (entryId: string) => {
     await deleteDataEntry(entryId);
@@ -364,6 +375,12 @@ export default function CategoryDetail({ category }: Props) {
                   <Button onClick={() => setFileUpload(false)}>Cancel</Button>
                 </Popup>
               )}
+              <Button
+                className={styles.lightMargin}
+                onClick={() => handleDuplicateDataCategory()}
+              >
+                Duplicate
+              </Button>
               <FlexForm
                 heading="Update Category"
                 fields={getUpdateCategoryFormFields(

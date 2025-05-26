@@ -103,6 +103,12 @@ export const getUpdateCategoryFormFields = (
       default: String(category.addDefault ?? false), // Ensure boolean conversion
     },
     {
+      name: "Use Last Entry as Default Value",
+      id: "useLastEntryAsDefaultValue",
+      type: "boolean",
+      default: String(category.useLastEntryAsDefaultValue ?? false), // Ensure boolean conversion
+    },
+    {
       name: "Default Value",
       id: "defaultValue",
       note: category.dataType?.note ?? "",
@@ -231,6 +237,11 @@ export const getAddCategorySecondaryFormFields = async (
     { name: "Name", id: "name", required: true },
     { name: "Note", id: "note" },
     { name: "Add Default", id: "addDefault", type: "boolean" },
+    {
+      name: "Use Last Entry as Default Value",
+      id: "useLastEntryAsDefaultValue",
+      type: "boolean"
+    },
     {
       name: "Default Value",
       id: "defaultValue",
