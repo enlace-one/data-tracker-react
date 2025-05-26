@@ -231,7 +231,17 @@ export function subscribeToDataCategories(
               ? topics.find((t) => t.imageLink === item.topicId)
               : undefined;
 
-            return { ...item, dataType, topic };
+            const computedDefaultValue = (() => {
+                if (item.useLastEntryAsDefaultValue && item.lastEntryValue) {
+                  return item.lastEntryValue;
+                } else if (item.defaultValue) {
+                  return item.defaultValue;
+                } else {
+                  return "";
+                }
+              })();
+
+            return { ...item, dataType, topic, computedDefaultValue };
           })
         );
 
@@ -340,7 +350,8 @@ export async function updateDataCategoryEntryCount(
  */
 export async function updateDataCategoryLastEntryDate(
   categoryId: string,
-  date: string
+  date: string,
+  value: string,
 ): Promise<void> {
   console.log(
     "Updating category last entry for category:",
@@ -352,6 +363,7 @@ export async function updateDataCategoryLastEntryDate(
   const { errors: updateErrors } = await client.models.DataCategory.update({
     id: categoryId,
     lastEntryDate: date,
+    lastEntryValue: value,
   });
 
   if (updateErrors) {

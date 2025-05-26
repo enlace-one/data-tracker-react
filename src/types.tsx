@@ -88,6 +88,8 @@ export type EnrichedDataCategory = Schema["DataCategory"]["type"] & {
   dataType: ResolvedDataType;
 } & {
   topic: ResolvedTopic;
+} & {
+  computedDefaultValue: string;
 };
 
 export type ResolvedDataCategory = Omit<

@@ -37,6 +37,7 @@ const schema = a
         topicId: a.string(), //
         macros: a.hasMany("Macro", "dataCategoryId"),
         lastEntryDate: a.date(),
+        lastEntryValue: a.string(),
         positiveIncrement: a.float().default(1),
         negativeIncrement: a.float().default(1),
         entryCount: a.integer().default(0),

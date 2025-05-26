@@ -253,7 +253,7 @@ export default function Day() {
         await createDataEntry({
           dataCategoryId: categoryId,
           date: date,
-          value: category.defaultValue ?? "", // Ensure a valid default value is set
+          value: category.computedDefaultValue,
         });
         console.log("Category added successfully");
         // await fetchEntries(); // Refresh entries after adding a new one

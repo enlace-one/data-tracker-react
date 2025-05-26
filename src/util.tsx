@@ -303,8 +303,8 @@ export async function setLastEntryDates(
       const entry = dataEntries.find(
         (entry) => entry.dataCategoryId === cat.id
       );
-      if (entry && entry.date !== cat.lastEntryDate) {
-        await updateDataCategoryLastEntryDate(cat.id, entry.date);
+      if (entry && (entry.date !== cat.lastEntryDate || entry.value !== cat.lastEntryValue)) {
+        await updateDataCategoryLastEntryDate(cat.id, entry.date, entry.value);
       }
       catsDone.push(cat.id);
     }

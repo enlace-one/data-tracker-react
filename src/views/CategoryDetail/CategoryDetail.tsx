@@ -343,11 +343,19 @@ export default function CategoryDetail({ category }: Props) {
               <br />
               Add Default: {category.addDefault ? "True" : "False"}
               <br />
+              Use Last Entry as Default: {category.useLastEntryAsDefaultValue ? "True" : "False"}
+              <br/>
               Default Value: {category.defaultValue}
               <br />
               Positive Increment: {category.positiveIncrement}
               <br />
               Negative Increment: {category.negativeIncrement}
+              {SETTINGS.debug && <>
+                <br />
+                Last Entry Date: {category.lastEntryDate}
+                <br />
+                Last Entry Value: {category.lastEntryValue}
+              </>}
             </td>
             <td>
               <Button
