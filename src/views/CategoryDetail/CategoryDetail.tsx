@@ -1,4 +1,4 @@
-import { Heading, Divider, Button, Pagination } from "@aws-amplify/ui-react";
+import { Heading, Divider, Button, Pagination, Flex } from "@aws-amplify/ui-react";
 import { useData } from "../../DataContext";
 import {
   createDataEntry,
@@ -22,7 +22,8 @@ import {
 } from "../../formFields";
 import styles from "./CategoryDetail.module.css";
 import { useState, useEffect, ChangeEvent } from "react";
-import { TOPIC_IMAGE_PATH } from "../../settings";
+import { TOPIC_IMAGE_PATH, UI_IMAGE_PATH } from "../../settings";
+import HoverText from "../../components/HoverText/HoverText";
 
 interface Props {
   category: EnrichedDataCategory;
@@ -39,6 +40,7 @@ export default function CategoryDetail({ category }: Props) {
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [hasMorePages, setHasMorePages] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const fetchEntries = async (token: string | null) => {
     const { data: fetchedEntries, nextToken } =
@@ -313,6 +315,10 @@ export default function CategoryDetail({ category }: Props) {
     setFileUpload(true);
   };
 
+  const toggleMoreMenu = () => {
+    setIsMoreOpen((prev) => !prev);
+  };
+
   return (
     <>
       {/* <Button onClick={onBack}>⬅ Back</Button> */}
@@ -357,31 +363,41 @@ export default function CategoryDetail({ category }: Props) {
               </>}
             </td>
             <td>
-              <Button
-                className={styles.lightMargin}
-                onClick={() => handleDeleteDataCategory(category.id)}
-              >
-                Delete
-              </Button>
-              <Button
-                className={styles.lightMargin}
-                onClick={handleExportToCSV}
-              >
-                Export
-              </Button>
-              <Button className={styles.lightMargin} onClick={handleImport}>
-                Import
-              </Button>
-              {fileUpload && (
-                <Popup>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={handleFileUpload}
-                  />
-                  <Button onClick={() => setFileUpload(false)}>Cancel</Button>
-                </Popup>
-              )}
+            <Flex direction="column" gap=".5rem">
+            <Button
+              className={styles.lightMargin}
+              onClick={toggleMoreMenu}
+            >
+              <HoverText onHoverText="More">
+                <img
+                  src={UI_IMAGE_PATH + "more-icon.svg"}
+                  alt="More"
+                  style={{ width: "1.5rem", height: "1.5rem" }}
+                />
+              </HoverText>
+            </Button>
+            {isMoreOpen && (<>
+  
+    <Button
+      className={styles.lightMargin}
+      onClick={() => handleDeleteDataCategory(category.id)}
+    >
+      Delete
+    </Button>
+    <Button
+      className={styles.lightMargin}
+      onClick={handleExportToCSV}
+    >
+      Export
+    </Button>
+    <Button
+      className={styles.lightMargin}
+      onClick={handleImport}
+    >
+      Import
+    </Button></>
+)}
+              {!isMoreOpen && (<>
               <Button
                 className={styles.lightMargin}
                 onClick={() => handleDuplicateDataCategory()}
@@ -407,6 +423,18 @@ export default function CategoryDetail({ category }: Props) {
               >
                 <Button className={styles.lightMargin}>Add Entry</Button>
               </FlexForm>
+              </>)}
+              </Flex>
+              {fileUpload && (
+                <Popup>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileUpload}
+                  />
+                  <Button onClick={() => setFileUpload(false)}>Cancel</Button>
+                </Popup>
+              )}
             </td>
           </tr>
         </tbody>
